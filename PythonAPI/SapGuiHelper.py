@@ -4,6 +4,7 @@ import re
 import pymsgbox
 import win32com.client
 import time
+from SapTCodes import *
 
 class SapKeys:
     ENTER = 0
@@ -72,36 +73,6 @@ class SapKeys:
     CTRL_G = 84
     CTRL_R = 85
     CTRL_P = 86
-
-class SapConnNames:
-    ECC = '1. ECC - Produção (DFP)'
-    EWM = '2. EWM - Produção (EWP)'
-
-class SapTransactions:
-    LOGIN = "S000" # Tela de login
-    MAIN_MENU = "SESSION_MANAGER" # Menu principal
-    TRANS_EWM_MONITOR = "/SCWM/MON" # Monitor de WM
-
-class SapPrograms:
-    LOGIN = "SAPMSYST" # Tela de login
-    MAIN_MENU = "SAPLSMTR_NAVIGATION" # Menu principal
-
-class SapFields:
-    #Geral
-    ALERTS_BAR = "wnd[0]/sbar/pane[0]"
-    
-    # Tela de login
-    LOGIN_USERNAME = "wnd[0]/usr/txtRSYST-BNAME"
-    LOGIN_PASSWORD = "wnd[0]/usr/pwdRSYST-BCODE"
-    LOGIN_MANDT = "wnd[0]/usr/txtRSYST-MANDT"
-    LOGIN_BNT_MULTI_FORCE = "wnd[1]/usr/radMULTI_LOGON_OPT1"
-    LOGIN_LABEL_COUNT_FAILS = "wnd[1]/usr/txtMESSTXT1"
-    
-    # Pop-up confirmação de logoff
-    POPUP_LOGOFF_WARNING = "wnd[1]/usr/txtSPOP-TEXTLINE1"
-    POPUP_LOGOFF_QUESTION = "wnd[1]/usr/txtSPOP-TEXTLINE2"
-    POPUP_LOGOFF_BNT_YES = "wnd[1]/usr/btnSPOP-OPTION1"
-    POPUP_LOGOFF_BNT_NO = "wnd[1]/usr/btnSPOP-OPTION2"
 
 class SapHelper():
     ''' Classe com funções básicas de ajudar
@@ -1059,7 +1030,7 @@ class SapGui():
                     return self.LoginSignIn(session, try_max - 1)
                 return None
             
-            force_sign_bnt = session.findById(SapFields.LOGIN_BNT_MULTI_FORCE, False)
+            force_sign_bnt = session.findById(SapFields.POPUP_MULTI_LOGIN_RAD_FORCE, False)
             
             if force_sign_bnt is not None:
                 if self.login_force_method == 'Exit':
@@ -1078,7 +1049,7 @@ class SapGui():
                     new_session = self.sap_logon.OpenConnection(conn_name)
                     return self.LoginSignIn(new_session, try_max)
             
-            field_count_fails = session.findById(SapFields.LOGIN_LABEL_COUNT_FAILS, False)
+            field_count_fails = session.findById(SapFields.POP_UP_COUNT_FAILS_LABEL_LINE_1, False)
             if field_count_fails is not None: session.SendKey(SapKeys.ENTER)
             
             copy_r = session.findById('wnd[1]')

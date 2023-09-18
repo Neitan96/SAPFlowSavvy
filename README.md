@@ -25,7 +25,7 @@ session = sap_gui.GetSessionLoged()
 * Funções para lidar com a maioria dos companetes do SAP Gui
 
 ### Todo only Python:
-* Nenhuma
+* Classes que refletem a API do SAP Gui
 
 ### Todo only VBA:
 * Voltar ao menu principal ao fazer login
