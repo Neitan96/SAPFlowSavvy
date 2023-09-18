@@ -5,9 +5,6 @@ import pymsgbox
 import win32com.client
 import time
 
-# TODO:
-# - Criar uma classe de registros(log)
-
 class SapKeys:
     ENTER = 0
     F1 = 1
@@ -76,6 +73,10 @@ class SapKeys:
     CTRL_R = 85
     CTRL_P = 86
 
+class SapConnNames:
+    ECC = '1. ECC - Produção (DFP)'
+    EWM = '2. EWM - Produção (EWP)'
+
 class SapTransactions:
     LOGIN = "S000" # Tela de login
     MAIN_MENU = "SESSION_MANAGER" # Menu principal
@@ -95,6 +96,12 @@ class SapFields:
     LOGIN_MANDT = "wnd[0]/usr/txtRSYST-MANDT"
     LOGIN_BNT_MULTI_FORCE = "wnd[1]/usr/radMULTI_LOGON_OPT1"
     LOGIN_LABEL_COUNT_FAILS = "wnd[1]/usr/txtMESSTXT1"
+    
+    # Pop-up confirmação de logoff
+    POPUP_LOGOFF_WARNING = "wnd[1]/usr/txtSPOP-TEXTLINE1"
+    POPUP_LOGOFF_QUESTION = "wnd[1]/usr/txtSPOP-TEXTLINE2"
+    POPUP_LOGOFF_BNT_YES = "wnd[1]/usr/btnSPOP-OPTION1"
+    POPUP_LOGOFF_BNT_NO = "wnd[1]/usr/btnSPOP-OPTION2"
 
 class SapHelper():
     ''' Classe com funções básicas de ajudar
@@ -188,15 +195,18 @@ class SapColletion(object):
     def CountItens(self) -> int:
         ''' Retorna a quantidade de itens da lista
         '''
-        return self.collection.Children.Count
+        try: return self.collection.Children.Count
+        except: return 0
     
     def GetAllItens(self) -> [object]:
         ''' Retorna uma array com todos os itens da lista
         '''
-        itens = []
-        for index in range(0, self.collection.Children.Count):
-            itens.append(self.collection.Children(index))
-        return itens
+        try:
+            itens = []
+            for index in range(0, self.collection.Children.Count):
+                itens.append(self.collection.Children(index))
+            return itens
+        except: return []
 
     def GetTypeDescription(self) -> str:
         ''' Retorna a descrição do tipo de itens da lista
@@ -211,7 +221,8 @@ class SapColletion(object):
     def GetLastItem(self) -> object:
         ''' Retorna o último item da lista
         '''
-        return self.collection.Children(self.CountItens()-1)
+        try: return self.collection.Children(self.CountItens()-1)
+        except: return None
 
 class SapCredentials():
     ''' Classe para gerenciamentos de credenciais do SAP
@@ -466,7 +477,7 @@ class SapInit():
             # SapHelper.PrintError('SAP Init', 'Erro ao verificar se o SAP está aberto')
         return False
     
-    def StartProcess(self, step_check: int = 3, wait_seconds: int = 10) -> bool:
+    def StartProcess(self, step_check: int = 5, wait_seconds: int = 30) -> bool:
         ''' Inicia o SAP Logon
 
         Abre o executavel do SAP Logon de acordo com o argumento sap_logon_path,
@@ -493,7 +504,10 @@ class SapInit():
         except:
             SapHelper.PrintError('SAP Init', 'Erro ao iniciar o programa do SAP')
         return False
-
+    
+    def KillProcess(self) -> None:
+        os.system('taskkill -f -im saplogon.exe')
+    
     def GetSapGui(self) -> object:
         ''' Obtém o objeto do SAP Gui
 
@@ -551,8 +565,6 @@ class SapInit():
 
         * Caso o SAP Logon não estiver aberto e o argumento auto_start for True,
         a função iniciará o SAP Logon
-        * Se não for encontrada nenhuma conexão aberta e o argumento auto_start for True,
-        a função irá abrir uma conexão.
 
         Parameters
         ----------
@@ -563,33 +575,16 @@ class SapInit():
         '''
         try:
             if sap_app is None: sap_app = self.GetSapApp()
-            connections = sap_app.Connections
-            connections_get = []
-            
-            if connections is None or connections.Count < 1:
-                if SapHelper.CheckStrings(conn_name) and self.auto_start:
-                    new_conn = self.OpenConnection(conn_name)
-                    if new_conn is not None: return [SapConnection(self.OpenConnection(conn_name))]
-                    else: return None
-                else: return None
-            
-            for conn_index in range(0, connections.Count):
-                if sap_app.Children(conn_index).Description == conn_name:
-                    connections_get.append(SapConnection(sap_app.Children(conn_index)))
-            
-            if len(connections_get) < 1 and self.auto_start and SapHelper.CheckStrings(conn_name):
-                new_conn = SapInit.OpenConnection(conn_name)
-                if new_conn is not None: return [SapConnection(SapInit.OpenConnection(conn_name))]
-                else: return None
-            
-            return connections_get
+            connections = SapColletion(sap_app)
+            connections = list(filter(lambda conn: conn.Description == conn_name, connections.GetAllItens()))
+            return list(map(lambda conn: SapConnection(conn), connections))
                 
         except:
           SapHelper.PrintError('SAP Init', 'Erro ao obter conexões do SAP')
         return None
 
-    def SearchSessionInMenu(self, conn_name: str, sap_app: object = None) -> 'SapSession':
-        ''' Procura uma conexão SAP que tenha uma sessão aberta no menu princiapal.
+    def GetSessionInMenuLogin(self, conn_name: str, sap_app: object = None) -> 'SapSession':
+        ''' Procura uma conexão SAP que tenha uma sessão aberta no menu princiapal ou na tela login.
 
         * Caso o SAP Logon não estiver aberto e o argumento auto_start for True,
         a função iniciará o SAP Logon
@@ -597,7 +592,7 @@ class SapInit():
         a função irá abrir uma conexão.
         * Se tiver conexão aberta e não encontrar nenhuma sessão no menu principal
         e o argumento auto_start for True a função irá abrir uma nova sessão na primeira 
-        conexão aberta encontrada.
+        conexão aberta encontrada ou uma que esteja na tela de login.
 
         Parameters
         ----------
@@ -608,15 +603,21 @@ class SapInit():
         '''
         try:
             connections = self.GetConnections(conn_name, sap_app)
-            in_menu = list(map(lambda conn: conn.GetSessionsInMenu(), connections))
-            conns_menu = list(filter(lambda conns: len(conns) > 0, in_menu))
-            if len(conns_menu) > 0:
-                return conns_menu[0][0]
-            else:
-                if self.auto_start:
-                    if len(connections) <= 0:
-                        connections = [self.OpenConnection(conn_name, sap_app)]
+            
+            sessions = list(map(lambda conn: conn.GetSessionsInMenu(), connections))
+            sessions = list(filter(lambda conns: len(conns) > 0, sessions))
+            if len(sessions) > 0: return sessions[0][0]
+            
+            sessions = list(map(lambda conn: conn.GetSessionsInLogin(), connections))
+            sessions = list(filter(lambda conns: len(conns) > 0, sessions))
+            if len(sessions) > 0: return sessions[0][0]
+            
+            if self.auto_start:
+                if len(connections) > 0:
                     return connections[0].OpenNewSession()
+                else:
+                    return self.OpenConnection(conn_name, sap_app).GetLastSession()
+            
             return None
             
         except:
@@ -631,9 +632,6 @@ class SapConnection(object):
     connection : object
         Objeto da conexão SAP
     '''
-    
-    ECC = '1. ECC - Produção (DFP)'
-    EWM = '2. EWM - Produção (EWP)'
     
     def __init__(self, connection: object):
         '''
@@ -669,6 +667,11 @@ class SapConnection(object):
         ''' Obtém todas sessões abertas no menu principal
         '''
         return list(filter(lambda session: session.info.CheckTransaction(SapTransactions.MAIN_MENU), self.GetAllSessions()))
+    
+    def GetSessionsInLogin(self) -> ['SapSession']:
+        ''' Obtém todas sessões abertas no menu principal
+        '''
+        return list(filter(lambda session: session.info.CheckTransaction(SapTransactions.LOGIN), self.GetAllSessions()))
     
     def GetSessionsUser(self, user_name: str) -> ['SapSession']:
         ''' Obtém todas sessões abertas do usuário especificado no parâmetro
@@ -794,7 +797,7 @@ class SapSession(object):
             SapHelper.PrintError('Sap Session', 'Erro ao criar uma nova sessão do SAP')
         return None
     
-    def findById(self, id: str) -> object:
+    def findById(self, id: str, show_warning: bool = True) -> object:
         ''' Obtém um objeto pelo ID
 
         Parameters
@@ -803,7 +806,8 @@ class SapSession(object):
             ID do objeto
         '''
         try: return self.session.findById(id)
-        except: SapHelper.PrintWaring('Sap Session', f'Id ({id}) não encontrado na sessão')
+        except:
+            if show_warning: SapHelper.PrintWaring('Sap Session', f'Id ({id}) não encontrado na sessão')
         return None
 
     def GetAlertBarMsg(self) -> str:
@@ -864,11 +868,17 @@ class SapSession(object):
         ''' Fecha a sessão atual
         '''
         self.ExecuteCommand('/i')
+        try:
+            popup_text = self.findById(SapFields.POPUP_LOGOFF_QUESTION).Text
+            if 'logoff' in popup_text or 'log off' in popup_text:
+                self.findById(SapFields.POPUP_LOGOFF_BNT_YES).Press()
+        except: pass
         
     def BackToMenu(self) -> bool:
         ''' Volta ao menu principal
         '''
-        self.ExecuteCommand('/n')
+        if not self.info.CheckTransaction(SapTransactions.MAIN_MENU):
+            self.OpenTransaction('/n')
         return self.info.CheckTransaction(SapTransactions.MAIN_MENU)
 
     def LockUser(self):
@@ -922,9 +932,13 @@ class SapSession(object):
 
 class SapGui():
     ''' Classe principal para gerenciamento dos objetos do SAP
-
-    Attributes
+    
+    Parameters
     ----------
+    credentials : 'SapCredentials'
+        Instancia de gerencimento de credenciais
+    sap_logon : 'SapInit'
+        Instancia para inicialização e obtenção de objetos do SAP
     login_storage_method : str
         O tipo de armazenamento de login, sendo:
         * 'FileTemp' para armazenar em arquivo
@@ -935,29 +949,81 @@ class SapGui():
         * 'Force' para derrubar o usuário
         * 'Exit' finaliza o script
         * 'Wait' Espera o usuário deslogar da outra máquina
-    login_wait_seconds : str
+    login_wait_seconds : int
         O intervalo de tempo em segundos entre as checagens de liberação do login
         para o caso do login_force_method ser 'Wait'
-    
-    Parameters
-    ----------
-    credentials : 'SapCredentials'
-        Instancia de gerencimento de credenciais
-    sap_logon : 'SapInit'
-        Instancia para inicialização e obtenção de objetos do SAP
+    conns_names : SapConnNames
+        Enum com os nome de conexões SAP
+    transactions : SapTransactions
+        Enum com a lista de transações do SAP
+    programs : SapPrograms
+        Enum com a lista de programas do SAP
+    fields : SapFields
+        Enum com a lista de ids de campos do SAP
+    keys : SapKeys
+        Enum com a lista de teclas para o SAP
     '''
     
-    login_storage_method = 'FileTemp'
-    login_force_method = 'Force'
-    login_wait_seconds = 10
+    conns_names = SapConnNames()
+    transactions = SapTransactions()
+    programs = SapPrograms()
+    fields = SapFields()
+    keys = SapKeys()
 
-    def __init__(self):
-        if SapGui.login_storage_method == 'Wait': self.credentials = None
-        elif SapGui.login_storage_method == 'InputBox': self.credentials = SapCredentials(None)
+    def __init__(self, auto_start: bool = True, login_storage_method: str = 'FileTemp', \
+                    login_force_method = 'Force', login_wait_seconds = 10, \
+                    sap_logon_path: str = r'C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe'):
+        '''
+        Parameters
+        ----------
+        auto_start : bool, optional
+            Se deseja iniciar automaticamente o SAP caso esteja fechado
+        login_storage_method : str, optional
+            O tipo de armazenamento de login, sendo:
+            * 'FileTemp' para armazenar em arquivo
+            * 'InputBox' pede as credenciais por meio de inputbox e armazena apenas no cahe
+            * 'Wait' Espera o usuário logar e continua o script
+        login_force_method : str, optional
+            A tratativa para quando ao fazer login o usuário já estiver logado, sendo:
+            * 'Force' para derrubar o usuário
+            * 'Exit' finaliza o script
+            * 'Wait' Espera o usuário deslogar da outra máquina
+        login_wait_seconds : int, optional
+            O intervalo de tempo em segundos entre as checagens de liberação do login
+            para o caso do login_force_method ser 'Wait'
+        login_storage_method : str, optional
+            O tipo de armazenamento de login, sendo:
+            * 'FileTemp' para armazenar em arquivo
+            * 'InputBox' pede as credenciais por meio de inputbox e armazena apenas no cahe
+            * 'Wait' Espera o usuário logar e continua o script
+        sap_logon_path : str, optional
+            Caminho do arquivo do executavel do SAP Logon.
+        '''
+        
+        if login_storage_method == 'Wait': self.credentials = None
+        elif login_storage_method == 'InputBox': self.credentials = SapCredentials(None)
         else: self.credentials = SapCredentials()
         
-        self.sap_logon = SapInit()
+        self.sap_logon = SapInit(auto_start=auto_start, sap_logon_path=sap_logon_path)
+        self.login_force_method = login_force_method
+        self.login_wait_seconds = login_wait_seconds
+    
+    def GetSessionLoged(self, conn_name: str) -> 'SapSession':
+        ''' Obtém uma sessão logada
         
+        Obtém uma sessão no menu principal, podendo ser uma que já esteja aberta,
+        caso não tenha nenhuma aberta e o parâmetro auto_start do SapInit for True
+        ele abrirá uma nova sessão.
+        
+        Parameters
+        ----------
+        conn_name : str
+            Nome da conexão do SAP
+        '''
+        session = self.sap_logon.GetSessionInMenuLogin(conn_name)
+        self.LoginSignIn(session)
+        return session
+    
     def LoginSignIn(self, session: 'SapSession', try_max: int = 3) -> 'SapSession':
         ''' Realiza o login no SAP
         
@@ -973,8 +1039,11 @@ class SapGui():
                 return session
             
             if self.credentials is None:
-                while not session.info.CheckTransaction(SapTransactions.LOGIN):
+                session.FocusWindows()
+                while session.info.CheckTransaction(SapTransactions.LOGIN):
                     time.sleep(1)
+                if SapSession.auto_minimize:
+                    session.Minimize()
                 return session
 
             user_name, password = self.credentials.GetCredentials(session.GetConnection().GetName())
@@ -990,40 +1059,35 @@ class SapGui():
                     return self.LoginSignIn(session, try_max - 1)
                 return None
             
-            force_sign_bnt = session.findById(SapFields.LOGIN_BNT_MULTI_FORCE)
+            force_sign_bnt = session.findById(SapFields.LOGIN_BNT_MULTI_FORCE, False)
             
             if force_sign_bnt is not None:
-                if self.login_force_Method == 'Exit':
+                if self.login_force_method == 'Exit':
                     session.SendKey(SapKeys.F12)
                     return None
                 
-                if self.login_force_Method == 'Force':
+                if self.login_force_method == 'Force':
                     force_sign_bnt.Select
                     session.SendKey(SapKeys.ENTER)
                     
-                if self.login_force_Method == 'Wait':
+                if self.login_force_method == 'Wait':
                     conn_name = session.GetConnection().GetName()
                     session.SendKey(SapKeys.F12)
-                    time.sleep(self.login_Wait_Seconds)
+                    time.sleep(self.login_wait_seconds)
                     
                     new_session = self.sap_logon.OpenConnection(conn_name)
                     return self.LoginSignIn(new_session, try_max)
             
-            field_count_fails = session.findById(SapFields.LOGIN_LABEL_COUNT_FAILS)
+            field_count_fails = session.findById(SapFields.LOGIN_LABEL_COUNT_FAILS, False)
             if field_count_fails is not None: session.SendKey(SapKeys.ENTER)
+            
+            copy_r = session.findById('wnd[1]')
+            if copy_r is not None and copy_r.Text == 'Copyright':
+                session.SendKey(SapKeys.ENTER)
+            
+            session.BackToMenu()
             
             return session
             
         except: SapHelper.PrintError('Sap Session', 'Erro ao fazer login no SAP')
         return False
-    
-    #Paramentros
-    #Init
-    #Conexões
-      #Sessões
-    #IDs
-    #Credentials
-
-sap_gui = SapGui()
-session = sap_gui.sap_logon.SearchSessionInMenu(SapConnection.EWM)
-sap_gui.LoginSignIn(session)

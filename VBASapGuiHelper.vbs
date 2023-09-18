@@ -8,13 +8,6 @@ Option Private Module
 ' VBAHelper: https://gist.github.com/Neitan96/5faf771139f8a5eaacf4838a1ec1417b
 
 '========--------========
-'          TODO
-'========--------========
-
-' 1. Funções para ler tabelas do SAP
-' 2. Função com janelas padrões (Filtro, multi-valores e etc.)
-
-'========--------========
 '     Configs da API
 '========--------========
 
@@ -738,6 +731,7 @@ Public Function InitSAP_Login(sap_session As Object, Optional try_count As Integ
     If CheckObject(radio_bnt_force) Then
         ' Verificando método de forçamento de login e executando a tratativa
         If SAP_Login_force_Method = "Exit" Then
+            SessionSAP_SendKey sap_session, SAP_KEY_F12
             InitSAP_Login = False
             Exit Function
             
