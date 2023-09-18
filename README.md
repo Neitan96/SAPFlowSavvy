@@ -3,7 +3,7 @@ Bibliotecas para auxiliar na automatização do SAP Gui
 
 ![Static Badge](https://img.shields.io/badge/Autor-Neitan96-purple?link=https%3A%2F%2Fgithub.com%2FNeitan96%2F)
 ![Static Badge](https://img.shields.io/badge/version-Alpha%200.1-blue)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://github.com/Neitan96/SapGuiApiHelper/blob/main/LICENSE)
 
 ## Exemplos:
 
@@ -22,6 +22,7 @@ session = sap_gui.GetSessionLoged()
   * Filtros
   * Etc
 * Verificar tela de login ao verificar timeout
+* Funções para lidar com a maioria dos companetes do SAP Gui
 
 ### Todo only Python:
 * Nenhuma
