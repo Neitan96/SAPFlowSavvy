@@ -12,6 +12,7 @@ OK:
 	- GuiSession
 	- GuiCollection
 	- GuiSessionInfo
+	- GuiVComponent
 
 TODO Components:
 
@@ -80,7 +81,6 @@ TODO Components:
 	- GuiToolbarControl
 	- GuiTree
 	- GuiUserArea
-	- GuiVComponent
 	- GuiVContainer
 	- GuiVHViewSwitch
 	- 
@@ -377,6 +377,134 @@ class SapGuiCollection():
         '''
         return self.component.TypeAsNumber
 
+class SapGuiVComponent(SapGuiComponent):
+    ''' A interface GuiVComponent é exposta por todos os objetos visuais, como janelas, botões ou campos de texto.
+    Assim como o GuiComponent, é uma interface abstrata. Qualquer objeto que suporte a interface GuiVComponent também expõe
+    a interface GuiComponent. GuiVComponent estende o objeto GuiComponent.
+    '''
+    
+    def DumpState(self, inner_object: str) -> SapGuiCollection:
+        ''' Esta função despeja o estado do objeto. O parâmetro innerObject pode ser usado para especificar para qual
+        objeto interno os dados devem ser despejados. Somente os componentes mais complexos, como o GuiCtrlGridView, suportam esse parâmetro.
+        Todos os outros componentes sempre descartam seu estado completo. Todos os componentes que suportam este parâmetro têm em
+        comum o fato de retornarem informações gerais sobre o estado do controle se o parâmetro “innerObject” contiver uma string vazia.
+        Os valores disponíveis para o parâmetro innerObject são especificados como parte da descrição da classe dos componentes que o suportam.
+        '''
+        return SapGuiCollection(self.component.DumpState(inner_object))
+    
+    def SetFocus(self) -> None:
+        ''' Esta função pode ser usada para definir o foco em um objeto. Se um usuário interagir com SAP GUI,
+        ele moverá o foco sempre que a interação for com um novo objeto. Interagir com um objeto por meio do componente
+        de script não altera o foco. Há alguns casos em que o aplicativo SAP verifica explicitamente o foco e
+        se comporta de maneira diferente dependendo do objeto em foco.
+        '''
+        self.component.SetFocus()
+    
+    def Visualize(self, on: bool, inner_object: str) -> bool:
+        ''' Chamar este método de um componente exibirá uma moldura vermelha ao redor do componente especificado se o parâmetro on for verdadeiro.
+        O quadro será removido se on for falso. Alguns componentes, como GuiCtrlGridView, suportam a exibição do quadro em torno de objetos internos,
+        como células. O formato da string innerObject é o mesmo do método dumpState.
+        '''
+        return self.component.Visualize(on, inner_object)
+    
+    def AccLabelCollection(self) -> SapGuiComponentCollection:
+        ''' A coleção contém objetos do tipo GuiLabel que foram atribuídos a este controle no ABAP Screen Painter.
+        '''
+        return self.component.AccLabelCollection
+    
+    def AccText(self) -> str:
+        ''' Um texto adicional para suporte de acessibilidade.
+        '''
+        return self.component.AccText
+    
+    def AccTextOnRequest(self) -> str:
+        ''' Um texto adicional para suporte de acessibilidade.
+        '''
+        return self.component.AccTextOnRequest
+    
+    def AccTooltip(self) -> str:
+        ''' Um texto de dica adicional para suporte de acessibilidade.
+        '''
+        return self.component.AccTooltip
+    
+    def Changeable(self) -> bool:
+        ''' Um objeto pode ser alterado se não estiver desabilitado nem somente leitura.
+        '''
+        return self.component.Changeable
+    
+    def DefaultTooltip(self) -> str:
+        ''' Texto de dica de ferramenta gerado a partir do texto curto definido no
+        dicionário de dados para determinado tipo de elemento de tela.
+        '''
+        return self.component.DefaultTooltip
+    
+    def IconName(self) -> str:
+        ''' Se ao objeto foi atribuído um ícone, então esta propriedade é o nome do ícone, caso contrário, é uma string vazia.
+        '''
+        return self.component.IconName
+    
+    def IsSymbolFont(self) -> bool:
+        ''' A propriedade é TRUE se o texto do componente for visualizado na fonte do símbolo SAP.
+        '''
+        return self.component.IsSymbolFont
+    
+    def Modified(self) -> bool:
+        ''' Um objeto é modificado se seu estado tiver sido alterado pelo usuário e essa alteração ainda não tiver sido enviada ao sistema SAP.
+        '''
+        return self.component.Modified
+    
+    def ParentFrame(self) -> bool:
+        ''' Se o controle estiver hospedado no objeto Frame, o valor da propriedade será esse quadro.
+        '''
+        # TODO
+        return self.component.ParentFrame
+    
+    def Text(self, text: str = None) -> str:
+        ''' O valor desta propriedade depende muito do tipo de objeto no qual ela é chamada.
+        Isto é óbvio para campos de texto ou itens de menu. Por outro lado, esta propriedade está vazia para botões da
+        barra de ferramentas e é o ID da classe para shells. Você pode ler a propriedade de texto de um rótulo, mas não
+        pode alterá-la, enquanto só pode definir a propriedade de texto de um campo de senha, mas não lê-la.
+        '''
+        if text is None: return self.component.Text
+        else:
+            self.component.Text = text
+            return self.component.Text
+    
+    def Tooltip(self) -> str:
+        ''' A dica de ferramenta contém um texto projetado para ajudar o usuário a entender o significado de um determinado campo de texto ou botão.
+        '''
+        return self.component.Tooltip
+    
+    def ScreenLeft(self) -> int:
+        ''' A posição y do componente nas coordenadas da tela.
+        '''
+        return self.component.ScreenLeft
+    
+    def ScreenTop(self) -> int:
+        ''' A posição x do componente nas coordenadas da tela.
+        '''
+        return self.component.ScreenTop
+    
+    def Top(self) -> int:
+        ''' Coordenada superior do elemento nas coordenadas da tela.
+        '''
+        return self.component.Top
+    
+    def Left(self) -> int:
+        ''' Posição esquerda do elemento nas coordenadas da tela.
+        '''
+        return self.component.Left
+    
+    def Width(self) -> int:
+        ''' Largura do componente em pixels.
+        '''
+        return self.component.Width
+    
+    def Height(self) -> int:
+        ''' Altura do componente em pixels.
+        '''
+        return self.component.Height
+    
 class SapGuiSessionInfo():
     ''' GuiSessionInfo é membro de todos os objetos GuiSession.
     Disponibiliza informações técnicas sobre a sessão. Algumas de suas propriedades são exibidas na
