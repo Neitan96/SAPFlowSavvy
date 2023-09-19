@@ -16,12 +16,12 @@ OK:
 	- GuiVContainer
 	- GuiFrameWindow
 	- GuiScrollbar
+	- GuiScrollContainer
 
 TODO Components:
 
 * Priority:
     * Objects:
-	- GuiScrollContainer
 	- GuiShell
 	- GuiContainerShell
 	- GuiContextMenu
@@ -259,7 +259,6 @@ class SapGuiScrollbar():
         '''
         if position is not None: self.component.Position = position
         return self.component.Position
-    
 
 class SapGuiComponentCollection(SapGuiComponent):
     ''' O GuiComponentCollection é usado para elementos de coleções, como a propriedade Children de contêineres.
@@ -567,6 +566,22 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiScrollContainer(SapGuiVContainer):
+    ''' Este contêiner representa subtelas roláveis. Uma subtela pode ser rolável sem realmente ter uma barra de rolagem,
+    porque a existência de uma barra de rolagem depende da quantidade de dados exibidos e do tamanho da GuiUserArea.
+    O prefixo do tipo é ssub, o nome é gerado a partir das configurações do dicionário de dados.
+    '''
+    
+    def HorizontalScrollbar(self) -> SapGuiScrollbar:
+        ''' A barra de rolagem horizontal do contêiner de rolagem.
+        '''
+        return SapGuiScrollbar(self.component.HorizontalScrollbar)
+    
+    def VerticalScrollbar(self) -> SapGuiScrollbar:
+        ''' A barra de rolagem vertical do contêiner de rolagem.
+        '''
+        return SapGuiScrollbar(self.component.VerticalScrollbar)
 
 class SapGuiFrameWindow(SapGuiVContainer):
     ''' Um GuiFrameWindow é um objeto visual de alto nível na hierarquia de tempo de execução.
