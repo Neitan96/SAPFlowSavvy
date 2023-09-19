@@ -13,6 +13,7 @@ OK:
 	- GuiCollection
 	- GuiSessionInfo
 	- GuiVComponent
+	- GuiVContainer
 
 TODO Components:
 
@@ -81,7 +82,6 @@ TODO Components:
 	- GuiToolbarControl
 	- GuiTree
 	- GuiUserArea
-	- GuiVContainer
 	- GuiVHViewSwitch
 	- 
 * Events
@@ -410,7 +410,7 @@ class SapGuiVComponent(SapGuiComponent):
     def AccLabelCollection(self) -> SapGuiComponentCollection:
         ''' A coleção contém objetos do tipo GuiLabel que foram atribuídos a este controle no ABAP Screen Painter.
         '''
-        return self.component.AccLabelCollection
+        return SapGuiComponentCollection(self.component.AccLabelCollection)
     
     def AccText(self) -> str:
         ''' Um texto adicional para suporte de acessibilidade.
@@ -504,7 +504,39 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
+    ''' Um objeto expõe a interface GuiVContainer se ela estiver visível e puder ter filhos.
+    Exemplos dessa interface são janelas e subtelas, barras de ferramentas ou controles com filhos, como o controle divisor.
+    GuiVContainer estende o objeto GuiContainer e o objeto GuiVComponent.
+    '''
     
+    def FindAllByName(self, name: str, type: str) -> SapGuiComponentCollection:
+        ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
+        No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção quando FindAllByName ou FindAllByNameEx forem usados.
+        '''
+        return SapGuiComponentCollection(self.component.FindAllByName(name, type))
+    
+    def FindAllByNameEx(self, name: str, type: int) -> SapGuiComponentCollection:
+        ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
+        No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção quando FindAllByName ou FindAllByNameEx forem usados.
+        '''
+        return SapGuiComponentCollection(self.component.FindAllByNameEx(name, type))
+    
+    def FindByName(self, name: str, type: str) -> SapGuiComponent:
+        # TODO
+        ''' Ao contrário de FindById, esta função não garante um resultado único.
+        Ele simplesmente retornará o primeiro descendente que corresponda aos parâmetros de nome e tipo.
+        Esta é uma descrição mais natural do objeto do que o ID complexo, mas só faz sentido em objetos dynpro,
+        pois a maioria dos outros objetos não tem um nome significativo. Se nenhum descendente com nome
+        e tipo correspondentes for encontrado, a função gera uma exceção.
+        '''
+        return SapTypeInstance.GetInstance(self.component.FindByName(name, type))
+    
+    def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
+        # TODO
+        return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
 class SapGuiSessionInfo():
     ''' GuiSessionInfo é membro de todos os objetos GuiSession.
     Disponibiliza informações técnicas sobre a sessão. Algumas de suas propriedades são exibidas na
