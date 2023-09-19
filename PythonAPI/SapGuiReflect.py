@@ -11,6 +11,7 @@ OK:
 	- GuiConnection
 	- GuiSession
 	- GuiCollection
+	- GuiSessionInfo
 
 TODO Components:
 
@@ -18,7 +19,6 @@ TODO Components:
     * Objects:
 	- GuiScrollbar
 	- GuiScrollContainer
-	- GuiSessionInfo
 	- GuiShell
 	- GuiFrameWindow
 	- GuiContainerShell
@@ -376,7 +376,161 @@ class SapGuiCollection():
         Os valores possíveis para esta propriedade são obtidos da enumeração GuiComponentType.
         '''
         return self.component.TypeAsNumber
-        
+
+class SapGuiSessionInfo():
+    ''' GuiSessionInfo é membro de todos os objetos GuiSession.
+    Disponibiliza informações técnicas sobre a sessão. Algumas de suas propriedades são exibidas na
+    área de informações do sistema (na barra de status ou na área de título dependendo do tema SAP GUI utilizado).
+    '''
+    
+    def __init__(self, component: object):
+        self.component = component
+    
+    def ApplicationServer(self) -> str:
+        ''' O nome do servidor de aplicação é definido somente se a sessão pertencer a uma conexão que
+        foi iniciada sem balanceamento de carga, especificando um servidor de aplicação.
+        '''
+        return self.component.ApplicationServer
+    
+    def Client(self) -> str:
+        ''' O cliente selecionado na tela de login.
+        '''
+        return self.component.Client
+    
+    def Codepage(self) -> int:
+        ''' A página de códigos especificada no SAP Logon nas propriedades da conexão.
+        '''
+        return self.component.Codepage
+    
+    def Flushes(self) -> int:
+        ''' A propriedade Flushes conta o número de liberações na fila de automação durante a comunicação do servidor.
+        '''
+        return self.component.Flushes
+    
+    def Group(self) -> str:
+        ''' As informações do grupo de login estarão disponíveis somente se a sessão
+        pertencer a uma conexão que foi iniciada usando balanceamento de carga.
+        '''
+        return self.component.Group
+    
+    def GuiCodepage(self) -> int:
+        ''' Uma lista de codepages está disponível na tabela TCP00A do sistema SAP.
+        Em um cliente executando Microsoft Windows com página de código 1252 (Latin I), a propriedade guiCodepage é 1160.
+        '''
+        return self.component.GuiCodepage
+    
+    def I18NMode(self) -> bool:
+        ''' O modo I18N do SAP GUI é necessário para conjuntos de caracteres multibyte.
+        '''
+        return self.component.I18NMode
+    
+    def InterpretationTime(self) -> int:
+        ''' O tempo de interpretação começa após a chegada dos dados do servidor.
+        Compreende a análise dos dados e distribuição para os elementos SAP GUI. A unidade é milissegundos.
+        '''
+        return self.component.InterpretationTime
+    
+    def IsLowSpeedConnection(self) -> bool:
+        ''' A propriedade é True se a conexão à qual pertence a sessão roda com flag de conexão de baixa velocidade.
+        Esse sinalizador pode ser definido na página de propriedades de conexão avançadas da caixa de diálogo SAPLogon.
+        O suporte ao SAP GUI Scripting é muito limitado para conexões de baixa velocidade, porque as informações necessárias
+        para identificar objetos SAP GUI não estão sendo enviadas.
+        '''
+        return self.component.IsLowSpeedConnection
+    
+    def Language(self) -> str:
+        ''' O idioma especificado na tela de login.
+        '''
+        return self.component.Language
+    
+    def MessageServer(self) -> str:
+        ''' As informações do servidor de mensagens estarão disponíveis somente se a
+        sessão pertencer a uma conexão que foi iniciada usando balanceamento de carga.
+        '''
+        return self.component.MessageServer
+    
+    def Program(self) -> str:
+        ''' O nome do programa de origem que está sendo executado no momento.
+        '''
+        return self.component.Program
+    
+    def ResponseTime(self) -> int:
+        ''' Este é o tempo gasto na comunicação da rede desde o momento em que os dados são
+        enviados ao servidor até o momento em que chega a resposta do servidor. A unidade é milissegundos.
+        '''
+        return self.component.ResponseTime
+    
+    def RoundTrips(self) -> int:
+        ''' Antes do SAP GUI enviar dados ao servidor, ele bloqueia a interface do usuário.
+        Em muitos casos, ele não desbloqueará a interface quando os dados chegarem do servidor,
+        mas enviará uma nova solicitação ao servidor imediatamente. Os controles, em particular,
+        usam essa tecnologia para carregar os dados necessários para visualização.
+        A contagem dessas alternâncias de token entre o SAP GUI e o servidor é a propriedade roundTrips.
+        '''
+        return self.component.RoundTrips
+    
+    def ScreenNumber(self) -> int:
+        ''' O número da tela exibida atualmente.
+        '''
+        return self.component.ScreenNumber
+    
+    def ScriptingModeReadOnly(self) -> bool:
+        ''' O modo somente leitura pode ser ativado usando um parâmetro de perfil do servidor de aplicativos.
+        Neste modo o estado das aplicações SAP não pode ser alterado através da API de Scripting, o que significa:
+        * As propriedades só podem ser lidas, mas não definidas
+        * As funções só podem ser chamadas se não alterarem o estado do controle.
+        Observações:
+        Neste modo, os scripts podem ser gravados e as informações sobre o aplicativo podem ser lidas no SAP GUI,
+        no entanto, uma transação não pode ser executada a partir de um script.
+        '''
+        return self.component.ScriptingModeReadOnly
+    
+    def ScriptingModeRecordingDisabled(self) -> bool:
+        ''' O modo de gravação desabilitada pode ser habilitado usando um parâmetro de perfil do servidor de aplicativos.
+        Neste modo, o SAP GUI Scripting não dispara nenhum evento. Isso implica que a interação do usuário não pode ser registrada.
+        No entanto, os dados podem ser lidos no SAP GUI e os scripts podem ser usados para executar transações.
+        '''
+        return self.component.ScriptingModeRecordingDisabled
+    
+    def SessionNumber(self) -> int:
+        ''' O número da sessão também é exibido no SAP GUI na barra de status.
+        '''
+        return self.component.SessionNumber
+    
+    def SystemName(self) -> str:
+        ''' Este é o nome do sistema SAP.
+        '''
+        return self.component.SystemName
+    
+    def SystemNumber(self) -> int:
+        ''' O número do sistema é definido somente se a sessão pertencer a uma
+        conexão que foi iniciada sem balanceamento de carga, especificando um servidor de aplicação.
+        '''
+        return self.component.SystemNumber
+    
+    def SystemSessionId(self) -> str:
+        ''' Todas as sessões SAP GUI da mesma conexão são representadas no servidor com o mesmo SystemSessionId.
+        Usando SystemSessionId e SessionNumber, é possível encontrar uma sessão SAP GUI correspondente a partir de um aplicativo ABAP.
+        '''
+        return self.component.SystemSessionId
+    
+    def Transaction(self) -> str:
+        ''' A transação que está sendo executada atualmente.
+        '''
+        return self.component.Transaction
+    
+    def UI_GUIDELINE(self) -> str:
+        ''' Esta propriedade pode ser utilizada para identificar se a sessão SAP GUI está rodando com Fiori Visual Theme (Belize) ou não.
+        O valor de retorno é
+        1 se a sessão estiver sendo executada sem Fiori Visual Theme (Belize)
+        2 se a sessão estiver rodando com Fiori Visual Theme (Belize)
+        '''
+        return self.component.UI_GUIDELINE
+    
+    def User(self) -> str:
+        ''' O nome SAP do usuário conectado ao sistema.
+        '''
+        return self.component.User
 
 class SapGuiSession(SapGuiContainer):
     ''' A GuiSession fornece o contexto no qual um usuário executa uma determinada tarefa, como trabalhar com uma transação.
