@@ -14,6 +14,7 @@ OK:
 	- GuiSessionInfo
 	- GuiVComponent
 	- GuiVContainer
+	- GuiFrameWindow
 
 TODO Components:
 
@@ -22,7 +23,6 @@ TODO Components:
 	- GuiScrollbar
 	- GuiScrollContainer
 	- GuiShell
-	- GuiFrameWindow
 	- GuiContainerShell
 	- GuiContextMenu
 	- GuiTableColumn Collection
@@ -536,6 +536,169 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiFrameWindow(SapGuiVContainer):
+    ''' Um GuiFrameWindow é um objeto visual de alto nível na hierarquia de tempo de execução.
+    Pode ser a janela principal ou uma janela pop-up modal. Consulte as seções GuiMainWindow e GuiModalWindow para obter exemplos.
+    O próprio GuiFrameWindow é uma interface abstrata. GuiFrameWindow estende o objeto GuiVContainer. O prefixo do tipo é wnd, o nome
+    é wnd mais o número da janela entre colchetes.
+    '''
+    #TODO:
+    
+    def Close(self) -> None:
+        ''' A função tenta fechar a janela. Tentar fechar a última janela principal de uma sessão não terá sucesso imediato
+        a caixa de diálogo 'Você realmente deseja fazer logoff?' será exibida primeiro.
+        '''
+        # TODO: Colocar um parâmetro para ignorar a caixa de diálogo ao fecha a última janela
+        self.component.Close()
+    
+    def CompBitmap(self, filename_1: str, filename_2: str) -> int:
+        ''' Este método compara dois arquivos bitmap pixel por pixel.
+        Tipo de retorno:
+        O método retorna um dos seguintes valores:
+        0: Os arquivos não diferem
+        1: Os arquivos diferem em tamanho
+        2: Os arquivos possuem conteúdo diferente
+        3: Houve um erro
+        '''
+        return self.component.CompBitmap(filename_1, filename_2)
+    
+    def HardCopy(self, filename: str, image_type: int = 0, x_pos: int = None, y_pos: int = None, n_width: int = None, n_height: int = None) -> str:
+        ''' Esta função despeja uma cópia impressa da janela como um arquivo bitmap no disco.
+        O parâmetro é o nome do arquivo.
+        Se a função for bem-sucedida, o valor de retorno será o caminho totalmente qualificado do arquivo.
+        Se nenhuma informação de caminho for fornecida, o arquivo será gravado na pasta de documentos SAP GUI.
+        Se os parâmetros opcionais xPos, yPos, nWidth e nHeight forem definidos, apenas o retângulo especificado da janela principal será capturado.
+        image_type:
+        0: BMP
+        1: JPG
+        2: PNG
+        3: GIF
+        4: TIFF
+        '''
+        return self.component.HardCopy(filename, image_type, x_pos, y_pos, n_width, n_height)
+    
+    def HardCopyToMemory(self, image_type: int = 0):
+        # TODO Verificar retorno no python
+        ''' Esta função retorna uma cópia impressa da janela como uma matriz segura de bytes.
+        image_type:
+        0: BMP
+        1: JPG
+        2: PNG
+        3: GIF
+        4: TIFF
+        '''
+        return self.component.HardCopyToMemory(image_type)
+    
+    def IsVKeyAllowed(self, v_key: int) -> bool:
+        ''' Esta função retorna True se a chave virtual VKey estiver disponível no momento.
+        As VKeys são definidas no pintor de menus.
+        '''
+        return self.component.IsVKeyAllowed(v_key)
+    
+    def Iconify(self) -> None:
+        ''' Isso definirá uma janela para o estado iconificado.
+        Não é possível iconificar uma janela específica de uma sessão, tanto a janela principal quanto todos os modais existentes serão iconificados.
+        '''
+        self.component.Iconify()
+    
+    def Minimize(self) -> None:
+        ''' Isso definirá uma janela para o estado iconificado.
+        Não é possível iconificar uma janela específica de uma sessão, tanto a janela principal quanto todos os modais existentes serão iconificados.
+        '''
+        self.Iconify()
+    
+    def Maximize(self) -> None:
+        ''' Isso maximizará uma janela. Não é possível maximizar uma janela modal,
+        é sempre a janela principal que será maximizada.
+        '''
+        self.component.Maximize()
+    
+    def Restore(self) -> None:
+        ''' Isso restaurará uma janela de seu estado iconificado. 
+        ão é possível restaurar uma janela específica de uma sessão, tanto a janela principal quanto todos os modais existentes serão restaurados.
+        '''
+        self.component.Restore()
+    
+    def SendVKey(self, v_key: int) -> None:
+        ''' A chave virtual VKey é executada na janela. As VKeys são definidas no pintor de menus.
+        '''
+        return self.component.SendVKey(v_key)
+    
+    def ShowMessageBox(self, title: str, text: str, msg_icon: int, msg_type: int) -> int:
+        ''' Mostra uma caixa de mensagem.
+        O valor de retorno será uma das constantes GuiMessageBoxResult.
+        title: Título da caixa de mensagem
+        text: Texto da caixa de mensagem.
+        msg_icon: MsgIcon define o ícone a ser usado para a caixa de mensagem e deve ser definido como uma das constantes GuiMessageBoxType.
+        msg_type: MsgType define os botões disponíveis na caixa de mensagem e deve ser definido como uma das constantes GuiMessageBoxOption.
+        '''
+        return self.component.ShowMessageBox(title, text, msg_icon, msg_type)
+    
+    def JumpBackward(self) -> None:
+        ''' Executa a tecla Ctrl+Shift+Tab na janela para retroceder um bloco.
+        '''
+        self.component.JumpBackward()
+    
+    def JumpForward(self) -> None:
+        ''' Execute a tecla Ctrl+Tab na janela para avançar um bloco.
+        '''
+        self.component.JumpForward()
+    
+    def TabBackward(self) -> None:
+        ''' Execute a tecla Shift+Tab na janela para retroceder um elemento.
+        '''
+        self.component.TabBackward()
+    
+    def TabForward(self) -> None:
+        ''' Execute a tecla Tab na janela para avançar um elemento.
+        '''
+        self.component.TabForward()
+
+    def ElementVisualizationMode(self, option: bool = None) -> bool:
+        ''' Quando elementVisualizationMode está habilitado, um teste de acerto pode ser executado no
+        SAP GUI movendo o cursor sobre a janela. O evento hit da sessão é disparado quando um componente é encontrado na posição do mouse.
+        '''
+        if option is not None: self.component.ElementVisualizationMode = option
+        return self.component.ElementVisualizationMode
+    
+    def GuiFocus(self) -> SapGuiVComponent:
+        # TODO
+        ''' O SystemFocus suporta apenas elementos dynpro.
+        Para receber informações sobre o controle ActiveX atualmente em foco você pode acessar a propriedade GuiFocus.
+        '''
+        return SapTypeInstance.GetInstance(self.component.GuiFocus)
+    
+    def Handle(self) -> int:
+        ''' O identificador de janela do controle que está conectado ao GuiShell.
+        Este é o identificador da janela subjacente no Microsoft Windows.
+        '''
+        return self.component.Handle
+    
+    def Iconic(self) -> bool:
+        ''' Esta propriedade é True se a janela estiver iconificada.
+        É possível executar comandos de script em uma janela iconificada, mas pode haver resultados indefinidos,
+        especialmente quando controles estão envolvidos, pois estes podem ter configurações de tamanho inválidas.
+        '''
+        return self.component.Iconic
+    
+    def SystemFocus(self) -> SapGuiVComponent:
+        # TODO
+        ''' O SystemFocus especifica o componente que o sistema SAP está atualmente vendo como sendo focado.
+        Este valor é válido apenas para elementos dynpro e pode, portanto, diferir do foco visto no frontend.
+        '''
+        return SapTypeInstance.GetInstance(self.component.SystemFocus)
+    
+    def WorkingPaneHeight(self) -> int:
+        ''' Esta é a altura do painel de trabalho na métrica de caracteres.
+        '''
+        return self.component.WorkingPaneHeight
+    
+    def WorkingPaneWidth(self) -> int:
+        ''' Esta é a largura do painel de trabalho na métrica de caracteres.
+        O painel de trabalho é a área entre as barras de ferramentas na parte superior da janela e a barra de status na parte inferior da janela.
+        '''
+        return self.component.WorkingPaneWidth
 
 class SapGuiSessionInfo():
     ''' GuiSessionInfo é membro de todos os objetos GuiSession.

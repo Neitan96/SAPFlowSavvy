@@ -1,7 +1,7 @@
-# SapGuiApiHelper - Automatização Simplificada do SAP Gui
+# SapGuiApiHelper - Automatização Simplificada do SAP
 
 ![GitHub](https://img.shields.io/github/license/Neitan96/SapGuiApiHelper)
-![Static Badge](https://img.shields.io/badge/version-Alpha%200.2-blue)
+![Static Badge](https://img.shields.io/badge/version-developing-blue)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Neitan96/SapGuiApiHelper)
 [![Python](https://img.shields.io/badge/python-3.9.6%2B-blue)](https://www.python.org/downloads/release/python-396/)
 [![VBA](https://img.shields.io/badge/VBA-Excel-green)](https://docs.microsoft.com/en-us/office/vba/api/overview/excel)
