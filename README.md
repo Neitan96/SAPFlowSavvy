@@ -1,4 +1,4 @@
-# SapGuiApiHelper - Automatização Simplificada do SAP GUI
+# SapGuiApiHelper - Automatização Simplificada do SAP Gui
 
 ![GitHub](https://img.shields.io/github/license/Neitan96/SapGuiApiHelper)
 ![Static Badge](https://img.shields.io/badge/version-Alpha%200.2-blue)
@@ -14,37 +14,36 @@ Este repositório é uma coleção de APIs desenvolvidas em *Python* e *VBA* pro
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/neitan96/)
 [![Instagram](https://img.shields.io/badge/Instagram-Profile-orange?style=flat&logo=instagram)](https://www.instagram.com/neitan96/)
 
-
 ## Exemplos:
-Aqui estão alguns exemplos de uso das APIs em Python e VBA:
 
-#### Python
+#### **Python:**
 ```python
 sap_gui = SapGui()
 session = sap_gui.GetSessionLoged()
 ```
 
+#### **VBA:**
+```vbs
+' TODO
+```
+
 ## Melhorias futuras:
 * Documentações e tutoriais
+* Fluxograma do componentes SAP Gui
+* Wrapper dos componentes do SAP Gui
 * Registro de execução e erros
-* Funções para lidar com tabelas do SAP
-  * Funções para selecão de layouts
-* Funções para pop-ups padrões:
-  * Seleção multipla
-  * Filtros
-  * Etc
-* Verificar tela de login ao verificar timeout
-* Funções para lidar com a maioria dos companetes do SAP Gui
-* Funções para ajudar em eventos do SAP
-* Funções para lidar com exportações de arquivos
-* Funções para ler arquivos para interagir com SAP
-
-### Melhorias para Python:
-* Classes que refletem a API do SAP Gui
-
-### Melhorias para VBA:
-* Voltar ao menu principal ao fazer login
-* Retorna a nova sessão ao fazer login, para os casos que criamos nova sessão para login
+* Funções para lidar com GridView
+  * Selecão, alteração e criação de layouts
+  * Possibilidade de exportar GridView que não tem a opção de exportar
+  * Varredura e busca de valores em GridView
+  * Carregamento rápido da GridView completa
+  * Funções de filtros
+  * Formulas para GridView, como soma, média e etc.
+* Funções para pop-ups comuns:
+  * Seleção múltipla.
+  * Botões comuns: limpar, executar, cancelar e etc.
+* Funções extras:
+  * Verificação de timeout
 
 ## Aviso Legal
 
