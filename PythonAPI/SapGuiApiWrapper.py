@@ -15,12 +15,12 @@ OK:
 	- GuiVComponent
 	- GuiVContainer
 	- GuiFrameWindow
+	- GuiScrollbar
 
 TODO Components:
 
 * Priority:
     * Objects:
-	- GuiScrollbar
 	- GuiScrollContainer
 	- GuiShell
 	- GuiContainerShell
@@ -229,6 +229,37 @@ class SapGuiComponent():
         Foi adicionado para melhor desempenho em métodos como FindByIdEx.
         '''
         return self.component.TypeAsNumber
+
+class SapGuiScrollbar():
+    ''' A classe GuiScrollbar é uma classe utilitária usada, por exemplo, em GuiScrollContainer ou GuiTableControl.
+    '''
+    
+    #TODO Fazer mais funções de auxilio
+    
+    def __init__(self, component: object):
+        self.component = component
+    
+    def Maximum(self) -> int:
+        ''' Esta é a posição máxima da barra de rolagem.
+        '''
+        return self.component.Maximum
+    
+    def Minimum(self) -> int:
+        ''' Esta é a posição mínima da barra de rolagem.
+        '''
+        return self.component.Minimum
+    
+    def PageSize(self) -> int:
+        ''' Quando o usuário rola uma página para baixo, a posição será aumentada pelo valor de pageSize.
+        '''
+        return self.component.PageSize
+    
+    def Position(self, position: int = None) -> int:
+        ''' A posição do polegar da barra de rolagem pode ser definida em valores do mínimo ao máximo.
+        '''
+        if position is not None: self.component.Position = position
+        return self.component.Position
+    
 
 class SapGuiComponentCollection(SapGuiComponent):
     ''' O GuiComponentCollection é usado para elementos de coleções, como a propriedade Children de contêineres.
