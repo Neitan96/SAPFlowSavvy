@@ -44,6 +44,10 @@ session = sap_gui.GetSessionLoged()
   * Botões comuns: limpar, executar, cancelar e etc.
 * Funções extras:
   * Verificação de timeout
+* Funções de telas padrões do SAP
+  * Migo
+  * /SCWM/PACK
+  * ...
 
 ## Aviso Legal
 
