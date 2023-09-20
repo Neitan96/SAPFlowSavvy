@@ -22,6 +22,7 @@ OK:
 	- GuiTableRow
 	- GuiTableColumn
 	- GuiMenu
+	- GuiContextMenu
 
 TODO Components:
 
@@ -29,7 +30,6 @@ TODO Components:
     * Objects:
 	- GuiShell
 	- GuiContainerShell
-	- GuiContextMenu
 	- GuiTableControl
 	- GuiGridView
 
@@ -595,6 +595,13 @@ class SapGuiMenu(SapGuiVComponent):
         ''' Selecione o menu.
         '''
         self.component.Select()
+
+class SapGuiContextMenu(SapGuiMenu):
+    ''' Um GuiContextMenu pode ter outros objetos GuiContextMenu como filhos.
+    O tipo é mnu, o nome é o código de função que é enviado ao sistema quando o item de menu é selecionado.
+    '''
+    
+    pass
 
 class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     ''' Um objeto expõe a interface GuiVContainer se ela estiver visível e puder ter filhos.
