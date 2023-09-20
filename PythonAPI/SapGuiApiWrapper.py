@@ -24,6 +24,7 @@ OK:
 	- GuiBox
 	- GuiButton
 	- GuiCheckBox
+	- GuiEnum
 
 TODO Components:
 
@@ -49,7 +50,6 @@ TODO Components:
 	- GuiDialogShell
 	- GuiEAIViewer2D
 	- GuiEAIViewer3D
-	- GuiEnum
 	- GuiGOSShell
 	- GuiGraphAdapt
 	- GuiHTMLViewer
@@ -171,6 +171,22 @@ class SapTypeInstance():
     @staticmethod
     def GetInstance(sap_object: object):
         return SapGuiComponent(sap_object)
+
+class SapGuiEnum():
+    # TODO Fazer descrição
+    # TODO Verificar retorno e descrições das funções dessa classe
+    
+    def __init__(self, component: object):
+        self.component = component
+    
+    def Next(self, celt: int, rgvar, pceltFetched: int):
+        return self.component.Next(celt, rgvar, pceltFetched)
+    
+    def Reset(self):
+        return self.component.Reset()
+    
+    def Skip(self, celt: int):
+        return self.component.Skip(celt)
 
 class SapGuiComponent():
     ''' GuiComponent é a classe base para a maioria das classes na API de script do SAP.
