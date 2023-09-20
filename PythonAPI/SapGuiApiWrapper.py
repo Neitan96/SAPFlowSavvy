@@ -26,12 +26,12 @@ OK:
 	- GuiCheckBox
 	- GuiEnum
 	- GuiShell
+	- GuiContainerShell
 
 TODO Components:
 
 * Priority:
     * Objects:
-	- GuiContainerShell
 	- GuiTableControl
 	- GuiGridView
 
@@ -828,6 +828,22 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiContainerShell(SapGuiShell):
+    ''' Um GuiContainerShell é um wrapper para um conjunto de objetos GuiShell.
+    GuiContainerShell estende o objeto GuiVContainer.
+    O prefixo do tipo é shellcont, o nome é a última parte do id, shellcont[n].
+    '''
+    
+    def DockerIsVertical(self) -> bool:
+        ''' Será TRUE se o contêiner for um controle de janela de encaixe vertical.
+        '''
+        return self.component.DockerIsVertical
+    
+    def DockerPixelSize(self) -> int:
+        ''' Retorna o tamanho do controle do Docker em pixels.
+        '''
+        return self.component.DockerPixelSize
 
 class SapGuiTab(SapGuiVContainer):
     ''' Os objetos GuiTab são filhos de um objeto GuiTabStrip.
