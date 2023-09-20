@@ -20,6 +20,7 @@ OK:
 	- GuiTabStrip
 	- GuiTab
 	- GuiTableRow
+	- GuiTableColumn
 
 TODO Components:
 
@@ -28,7 +29,6 @@ TODO Components:
 	- GuiShell
 	- GuiContainerShell
 	- GuiContextMenu
-	- GuiTableColumn
 	- GuiTableControl
 	- GuiGridView
 
@@ -301,6 +301,40 @@ class SapGuiComponentCollection(SapGuiComponent):
             itens.append(self.Item(index))
         return itens
 
+class SapGuiTableColumn(SapGuiComponentCollection):
+    # TODO Fazer uma descrição
+    
+    def DefaultTooltip(self) -> str:
+        ''' Texto de dica de ferramenta gerado a partir do texto curto definido no dicionário de dados para determinado tipo de elemento de tela.
+        '''
+        return self.component.DefaultTooltip
+    
+    def Fixed(self) -> bool:
+        ''' Algumas colunas podem ser fixas, o que significa que não serão roladas com o restante das colunas.
+        '''
+        return self.component.Fixed
+    
+    def IconName(self) -> str:
+        ''' Se ao objeto foi atribuído um ícone, então esta propriedade é o nome do ícone, caso contrário, é uma string vazia.
+        '''
+        return self.component.IconName
+    
+    def Selected(self, option: bool = None) -> bool:
+        ''' Esta propriedade é verdadeira se a linha estiver selecionada.
+        '''
+        if option is not None: self.component.Selected = option
+        return self.component.Selected
+    
+    def Title(self) -> str:
+        ''' Esta é a legenda da coluna.
+        '''
+        return self.component.Title
+    
+    def Tooltip(self) -> str:
+        ''' A dica de ferramenta contém um texto projetado para ajudar o usuário a entender o significado de um determinado campo de texto ou botão.
+        '''
+        return self.component.Tooltip
+
 class SapGuiTableRow(SapGuiComponentCollection):
     # TODO colocar descrição
     
@@ -316,7 +350,6 @@ class SapGuiTableRow(SapGuiComponentCollection):
         '''
         if option is not None: self.component.Selected = option
         return self.component.Selected
-
 
 class SapGuiContainer(SapGuiComponent):
     ''' Um objeto herda a interface GuiContainer se ela puder ter filhos.
