@@ -1,5 +1,3 @@
-import sys, win32com.client
-
 '''
 OK:
 * Objects
@@ -24,6 +22,7 @@ OK:
 	- GuiMenu
 	- GuiContextMenu
 	- GuiBox
+	- GuiButton
 
 TODO Components:
 
@@ -38,7 +37,6 @@ TODO Components:
 	- GuiAbapEditor - N/a
 	- GuiApoGrid - N/a
 	- GuiBarChart
-	- GuiButton
 	- GuiCalendar
 	- GuiChart
 	- GuiCheckBox
@@ -584,6 +582,35 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiButton(SapGuiVComponent):
+    ''' GuiButton representa todos os botões que estão no dynpros, na barra de ferramentas ou nos controles da tabela.
+    O prefixo do tipo é btn, a propriedade name é o nome do campo obtido do dicionário de dados SAP.
+    Há uma exceção: para botões de tabstrip, é o ID do botão definido no pintor de tela que é obtido do dicionário de dados SAP.
+    '''
+    
+    def Press(self) -> None:
+        ''' Isso emula o pressionamento manual de um botão.
+        Pressionar um botão sempre fará com que a comunicação do servidor ocorra,
+        tornando inválidas todas as referências a elementos abaixo do nível da janela.
+        '''
+        self.component.Press()
+    
+    def Emphasized(self) -> bool:
+        ''' Esta propriedade é True se o botão for exibido enfatizado
+        (no Fiori Visual Themes: O botão mais à esquerda no rodapé e botões configurados como "Fiori Usage D Display<->Change").
+        '''
+        return self.component.Emphasized
+    
+    def LeftLabel(self) -> SapGuiVComponent:
+        ''' Rótulo esquerdo do GuiButton. O rótulo é atribuído no Screen Painter, usando o sinalizador 'assign left'.
+        '''
+        return self.component.LeftLabel
+    
+    def RightLabel(self) -> SapGuiVComponent:
+        ''' Rótulo direito do GuiButton. Esta propriedade é definida no Screen Painter usando o sinalizador 'assign right'.
+        '''
+        return self.component.RightLabel
 
 class SapGuiBox(SapGuiVComponent):
     ''' Uma GuiBox é um quadro simples com um nome (também chamado de "Group Box").
