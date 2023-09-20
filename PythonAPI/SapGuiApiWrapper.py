@@ -18,6 +18,7 @@ OK:
 	- GuiScrollbar
 	- GuiScrollContainer
 	- GuiTabStrip
+	- GuiTab
 
 TODO Components:
 
@@ -29,6 +30,7 @@ TODO Components:
 	- GuiTableColumn
 	- GuiTableControl
 	- GuiTableRow
+	- GuiGridView
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -51,7 +53,6 @@ TODO Components:
 	- GuiEnum
 	- GuiGOSShell
 	- GuiGraphAdapt
-	- GuiGridView
 	- GuiHTMLViewer
 	- GuiInputFieldControl
 	- GuiLabel
@@ -74,7 +75,6 @@ TODO Components:
 	- GuiStage
 	- GuiStatusbar
 	- GuiStatusPane
-	- GuiTab
 	- GuiTextedit
 	- GuiTextField231
 	- GuiTitlebar
@@ -566,6 +566,23 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiTab(SapGuiVContainer):
+    ''' Os objetos GuiTab são filhos de um objeto GuiTabStrip.
+    O prefixo do tipo é tabp, o nome é o id do botão da aba retirado do dicionário de dados SAP.
+    '''
+    
+    def ScrollToLeft(self) -> None:
+        #TODO explicar melhor
+        ''' ScrollToLeft desloca as guias para que uma determinada guia se torne a leftTab da faixa de guias.
+        '''
+        self.component.ScrollToLeft
+    
+    def Select(self) -> None:
+        ''' Esta função define a guia como a guia selecionada na faixa de guias.
+        Alterar a guia selecionada de uma faixa de guias pode causar comunicação com o servidor.
+        '''
+        self.component.Select
 
 class SapGuiTabStrip(SapGuiVContainer):
     ''' Uma faixa de guias é um contêiner cujos filhos são do tipo GuiTab.
