@@ -23,6 +23,7 @@ OK:
 	- GuiTableColumn
 	- GuiMenu
 	- GuiContextMenu
+	- GuiBox
 
 TODO Components:
 
@@ -37,7 +38,6 @@ TODO Components:
 	- GuiAbapEditor - N/a
 	- GuiApoGrid - N/a
 	- GuiBarChart
-	- GuiBox
 	- GuiButton
 	- GuiCalendar
 	- GuiChart
@@ -584,6 +584,31 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiBox(SapGuiVComponent):
+    ''' Uma GuiBox é um quadro simples com um nome (também chamado de "Group Box").
+    Os itens dentro da moldura não são filhos da caixa. O prefixo do tipo é "caixa".
+    '''
+    
+    def CharHeight(self) -> int:
+        ''' Altura do GuiBox em caracteres métricos.
+        '''
+        return self.component.CharHeight
+    
+    def CharLeft(self) -> int:
+        ''' Coordenada esquerda do GuiBox em métrica de caracteres.
+        '''
+        return self.component.CharLeft
+    
+    def CharTop(self) -> int:
+        ''' Coordenada superior do GuiBox em métrica de caracteres.
+        '''
+        return self.component.CharTop
+    
+    def CharWidth(self) -> int:
+        ''' Largura do GuiBox em métrica de caracteres.
+        '''
+        return self.component.CharWidth
 
 class SapGuiMenu(SapGuiVComponent):
     ''' Um GuiMenu pode ter outros objetos GuiMenu como filhos.
