@@ -29,6 +29,18 @@ OK:
 	- GuiContainerShell
 	- GuiTableControl
 
+* Enumerations
+	- GuiComponentType
+	- GuiErrorType
+	- GuiEventType281
+	- GuiImageType
+	- GuiMagicDispIDs
+	- GuiMessageBoxOption
+	- GuiMessageBoxResult
+	- GuiMessageBoxType
+	- GuiScrollbarType
+	- GuiTableSelectionType
+ 
 TODO Components:
 
 * Priority:
@@ -82,90 +94,488 @@ TODO Components:
 	- GuiUserArea
 	- GuiVHViewSwitch
 	- 
-* Events
-	- Change Event- Additional Remarks
-
-* Enumerations
-	- GuiComponentType
-	- GuiErrorType
-	- GuiEventType281
-	- GuiImageType
-	- GuiMagicDispIDs
-	- GuiMessageBoxOption
-	- GuiMessageBoxResult
-	- GuiMessageBoxType
-	- GuiScrollbarType
-	- GuiTableSelectionType
 '''
 
-class SapNumbersTypes():
-    GuiApplication = 10
-    GuiBox = 62
-    GuiButton = 40
-    GuiCheckBox = 42
-    GuiCollection = 120
-    GuiComboBox = 34
-    GuiComponent = 0
-    GuiComponentCollection = 128
-    GuiConnection = 11
-    GuiContainer = 70
-    GuiContainerShell = 51
-    GuiContextMenu = 127
-    GuiCTextField = 32
-    GuiCustomControl = 50
-    GuiDialogShell = 125
-    GuiDockShell = 126
-    GuiFrameWindow = 20
-    GuiGOSShell = 123
-    GuiLabel = 30
-    GuiListContainer = 73
-    GuiMainWindow = 21
-    GuiMenu = 110
-    GuiMenubar = 111
-    GuiMessageWindow = 23
-    GuiModalWindow = 22
-    GuiOkCodeField = 35
-    GuiPasswordField = 33
-    GuiRadioButton = 41
-    GuiScrollbar = 100
-    GuiScrollContainer = 72
-    GuiSession = 12
-    GuiSessionInfo = 121
-    GuiShell = 122
-    GuiSimpleContainer = 71
-    GuiSplitterContainer = 75
-    GuiSplitterShell = 124
-    GuiStatusbar = 103
-    GuiStatusPane = 43
-    GuiTab = 91
-    GuiTableColumn = 81
-    GuiTableControl = 80
-    GuiTableRow = 82
-    GuiTabStrip = 90
-    GuiTextField = 31
-    GuiTitlebar = 102
-    GuiToolbar = 101
-    GuiUnknown = -1
-    GuiUserArea = 74
-    GuiVComponent = 1
-    GuiVContainer = 2
-    GuiVHViewSwitch = 129
+class SapGuiComponentType:
+    GuiApplication = 10  # Aplicação: Representa a aplicação SAP GUI em si, permitindo interagir com todo o ambiente SAP.
+    GuiBox = 62  # Caixa: Uma caixa de diálogo ou janela usada para exibir informações ou solicitar entrada do usuário.
+    GuiButton = 40  # Botão: Um botão clicável que normalmente dispara ações ou comandos quando pressionado.
+    GuiCheckBox = 42  # Caixa de Seleção: Uma caixa que pode ser marcada ou desmarcada para indicar uma escolha ou opção.
+    GuiCollection = 120  # Coleção: Representa uma coleção de elementos ou objetos SAP GUI, permitindo operações em massa.
+    GuiComboBox = 34  # Caixa de Combinação: Uma caixa de texto com uma lista suspensa de opções que o usuário pode selecionar.
+    GuiComponent = 0  # Componente: O componente base que pode representar qualquer elemento na interface do SAP GUI.
+    GuiComponentCollection = 128  # Coleção de Componentes: Uma coleção de componentes SAP GUI, útil para gerenciar vários elementos.
+    GuiConnection = 11  # Conexão: Representa uma conexão com um servidor SAP, permitindo a seleção de diferentes sessões.
+    GuiContainer = 70  # Contêiner: Um elemento que pode conter outros componentes, como um grupo de botões ou campos.
+    GuiContainerShell = 51  # Shell de Contêiner: Um shell que contém componentes em uma hierarquia de árvore.
+    GuiContextMenu = 127  # Menu de Contexto: Um menu contextual que oferece opções específicas do contexto para um componente.
+    GuiCTextField = 32  # Campo de Texto Curto: Um campo de entrada de texto para entrada de dados breve.
+    GuiCustomControl = 50  # Controle Personalizado: Um componente personalizado criado para atender a requisitos específicos.
+    GuiDialogShell = 125  # Shell de Diálogo: Uma janela de diálogo que normalmente exibe informações detalhadas ou solicitações ao usuário.
+    GuiDockShell = 126  # Shell de Ancoragem: Um shell de ancoragem usado para ancorar janelas em áreas específicas da interface.
+    GuiFrameWindow = 20  # Janela de Quadro: Uma janela de quadro que pode conter outros elementos, como caixas de diálogo.
+    GuiGOSShell = 123  # Shell de SOS: Um shell usado para exibir mensagens do sistema SAP e mensagens de erro.
+    GuiLabel = 30  # Rótulo: Um rótulo de texto usado para exibir informações ou etiquetar outros componentes.
+    GuiListContainer = 73  # Contêiner de Lista: Um contêiner que exibe uma lista de itens, como uma lista de seleção.
+    GuiMainWindow = 21  # Janela Principal: A janela principal da aplicação SAP GUI, que contém a maioria dos elementos da interface.
+    GuiMenu = 110  # Menu: Um menu suspenso que fornece acesso a várias opções e comandos.
+    GuiMenubar = 111  # Barra de Menu: A barra de menu superior que contém menus e comandos.
+    GuiMessageWindow = 23  # Janela de Mensagem: Uma janela que exibe mensagens e notificações do sistema SAP.
+    GuiModalWindow = 22  # Janela Modal: Uma janela que bloqueia a interação com outras partes da interface até ser fechada.
+    GuiOkCodeField = 35  # Campo de Código OK: Um campo de entrada de código que pode ser usado para inserir comandos específicos.
+    GuiPasswordField = 33  # Campo de Senha: Um campo de entrada de senha usado para entrada segura de senhas.
+    GuiRadioButton = 41  # Botão de Opção: Uma opção que pode ser selecionada entre várias opções mutuamente exclusivas.
+    GuiScrollbar = 100  # Barra de Rolagem: Uma barra que permite rolar o conteúdo de uma área maior.
+    GuiScrollContainer = 72  # Contêiner de Rolagem: Um contêiner que suporta rolagem de conteúdo.
+    GuiSession = 12  # Sessão: Representa uma sessão de comunicação com um servidor SAP.
+    GuiSessionInfo = 121  # Informações de Sessão: Fornece informações sobre a sessão SAP atual.
+    GuiShell = 122  # Shell: Uma janela de nível superior que pode conter outros componentes.
+    GuiSimpleContainer = 71  # Contêiner Simples: Um contêiner simples que contém outros componentes.
+    GuiSplitterContainer = 75  # Contêiner de Divisão: Um contêiner que suporta divisão de áreas com barras divisórias.
+    GuiSplitterShell = 124  # Shell de Divisão: Um shell que suporta divisão de áreas com barras divisórias.
+    GuiStatusbar = 103  # Barra de Status: Uma barra na parte inferior da interface que exibe informações de status.
+    GuiStatusPane = 43  # Painel de Status: Um painel dentro da barra de status que pode exibir informações adicionais.
+    GuiTab = 91  # Guia: Uma guia que permite alternar entre diferentes conjuntos de conteúdo.
+    GuiTableColumn = 81  # Coluna de Tabela: Uma coluna em uma tabela que contém dados tabulares.
+    GuiTableControl = 80  # Controle de Tabela: Um controle que exibe dados tabulares em linhas e colunas.
+    GuiTableRow = 82  # Linha de Tabela: Uma linha em uma tabela que contém dados tabulares.
+    GuiTabStrip = 90  # Tira de Guia: Uma tira de guias que permite alternar entre várias guias.
+    GuiTextField = 31  # Campo de Texto: Um campo de entrada de texto para entrada de dados.
+    GuiTitlebar = 102  # Barra de Título: A barra superior de uma janela que exibe o título e os botões de controle.
+    GuiToolbar = 101  # Barra de Ferramentas: Uma barra que contém botões de ação e comandos frequentemente usados.
+    GuiUnknown = -1  # Desconhecido: Um componente cujo tipo não é reconhecido ou não está definido.
+    GuiUserArea = 74  # Área do Usuário: Uma área que pode conter componentes personalizados ou elementos específicos do usuário.
+    GuiVComponent = 1  # VComponent: Um tipo específico de componente visual.
+    GuiVContainer = 2  # VContainer: Um tipo específico de contêiner visual.
+    GuiVHViewSwitch = 129  # VHViewSwitch: Um tipo de interruptor de exibição usado em componentes visuais.
 
-class SapEnums:
-    MSG_OPTION_OK = 0 # A caixa de mensagem mostrará um botão "OK".
-    MSG_OPTION_YESNO = 1 # A caixa de mensagem mostrará um botão “Sim” e um botão “Não”.
-    MSG_OPTION_OKCANCEL = 2 # A caixa de mensagem mostrará um botão “OK” e um botão “Cancelar”.
-    
-    MSG_RESULT_CANCEL = 0 # A caixa de mensagem foi fechada através do botão “Cancelar”.
-    MSG_RESULT_OK = 1 # A caixa de mensagem foi fechada através do botão "OK".
-    MSG_RESULT_YES = 2 # A caixa de mensagem foi fechada através do botão “Sim”.
-    MSG_RESULT_NO = 3 # A caixa de mensagem foi fechada através do botão “Não”.
-    
-    MSG_TYPE_INFORMATION = 0 # A caixa de mensagem mostra o respectivo ícone para uma mensagem informativa.
-    MSG_TYPE_QUESTION = 1 # A caixa de mensagem mostra o respectivo ícone de uma pergunta.
-    MSG_TYPE_WARNING = 2 # A caixa de mensagem mostra o respectivo ícone para uma mensagem de aviso.
-    MSG_TYPE_ERROR = 3 # A caixa de mensagem mostra o respectivo ícone para uma mensagem de erro.
-    MSG_TYPE_PLAIN = 4 # A caixa de mensagem não mostra nenhum ícone.
+class SapGuiErrorType:
+    Gui_Err_AccessDenied = 633 # Acesso negado.
+    Gui_Err_Bad_Focus = 634 # Não é possível definir o foco neste objeto.
+    Gui_Err_Bad_Index_Type = 618 # Tipo de índice inválido para acesso à coleção.
+    Gui_Err_Control_Label = 615 # O controle não pôde ser encontrado pelo rótulo.
+    Gui_Err_Control_Name = 608 # O controle não pôde ser encontrado pelo nome.
+    Gui_Err_Control_Position = 616 # O controle não pôde ser encontrado pela posição.
+    Gui_Err_Disconnected = 621 # O objeto invocado se desconectou de seus clientes.
+    Gui_Err_Enumerator_Index = 614 # O enumerador da coleção não pode encontrar um elemento com o índice especificado.
+    Gui_Err_Enumerator_Reset = 612 # O enumerador da coleção não pode ser redefinido.
+    Gui_Err_FindById = 619 # O controle não pôde ser encontrado pelo ID.
+    Gui_Err_FindByName = 620 # O controle não pôde ser encontrado pelo nome.
+    Gui_Err_FindByPos = 632 # O controle não pôde ser encontrado pela posição.
+    Gui_Err_Front_Module = 602 # O caminho do 'sapfront.dll' não pôde ser determinado.
+    Gui_Err_Init = 601 # O mecanismo do Sapgui não pode ser inicializado.
+    Gui_Err_Int_Get_Session_Failed = 629 # Não é possível obter a sessão do TLS.
+    Gui_Err_Int_GetCtrl_Failed = 625 # Não foi possível obter o controle (Erro interno).
+    Gui_Err_Int_GetFocusManFromSes_Failed = 627 # Não foi possível obter o gerenciador de foco da sessão (Erro interno).
+    Gui_Err_Int_GetSesFromCtrl_Failed = 626 # Não foi possível obter a sessão do controle (Erro interno).
+    Gui_Err_Int_Invalid_TestToolMode = 628 # Modo de ferramenta de teste inválido.
+    Gui_Err_Int_View_Not_Set = 630 # Visão não definida (Erro interno).
+    Gui_Err_Invalid_Argument = 613 # O método recebeu um argumento inválido.
+    Gui_Err_Invalid_Context = 603 # Função chamada em contexto de thread inválido.
+    Gui_Err_Invalid_Window = 611 # A janela requerida é inválida.
+    Gui_Err_Logon_Module = 604 # O 'Componente de Logon do Sapgui' não pôde ser instanciado.
+    Gui_Err_Menu_Disabled = 623 # O item de menu está desativado.
+    Gui_Err_No_Memory = 607 # O sistema está sem memória.
+    Gui_Err_No_Wrapper = 622 # Nenhum wrapper disponível para este controle.
+    Gui_Err_Not_Implemented = 610 # O método ou propriedade não está atualmente implementado.
+    Gui_Err_Permission_Denied = 637 # Permissão negada.
+    Gui_Err_Property_Readonly = 609 # A propriedade é somente leitura.
+    Gui_Err_Resize_Failed = 631 # Falha ao redimensionar.
+    Gui_Err_Sapgui_Module = 605 # O 'Componente Sapgui' não pôde ser instanciado.
+    Gui_Err_Save_Image = 635 # Erro ao salvar a imagem.
+    Gui_Err_Scripting_Disabled_Srv = 624 # O scripting está desativado pelo servidor.
+    Gui_Err_Session_Index = 606 # O índice da sessão está fora de alcance.
+    Gui_Err_Shortcut_Evaluation = 636 # Falha na avaliação do atalho.
+    Gui_Err_SL_No_Entry = 1000 # Não é uma entrada válida do SAPLogon.
+    Gui_Err_VKey_Disabled = 617 # A tecla virtual não está habilitada.
+
+class SapGuiEventType:
+    SapApplicationCreateSessionEvent = 2002 # Evento de Criação de Sessão da Aplicação
+    SapApplicationDestroySessionEvent = 2003 # Evento de Destruição de Sessão da Aplicação
+    SapApplicationErrorEvent = 2004 # Evento de Erro da Aplicação
+    SapApplicationIgnoreSessionEvent = 2005 # Evento de Ignorar Sessão da Aplicação
+    SapContextMenuEvent = 1282 # Menu de Contexto
+    SapCustomDataChangedEvent = 1280 # Evento de Dados Personalizados Alterados
+    SapDefaultEvent = 0 # Evento Padrão
+    SapHitSelectEvent = 1281 # Evento de Seleção de Hit
+    SapSessionAbapScriptingEvent = 1289 # Evento de Abap Scripting da Sessão
+    SapSessionActivatedEvent = 1285 # Evento de Ativação da Sessão
+    SapSessionAutoFCodeEvent = 1284 # Evento de Auto FCode da Sessão
+    SapSessionDestroyEvent = 1283 # Evento de Destruição da Sessão
+    SapSessionEndRequestEvent = 515 # Evento de Fim de Requisição da Sessão
+    SapSessionErrorEvent = 516 # Evento de Erro da Sessão
+    SapSessionFocusChangedEvent = 1286 # Evento de Mudança de Foco da Sessão
+    SapSessionHistoryOpenedEvent = 1287 # Evento de Histórico da Sessão Aberto
+    SapSessionProgressIndicatorEvent = 1288 # Evento de Indicador de Progresso da Sessão
+    SapSessionStartRequestEvent = 514 # Evento de Início de Requisição da Sessão
+
+class SapGuiImageType:
+    BMP = 0
+    GIF = 2
+    JPEG = 1
+    PNG = 2
+
+class SapGuiMagicDispIDs:
+    GuiDispIDBTPress = 32200
+    GuiDispIDCBChecked = 32011
+    GuiDispIDCBCurListBoxEntry = 32305
+    GuiDispIDCBEntries = 32302
+    GuiDispIDCBEntryKey = 33800
+    GuiDispIDCBEntryPos = 33802
+    GuiDispIDCBEntryValue = 33801
+    GuiDispIDCBIsListBoxActive = 32304
+    GuiDispIDCBKey = 32300
+    GuiDispIDCBKeySpace = 32303
+    GuiDispIDCBShowKey = 32306
+    GuiDispIDCBValue = 32301
+    GuiDispIDCollAdd = 33103
+    GuiDispIDCollCount = 33100
+    GuiDispIDCollElAt = 33102
+    GuiDispIDCollLength = 33101
+    GuiDispIDConConnString = 33003
+    GuiDispIDConDescription = 33002
+    GuiDispIDConDisabled = 33001
+    GuiDispIDConnClose = 32831
+    GuiDispIDConSessions = 33000
+    GuiDispIDCTFindAllByName = 32035
+    GuiDispIDCTFindAllByNameEx = 32036
+    GuiDispIDCTFindById = 32029
+    GuiDispIDCTFindByLabel = 32027
+    GuiDispIDCTFindByName = 32026
+    GuiDispIDCTFindByNameEx = 32034
+    GuiDispIDCTFindByPosition = 32028
+    GuiDispIDDockerIsVertical = 34301
+    GuiDispIDDockerPixelSize = 34300
+    GuiDispIDEngAddHist = 32913
+    GuiDispIDEngButtonB = 32903
+    GuiDispIDEngCon = 32900
+    GuiDispIDEngConnErr = 32924
+    GuiDispIDEngCrColl = 32911
+    GuiDispIDEngDropHist = 32914
+    GuiDispIDEngGetEng = 1
+    GuiDispIDEngHistEnabled = 32916
+    GuiDispIDEngIgnore = 32908
+    GuiDispIDEngInplace = 32907
+    GuiDispIDEngMajor = 32909
+    GuiDispIDEngMinor = 32910
+    GuiDispIDEngNoSysMsg = 32925
+    GuiDispIDEngOpenCon = 32905
+    GuiDispIDEngOpenConEx = 32918
+    GuiDispIDEngOpenWDCon = 32926
+    GuiDispIDEngPatchlevel = 32919
+    GuiDispIDEngQuit = 32906
+    GuiDispIDEngRegister = 32921
+    GuiDispIDEngRevision = 32920
+    GuiDispIDEngRevoke = 32923
+    GuiDispIDEngStatusB = 32902
+    GuiDispIDEngTheme = 32912
+    GuiDispIDEngTitleB = 32904
+    GuiDispIDEngToolB = 32901
+    GuiDispIDEngUtils = 32917
+    GuiDispIDEngWDSessions = 32927
+    GuiDispIDErrDesc1 = 33601
+    GuiDispIDErrDesc2 = 33602
+    GuiDispIDErrDesc3 = 33603
+    GuiDispIDErrDesc4 = 33604
+    GuiDispIDErrNo = 33600
+    GuiDispIDGActiveSession = 32049
+    GuiDispIDGActiveSession2 = 32075
+    GuiDispIDGCAccDescription = 33703
+    GuiDispIDGCAccLabelCol = 32043
+    GuiDispIDGCAccText = 32044
+    GuiDispIDGCAccTextOnReq = 32045
+    GuiDispIDGCAccTooltip = 32042
+    GuiDispIDGCChangeable = 32009
+    GuiDispIDGCCharHeight = 32073
+    GuiDispIDGCCharLeft = 32070
+    GuiDispIDGCCharTop = 32071
+    GuiDispIDGCCharWidth = 32072
+    GuiDispIDGCChildren = 32019
+    GuiDispIDGCClass = 32017
+    GuiDispIDGCColorIndex = 32058
+    GuiDispIDGCColorIntensified = 32059
+    GuiDispIDGCColorInverse = 32060
+    GuiDispIDGCCtxMnu = 33701
+    GuiDispIDGCDefaultTooltip = 32069
+    GuiDispIDGCDisplayedText = 32074
+    GuiDispIDGCDragDrop = 33706
+    GuiDispIDGCDumpState = 31194
+    GuiDispIDGCFlushing = 33704
+    GuiDispIDGCHeight = 32006
+    GuiDispIDGCHwnd = 33702
+    GuiDispIDGCIcon = 32037
+    GuiDispIDGCId = 32025
+    GuiDispIDGCIsContainer = 32033
+    GuiDispIDGCIsHotspot = 32051
+    GuiDispIDGCIsList = 32052
+    GuiDispIDGCIsStepLoop = 32062
+    GuiDispIDGCIsSymbolFont = 32061
+    GuiDispIDGCLeft = 32003
+    GuiDispIDGCLeftLabel = 32040
+    GuiDispIDGCLoopCurrentCol = 32065
+    GuiDispIDGCLoopCurrentRow = 32066
+    GuiDispIDGCLoopHeight = 32064
+    GuiDispIDGCLoopWidth = 32063
+    GuiDispIDGCModified = 32030
+    GuiDispIDGCName = 32001
+    GuiDispIDGCOcxEvents = 33705
+    GuiDispIDGCParent = 32038
+    GuiDispIDGCParentFrame = 32050
+    GuiDispIDGCRightLabel = 32041
+    GuiDispIDGCRowText = 32053
+    GuiDispIDGCScreenLeft = 32046
+    GuiDispIDGCScreenTop = 32047
+    GuiDispIDGCSession = 32018
+    GuiDispIDGCSetFocus = 32024
+    GuiDispIDGCShortId = 32031
+    GuiDispIDGCShowContextMenu = 32068
+    GuiDispIDGCSubType = 33700
+    GuiDispIDGCText = 32000
+    GuiDispIDGCTitle = 32048
+    GuiDispIDGCTooltip = 32008
+    GuiDispIDGCTop = 32004
+    GuiDispIDGCType = 32015
+    GuiDispIDGCTypeAsNum = 32032
+    GuiDispIDGCVisualize = 32039
+    GuiDispIDGCWidth = 32005
+    GuiDispIDGECATTReplay = 32076
+    GuiDispIDGetAbsoluteRow = 33407
+    GuiDispIDGMSelect = 33300
+    GuiDispIDGMWFocusedButton = 32433
+    GuiDispIDGMWHelpButtonHelpText = 32440
+    GuiDispIDGMWHelpButtonText = 32435
+    GuiDispIDGMWMessageText = 32437
+    GuiDispIDGMWMessageType = 32436
+    GuiDispIDGMWOKButtonHelpText = 32439
+    GuiDispIDGMWOKButtonText = 32434
+    GuiDispIDGMWVisible = 32438
+    GuiDispIDGUCharHeight = 32603
+    GuiDispIDGUCharWidth = 32602
+    GuiDispIDGUHorizontalScrollbar = 32600
+    GuiDispIDGUListNav = 32605
+    GuiDispIDGUOTFPreview = 32606
+    GuiDispIDGUResize = 32604
+    GuiDispIDGUVerticalScrollbar = 32601
+    GuiDispIDGWButtonB = 32425
+    GuiDispIDGWClose = 32414
+    GuiDispIDGWCompBitmap = 32443
+    GuiDispIDGWGuiFocus = 32422
+    GuiDispIDGWHandle = 32420
+    GuiDispIDGWHardCopy = 32415
+    GuiDispIDGWHardCopyMem = 32441
+    GuiDispIDGWIconic = 32400
+    GuiDispIDGWIconify = 32408
+    GuiDispIDGWIsPopupDialog = 32427
+    GuiDispIDGWJumpBackward = 32432
+    GuiDispIDGWJumpForward = 32431
+    GuiDispIDGWMaximize = 32410
+    GuiDispIDGWMoveWindow = 32407
+    GuiDispIDGWPopupDialogText = 32428
+    GuiDispIDGWRestore = 32409
+    GuiDispIDGWSpyMode = 32413
+    GuiDispIDGWStatusB = 32424
+    GuiDispIDGWSysFocus = 32421
+    GuiDispIDGWTabBackward = 32430
+    GuiDispIDGWTabForward = 32429
+    GuiDispIDGWTitleB = 32426
+    GuiDispIDGWToolB = 32423
+    GuiDispIDGWVKAllowed = 32412
+    GuiDispIDGWWPHeight = 32417
+    GuiDispIDGWWPMsgBox = 32419
+    GuiDispIDGWWPResize = 32418
+    GuiDispIDGWWPResizeEx = 32442
+    GuiDispIDGWWPWidth = 32416
+    GuiDispIDIsListBoxActive = 32840
+    GuiDispIDLCursor = 32022
+    GuiDispIDLHighlighted = 32100
+    GuiDispIDLIsLeftLabel = 32101
+    GuiDispIDLIsRightLabel = 32102
+    GuiDispIDListBoxCurrEntry = 32849
+    GuiDispIDListBoxCurrEntryHeight = 32848
+    GuiDispIDListBoxCurrEntryLeft = 32846
+    GuiDispIDListBoxCurrEntryTop = 32845
+    GuiDispIDListBoxCurrEntryWidth = 32847
+    GuiDispIDListBoxHeight = 32844
+    GuiDispIDListBoxLeft = 32842
+    GuiDispIDListBoxTop = 32841
+    GuiDispIDListBoxWidth = 32843
+    GuiDispIDLListProperty = 32103
+    GuiDispIDLMaxLength = 32012
+    GuiDispIDLNumerical = 32013
+    GuiDispIDLPassword = 32016
+    GuiDispIDLSimpleListProperty = 32104
+    GuiDispIDMsgAsPopup = 34004
+    GuiDispIDMsgId = 34001
+    GuiDispIDMsgNumber = 34002
+    GuiDispIDMsgPar = 34003
+    GuiDispIDMsgType = 34000
+    GuiDispIDOcxCallbackChange = 200889
+    GuiDispIDOcxCallbackHighlight = 200890
+    GuiDispIDOcxCallbackHit = 200891
+    GuiDispIDOcxControl = 271062
+    GuiDispIDOcxGetRect = 31192
+    GuiDispIDOcxHit = 31195
+    GuiDispIDOcxHitTest = 31193
+    GuiDispIDOcxHover = 31196
+    GuiDispIDOcxIsReadOnlyCall = 31191
+    GuiDispIDOcxNotify = 31199
+    GuiDispIDOcxNotifyContEvSink = 31197
+    GuiDispIDOcxNotifyCtrlEvent = 31198
+    GuiDispIDOKF1 = 32351
+    GuiDispIDOKOpened = 32350
+    GuiDispIDRBGroupColl = 32504
+    GuiDispIDRBGroupCount = 32502
+    GuiDispIDRBGroupPos = 32503
+    GuiDispIDRBSelect = 32501
+    GuiDispIDRBSelected = 32500
+    GuiDispIDSBDblClick = 32750
+    GuiDispIDScrollMax = 33904
+    GuiDispIDScrollMin = 33905
+    GuiDispIDScrollPage = 33903
+    GuiDispIDScrollPos = 33902
+    GuiDispIDScrollRange = 33900
+    GuiDispIDSesActivWin = 32800
+    GuiDispIDSesBusy = 32803
+    GuiDispIDSesClearErrorList = 32825
+    GuiDispIDSesClose = 32811
+    GuiDispIDSesCmd = 32805
+    GuiDispIDSesCmdAsync = 32806
+    GuiDispIDSesCreate = 32812
+    GuiDispIDSesEnableAccSymbols = 32830
+    GuiDispIDSesEnableAccTabChain = 32829
+    GuiDispIDSesEnableJaws = 32828
+    GuiDispIDSesEndT = 32810
+    GuiDispIDSesErrorList = 32824
+    GuiDispIDSesFindByPos = 32818
+    GuiDispIDSesIconDesc = 33525
+    GuiDispIDSesInfo = 32802
+    GuiDispIDSesInfoAppSr = 33508
+    GuiDispIDSesInfoCl = 33509
+    GuiDispIDSesInfoCP = 33512
+    GuiDispIDSesInfoDisRec = 33521
+    GuiDispIDSesInfoDynp = 33506
+    GuiDispIDSesInfoFlush = 33503
+    GuiDispIDSesInfoForceNot = 33522
+    GuiDispIDSesInfoGrpN = 33515
+    GuiDispIDSesInfoGuiCP = 33523
+    GuiDispIDSesInfoI18N = 33524
+    GuiDispIDSesInfoITime = 33501
+    GuiDispIDSesInfoLang = 33511
+    GuiDispIDSesInfoModeNo = 33517
+    GuiDispIDSesInfoMsgSrc = 33514
+    GuiDispIDSesInfoMsgSrv = 33513
+    GuiDispIDSesInfoProg = 33505
+    GuiDispIDSesInfoReadOnly = 33520
+    GuiDispIDSesInfoRound = 33504
+    GuiDispIDSesInfoRTime = 33500
+    GuiDispIDSesInfoSesCtx = 33518
+    GuiDispIDSesInfoSysN = 33507
+    GuiDispIDSesInfoSysNo = 33516
+    GuiDispIDSesInfoTrans = 33502
+    GuiDispIDSesInfoUser = 33510
+    GuiDispIDSesInfoWAN = 33519
+    GuiDispIDSesIsActive = 32819
+    GuiDispIDSesLockSessionUI = 32826
+    GuiDispIDSesMenu = 32807
+    GuiDispIDSesPPPSyId = 32821
+    GuiDispIDSesPPSyId = 32822
+    GuiDispIDSesPPTaId = 32820
+    GuiDispIDSesProgressPercent = 32832
+    GuiDispIDSesProgressText = 32833
+    GuiDispIDSesRecFile = 32814
+    GuiDispIDSesRecord = 32804
+    GuiDispIDSesRunScrCtrl = 32816
+    GuiDispIDSesSaveAsUnicode = 32823
+    GuiDispIDSesShowKeys = 33527
+    GuiDispIDSesStartT = 32809
+    GuiDispIDSesStdNumFmt = 33526
+    GuiDispIDSesSuppressBackendPopups = 32834
+    GuiDispIDSesTestTool = 32813
+    GuiDispIDSesUnlockSessionUI = 32827
+    GuiDispIDSesVKey = 32808
+    GuiDispIDSesVKeyDesc = 32817
+    GuiDispIDSHSelCtxtMenIt = 34100
+    GuiDispIDSHSelCtxtMenItPos = 34102
+    GuiDispIDSHSelCtxtMenItTxt = 34101
+    GuiDispIDSplitterIsVertical = 34400
+    GuiDispIDSplitterSashPosition = 34401
+    GuiDispIDTableBase = 33400
+    GuiDispIDTableColBase = 33420
+    GuiDispIDTableColFixed = 33421
+    GuiDispIDTableColSelected = 33422
+    GuiDispIDTableColSelectMode = 33401
+    GuiDispIDTableColTitle = 33420
+    GuiDispIDTableColumns = 33402
+    GuiDispIDTableConfigureLayout = 33406
+    GuiDispIDTableCurrentCol = 33410
+    GuiDispIDTableCurrentRow = 33411
+    GuiDispIDTableDeselAllCols = 33414
+    GuiDispIDTableFieldName = 33409
+    GuiDispIDTabLeftTab = 33200
+    GuiDispIDTableGetCell = 33415
+    GuiDispIDTableReorderTable = 33405
+    GuiDispIDTableRowBase = 33430
+    GuiDispIDTableRowCount = 33412
+    GuiDispIDTableRows = 33404
+    GuiDispIDTableRowSelectable = 33431
+    GuiDispIDTableRowSelected = 33430
+    GuiDispIDTableRowSelectMode = 33403
+    GuiDispIDTableSelAllCols = 33408
+    GuiDispIDTableVisRowCount = 33413
+    GuiDispIDTabSelTab = 33201
+    GuiDispIDTBSelect = 32700
+    GuiDispIDTBToLeft = 32701
+    GuiDispIDTHistoryCurEntry = 32057
+    GuiDispIDTHistoryCurIndex = 32056
+    GuiDispIDTHistoryIsActive = 32054
+    GuiDispIDTHistoryList = 32055
+    GuiDispIDTIsOField = 32067
+    GuiDispIDTRequired = 32014
+    GuiDispIDUtilCloseFile = 34202
+    GuiDispIDUtilMsgBox = 34200
+    GuiDispIDUtilMsgOptOK = 34220
+    GuiDispIDUtilMsgOptOKCan = 34222
+    GuiDispIDUtilMsgOptYesNo = 34221
+    GuiDispIDUtilMsgResCancel = 34230
+    GuiDispIDUtilMsgResNo = 34233
+    GuiDispIDUtilMsgResOK = 34231
+    GuiDispIDUtilMsgResYes = 34232
+    GuiDispIDUtilMsgTypeE = 34208
+    GuiDispIDUtilMsgTypeI = 34205
+    GuiDispIDUtilMsgTypeP = 34209
+    GuiDispIDUtilMsgTypeQ = 34206
+    GuiDispIDUtilMsgTypeW = 34207
+    GuiDispIDUtilOpenFile = 34201
+    GuiDispIDUtilWriteFile = 34203
+    GuiDispIDUtilWriteLnFile = 34204
+
+class SapGuiMessageBoxOption:
+    MSG_OPTION_OK = 0 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá apenas um botão 'OK'. (0)
+    MSG_OPTION_YESNO = 1 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá um botão 'Sim' e um botão 'Não'. (1)
+    MSG_OPTION_OKCANCEL = 2 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá um botão 'OK' e um botão 'Cancelar'. (2)
+
+class SapGuiMessageBoxResult:
+    MSG_RESULT_CANCEL = 0 # Valor constante a ser usado como um valor de retorno pelo método showMessageBox. Esse valor é retornado quando o botão 'Cancelar' é pressionado. (0)
+    MSG_RESULT_OK = 1 # Valor constante a ser usado como um valor de retorno pelo método showMessageBox. Esse valor é retornado quando o botão 'OK' é pressionado. (1)
+    MSG_RESULT_YES = 2 # Valor constante a ser usado como um valor de retorno pelo método showMessageBox. Esse valor é retornado quando o botão 'Sim' é pressionado. (2)
+    MSG_RESULT_NO = 3 # Valor constante a ser usado como um valor de retorno pelo método showMessageBox. Esse valor é retornado quando o botão 'Não' é pressionado. (3)
+
+class SapGuiMessageBoxType:
+    MSG_TYPE_INFORMATION = 0 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá a letra 'i' como ícone da caixa de mensagem. (0)
+    MSG_TYPE_QUESTION = 1 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá um ponto de interrogação como ícone da caixa de mensagem. (1)
+    MSG_TYPE_WARNING = 2 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá um ponto de exclamação como ícone da caixa de mensagem. (2)
+    MSG_TYPE_ERROR = 3 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor exibirá um sinal de pare como ícone da caixa de mensagem. (3)
+    MSG_TYPE_PLAIN = 4 # Valor constante a ser usado ao chamar o método showMessageBox. Usar este valor não exibirá nenhum ícone na caixa de mensagem. (4)
+
+class SapGuiScrollbarType:
+    GuiScrollbarTypeUnknown = 0
+    GuiScrollbarTypeVertical = 1
+    GuiScrollbarTypeHorizontal = 2
+
+class SapGuiTableSelectionType:
+    MULTIPLE_INTERVAL_SELECTION = 2 # Várias colunas/linhas podem ser selecionadas. (2)
+    NO_SELECTION = 0 # Nenhuma seleção é possível. (0)
+    SINGLE_SELECTION = 1 # Uma coluna/linha pode ser selecionada. (1)
 
 class SapTypeInstance():
     @staticmethod
