@@ -36,6 +36,9 @@ OK:
 	- GuiSapChart
 	- GuiChart
 	- GuiUserArea
+	- GuiToolbar
+	- GuiTitlebar
+	- GuiStatusbar
 
 * Enumerations
 	- GuiComponentType
@@ -58,12 +61,9 @@ Priority:
 	- GuiLabel
 	- GuiPasswordField
 	- GuiRadioButton
-	- GuiStatusbar
 	- GuiStatusPane
 	- GuiTextedit
 	- GuiTextField
-	- GuiTitlebar
-	- GuiToolbar
 	- GuiToolbarControl
 	- GuiTree
 
@@ -1087,6 +1087,54 @@ class SapGuiVComponent(SapGuiComponent):
         '''
         return self.component.Height
 
+class SapGuiStatusbar(SapGuiVComponent):
+    ''' GuiStatusbar representa a mensagem que exibe parte da barra de status na parte inferior da janela SAP GUI.
+    Ele não inclui as informações do sistema e de login exibidas na área mais à direita da barra de status,
+    pois estão disponíveis no objeto GuiSessionInfo. GuiStatusbar estende o objeto GuiVComponent. O prefixo do tipo é sbar.
+    '''
+    
+    def DoubleClick(self) -> None:
+        self.component.DoubleClick
+    
+    def Handle(self) -> int:
+        ''' O identificador de janela do controle que está conectado ao GuiShell.
+        '''
+        return self.component.Handle
+    
+    def MessageAsPopup(self) -> bool:
+        ''' Algumas mensagens podem ser exibidas não apenas na barra de status, mas também como uma janela pop-up.
+        Nesses casos, esta propriedade é definida como True para que um script saiba que precisa fechar um pop-up para continuar.
+        '''
+        return self.component.MessageAsPopup
+    
+    def MessageId(self) -> str:
+        ''' Este é o nome da classe de mensagem usada na chamada de mensagem ABAP.
+        '''
+        return self.component.MessageId
+    
+    def MessageNumber(self) -> str:
+        ''' Este é o nome do número da mensagem usado na chamada de mensagem ABAP.
+        Geralmente será um número, mas isso não é imposto pelo sistema.
+        '''
+        return self.component.MessageNumber
+    
+    def MessageParameter(self) -> str:
+        ''' Estes são os valores dos parâmetros usados para expandir os espaços reservados na definição do texto da mensagem no dicionário de dados.
+        A propriedade text do GuiStatusbar já contém o texto expandido da mensagem. Um máximo de 8 valores de parâmetros podem
+        ser fornecidos na codificação ABAP, portanto o índice deve estar na faixa de 0 a 7.
+        '''
+        return self.component.MessageParameter
+    
+    def MessageType(self) -> str:
+        ''' Esta propriedade pode ter qualquer um dos seguintes valores:
+        S - Success
+        W - Warning
+        E - Error
+        A - Abort
+        I - Information
+        '''
+        return self.component.MessageType
+
 class SapGuiComboBoxEntry():
     
     def __init__(self, component: object):
@@ -1398,6 +1446,23 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiToolbar(SapGuiVContainer):
+    ''' Cada GuiFrameWindow possui uma GuiToolbar.
+    O GuiMainWindow possui duas barras de ferramentas, a menos que a segunda tenha sido desativada pela aplicação ABAP.
+    A barra de ferramentas superior é a barra de ferramentas do sistema, enquanto a segunda barra de ferramentas é a barra de ferramentas do aplicativo.
+    Os filhos de uma GuiToolbar são botões. Os índices dos botões da barra de ferramentas são determinados pelos valores de chave virtual definidos para o botão.
+    '''
+    
+    pass
+
+class SapGuiToolbar(SapGuiVContainer):
+    ''' A barra de título só é exibida e exposta como um objeto separado no modo Novo Design Visual.
+    O prefixo do tipo e o nome do GuiTitlebar são titl.
+    Em algumas transações a barra de título pode conter objetos do tipo GuiGosShell.
+    '''
+
+    pass
 
 class SapGuiUserArea(SapGuiVContainer):
     ''' A GuiUserArea compreende a área entre a barra de ferramentas e a barra de status para janelas do
