@@ -28,6 +28,7 @@ OK:
 	- GuiShell
 	- GuiContainerShell
 	- GuiTableControl
+	- GuiGridView
 
 * Enumerations
 	- GuiComponentType
@@ -42,10 +43,6 @@ OK:
 	- GuiTableSelectionType
  
 TODO Components:
-
-* Priority:
-    * Objects:
-	- GuiGridView
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -94,6 +91,45 @@ TODO Components:
 	- GuiUserArea
 	- GuiVHViewSwitch
 	- 
+'''
+
+'''
+- Application - Representa a aplicação SAP GUI.
+  - Connection - Representa a conexão a um servidor SAP.
+    - Session - Representa uma sessão SAP.
+      - StatusBar - Representa a barra de status na sessão SAP.
+      - Scripting - Permite acesso ao ambiente de script da sessão.
+        - GuiFrameWindow - Representa uma janela de quadro na sessão SAP.
+          - GuiMainWindow - Representa a janela principal na sessão SAP.
+            - GuiVContainer - Contêiner vertical para abas e componentes.
+              - GuiVTab - Representa uma aba no contêiner vertical.
+                - GuiShell - Uma área de trabalho para exibir informações e interações.
+                  - GuiGridView - Uma grade para exibir dados tabulares.
+                  - GuiShellObject - Um objeto na área de trabalho do shell.
+                  - GuiGridView - Uma grade para exibir dados tabulares.
+                - GuiComponent - Componente de entrada de dados.
+                  - GuiCTextField - Campo de texto simples.
+                  - GuiCTextEdit - Área de edição de texto.
+                  - GuiComboBox - Caixa de combinação (lista suspensa).
+                  - GuiCTextField - Campo de texto simples.
+                  - GuiCTextEdit - Área de edição de texto.
+                  - GuiComboBox - Caixa de combinação (lista suspensa).
+              - GuiContainer - Um contêiner genérico.
+                - GuiShell - Uma área de trabalho para exibir informações e interações.
+                - GuiFrameWindow - Representa uma janela de quadro na sessão SAP.
+                - GuiContainer - Outro contêiner genérico.
+                  - GuiTab - Representa uma aba em um contêiner.
+                  - GuiTree - Uma árvore para exibir hierarquias.
+                  - GuiTreeItem - Um item em uma árvore.
+                  - GuiToolbar - Uma barra de ferramentas com botões.
+                - GuiVContainer - Contêiner vertical para abas e componentes.
+                  - GuiVTab - Representa uma aba no contêiner vertical.
+                    - GuiShell - Uma área de trabalho para exibir informações e interações.
+                    - GuiGridView - Uma grade para exibir dados tabulares.
+                - GuiComponent - Componente de entrada de dados.
+                  - GuiCTextField - Campo de texto simples.
+                  - GuiCTextEdit - Área de edição de texto.
+                  - GuiComboBox - Caixa de combinação (lista suspensa).
 '''
 
 class SapGuiComponentType:
@@ -1360,6 +1396,493 @@ class SapGuiShell(SapGuiVContainer):
         '''
         return self.component.SubType
 
+class SapGuiGridView(SapGuiShell):
+    ''' A visualização em grade é semelhante ao controle de tabela dynpro, mas significativamente mais poderosa. '''
+    
+    def ClearSelection(self) -> None:
+        ''' Chamar ClearSelection remove todas as seleções de linhas, colunas e células. '''
+        self.component.ClearSelection()
+    
+    def Click(self, row: int, column: str) -> None:
+        ''' Esta função emula um clique do mouse em uma determinada célula se os parâmetros forem válidos e gera uma exceção caso contrário. '''
+        self.component.Click(row, column)
+    
+    def ClickCurrentCell(self) -> None:
+        ''' Esta função emula um clique do mouse na célula atual. '''
+        self.component.ClickCurrentCell()
+    
+    def ContextMenu(self) -> None:
+        ''' Chamar ContextMenu emula a solicitação do menu de contexto. '''
+        self.component.ContextMenu()
+    
+    def CurrentCellMoved(self) -> None:
+        ''' Esta função notifica o servidor de que uma célula diferente se tornou a célula atual.
+        Deve ser chamado sempre que a célula atual for alterada.
+        '''
+        self.component.CurrentCellMoved()
+    
+    def DeleteRows(self, rows: str) -> None:
+        ''' As linhas de parâmetro são uma sequência separada por vírgulas de índices ou intervalos de índices,por exemplo “3,5-8,14,15”.
+        As entradas devem ser ordenadas e não sobrepostas, caso contrário será gerada uma exceção.
+        '''
+        # TODO Funções auxiliares
+        self.component.DeleteRows(rows)
+    
+    def DeselectColumn(self, column: str) -> None:
+        ''' Esta função remove a coluna especificada da coleção de colunas selecionadas. '''
+        self.component.DeselectColumn(column)
+    
+    def DoubleClick(self, row: int, column: str) -> None:
+        ''' Esta função emula um clique duplo do mouse em uma determinada célula se os parâmetros forem válidos e gera uma exceção caso contrário. '''
+        self.component.DoubleClick(row, column)
+    
+    def DoubleClickCurrentCell(self) -> None:
+        ''' Esta função emula um clique duplo do mouse na célula atual. '''
+        self.component.DoubleClickCurrentCell()
+    
+    def DuplicateRows(self, rows: str) -> None:
+        ''' As linhas de parâmetro são uma sequência separada por vírgulas de índices ou intervalos de índices, por exemplo “3,5-8,14,15”.
+        Para qualquer índice único, uma cópia da linha será inserida no índice fornecido.
+        Se um intervalo de índices for duplicado, todas as novas linhas serão inseridas como um bloco, antes das linhas antigas.
+        As entradas devem ser ordenadas e não sobrepostas, caso contrário será gerada uma exceção.
+        '''
+        # TODO Funções auxiliares
+        self.component.DuplicateRows(rows)
+    
+    def GetCellChangeable(self, row: int, column: str) -> bool:
+        ''' Esta função retorna True se a célula especificada puder ser alterada. '''
+        self.component.GetCellChangeable(row, column)
+    
+    def GetCellCheckBoxChecked(self, row: int, column: str) -> bool:
+        ''' Retorna True se a caixa de seleção na posição especificada estiver marcada.
+        Lança uma exceção se não houver caixa de seleção na célula especificada. '''
+        self.component.GetCellCheckBoxChecked(row, column)
+    
+    def GetCellColor(self, row: int, column: str) -> int:
+        ''' Retorna um identificador para a cor da célula.
+        Isso pode ser usado para recuperar as informações de cores usando GetColorInfo.
+        '''
+        self.component.GetCellColor(row, column)
+    
+    def GetCellHeight(self, row: int, column: str) -> int:
+        ''' Retorna a altura da célula em pixels. '''
+        self.component.GetCellHeight(row, column)
+    
+    def GetCellIcon(self, row: int, column: str) -> str:
+        ''' Retorna a sequência de ícones da célula, se a célula contiver um ícone.
+        A string tem o formato de ícone ABAP '@xy@', onde xy é um número ou caractere.
+        '''
+        self.component.GetCellIcon(row, column)
+    
+    def GetCellLeft(self, row: int, column: str) -> int:
+        ''' Retorna a posição esquerda da célula nas coordenadas do cliente. '''
+        self.component.GetCellLeft(row, column)
+    
+    def GetCellMaxLength(self, row: int, column: str) -> int:
+        ''' Retorna o comprimento máximo da célula em número de bytes. '''
+        self.component.GetCellMaxLength(row, column)
+    
+    def GetCellState(self, row: int, column: str) -> str:
+        ''' Retorna o estado da célula. Os valores possíveis são:
+        Normal
+        Error
+        Warning
+        Info
+        '''
+        self.component.GetCellState(row, column)
+    
+    def GetCellTooltip(self, row: int, column: str) -> str:
+        ''' Retorna a dica de ferramenta da célula.
+        '''
+        self.component.GetCellTooltip(row, column)
+    
+    def GetCellTop(self, row: int, column: str) -> int:
+        ''' Retorna a posição superior da célula nas coordenadas do cliente. '''
+        self.component.GetCellTop(row, column)
+    
+    def GetCellType(self, row: int, column: str) -> str:
+        ''' Esta função retorna o tipo da célula especificada. Os valores possíveis são:
+        Normal
+        Button
+        Checkbox
+        ValueList
+        RadioButton
+        '''
+        self.component.GetCellType(row, column)
+    
+    def GetCellValue(self, row: int, column: str) -> str:
+        ''' Retorna o valor da célula como uma string.
+        '''
+        self.component.GetCellValue(row, column)
+    
+    def GetCellWidth(self, row: int, column: str) -> int:
+        ''' Retorna a largura da célula em pixels. '''
+        self.component.GetCellWidth(row, column)
+    
+    def GetColorInfo(self, color: int) -> str:
+        ''' Retorna a descrição da cor da célula.
+        '''
+        self.component.GetColorInfo(color)
+    
+    def GetColumnDataType(self, column: str) -> str:
+        ''' Retorna o tipo de dados da coluna de acordo com os 'tipos de dados integrados' do padrão de esquema XML.
+        '''
+        self.component.GetColumnDataType(column)
+    
+    def GetColumnPosition(self, column: str) -> int:
+        ''' Retorna a posição da coluna conforme mostrado na tela, começando em 1.
+        '''
+        self.component.GetColumnPosition(column)
+    
+    def GetColumnSortType(self, column: str) -> str:
+        ''' Retorna o tipo de classificação da coluna. Os valores possíveis são:
+        None
+        Ascending
+        Descending
+        '''
+        self.component.GetColumnSortType(column)
+    
+    def GetColumnTitles(self, column: str) -> object:
+        ''' Esta função retorna uma coleção de strings que são usadas para exibir o título de uma coluna.
+        O controle escolhe o título apropriado de acordo com a largura da coluna.
+        '''
+        # TODO Verificar retorno
+        self.component.GetColumnTitles(column)
+    
+    def GetColumnTooltip(self, column: str) -> str:
+        ''' A dica de ferramenta de uma coluna contém um texto projetado para ajudar o usuário a compreender o significado da coluna.
+        '''
+        self.component.GetColumnTooltip(column)
+    
+    def GetColumnTotalType(self, column: str) -> str:
+        ''' Retorna o tipo total da coluna. Os valores possíveis são:
+        None
+        Total
+        Subtotal
+        '''
+        self.component.GetColumnTotalType(column)
+    
+    def GetDisplayedColumnTitle(self, column: str) -> str:
+        ''' Esta função retorna o título da coluna exibida atualmente.
+        Este texto é um dos valores da coleção retornada da função "getColumnTitles".
+        '''
+        self.component.GetDisplayedColumnTitle(column)
+    
+    def GetRowTotalLevel(self, row: int) -> int:
+        ''' Retorna o nível da linha.
+        '''
+        self.component.GetRowTotalLevel(row)
+    
+    def GetSymbolInfo(self, symbol: str) -> str:
+        ''' Retorna a descrição do símbolo na célula.
+        '''
+        self.component.GetSymbolInfo(symbol)
+    
+    def GetToolbarButtonChecked(self, button_pos: int) -> bool:
+        ''' Retorna True se o botão estiver marcado (pressionado).
+        '''
+        self.component.GetToolbarButtonChecked(button_pos)
+    
+    def GetToolbarButtonEnabled(self, button_pos: int) -> bool:
+        ''' Indica se o botão pode ser pressionado.
+        '''
+        self.component.GetToolbarButtonEnabled(button_pos)
+    
+    def GetToolbarButtonIcon(self, button_pos: int) -> str:
+        ''' Retorna o nome do ícone do botão da barra de ferramentas especificado.
+        '''
+        self.component.GetToolbarButtonIcon(button_pos)
+        
+    def GetToolbarButtonId(self, button_pos: int) -> str:
+        ''' Retorna o ID do botão da barra de ferramentas especificado, conforme definido no dicionário de dados ABAP.
+        '''
+        self.component.GetToolbarButtonId(button_pos)
+
+    def GetToolbarButtonText(self, button_pos: int) -> str:
+        ''' Retorna o texto do botão da barra de ferramentas especificado.
+        '''
+        self.component.GetToolbarButtonText(button_pos)
+
+    def GetToolbarButtonTooltip(self, button_pos: int) -> str:
+        ''' Retorna a dica de ferramentas do botão da barra de ferramentas especificado.
+        '''
+        self.component.GetToolbarButtonTooltip(button_pos)
+
+    def GetToolbarButtonType(self, button_pos: int) -> str:
+        ''' Retorna o tipo do botão da barra de ferramentas especificado. Os valores possíveis são:
+        Button
+        ButtonAndMenu
+        Menu
+        Separator
+        Group
+        CheckBox
+        '''
+        self.component.GetToolbarButtonType(button_pos)
+
+    def GetToolbarFocusButton(self) -> int:
+        ''' Retorna a posição do botão da barra de ferramentas que tem o foco. Se nenhum botão na barra de ferramentas tiver o foco, o método retorna -1.
+        '''
+        self.component.GetToolbarFocusButton()
+
+    def HasCellF4Help(self, row: int, column: str) -> bool:
+        ''' Retorna True se a célula tiver um valor de ajuda.
+        '''
+        self.component.HasCellF4Help(row, column)
+
+    def HistoryCurEntry(self, row: int, column: str) -> str:
+        ''' Retorna o texto da entrada selecionada atualmente da lista de histórico na célula especificada.
+        '''
+        self.component.HistoryCurEntry(row, column)
+
+    def HistoryCurIndex(self, row: int, column: str) -> int:
+        ''' Retorna o índice (base zero) da entrada selecionada atualmente na lista de histórico da célula especificada.
+        '''
+        self.component.HistoryCurIndex(row, column)
+
+    def HistoryIsActive(self, row: int, column: str) -> bool:
+        ''' Este método retorna True se a lista de histórico de entrada estiver aberta para a célula especificada.
+        '''
+        self.component.HistoryIsActive(row, column)
+
+    def HistoryList(self, row: int, column: str) -> SapGuiCollection:
+        ''' Este método recupera a lista de entradas de histórico de entrada da célula GuiGridView especificada como uma GuiCollection.
+        Os valores da lista de histórico dependem do valor atual contido na célula.
+        '''
+        self.component.HistoryList(row, column)
+
+    def InsertRows(self, rows: str) -> None:
+        ''' As linhas de parâmetro são uma sequência separada por vírgulas de índices ou intervalos de índices, por exemplo “3,5-8,14,15”.
+        Para qualquer índice único, uma nova linha será adicionada no índice fornecido, movendo a linha antiga uma linha para baixo.
+        Se um intervalo de índices for inserido, todas as novas linhas serão inseridas como um bloco, antes das linhas antigas.
+        As entradas devem ser ordenadas e não sobrepostas, caso contrário será gerada uma exceção.
+        '''
+        # TODO Funções auxiliares
+        self.component.InsertRows(rows)
+
+    def IsCellHotspot(self, row: int, column: str) -> bool:
+        ''' Retorna True se a célula for um link.
+        '''
+        self.component.IsCellHotspot(row, column)
+
+    def IsCellSymbol(self, row: int, column: str) -> bool:
+        ''' Retorna True se o texto na célula for exibido na fonte de símbolo SAP.
+        '''
+        self.component.IsCellSymbol(row, column)
+
+    def IsCellTotalExpander(self, row: int, column: str) -> bool:
+        ''' Retorna True se a célula contiver um botão de expansão total.
+        '''
+        self.component.IsCellTotalExpander(row, column)
+
+    def IsColumnFiltered(self, column: str) -> bool:
+        ''' Retorna True se um filtro foi aplicado à coluna.
+        '''
+        self.component.IsColumnFiltered(column)
+
+    def IsColumnKey(self, column: str) -> bool:
+        ''' Retorna True se a coluna estiver marcada como uma coluna de chave.
+        '''
+        self.component.IsColumnKey(column)
+
+    def IsTotalRowExpanded(self, row: int) -> bool:
+        ''' Retorna True se a linha que contém um botão de expansão estiver atualmente expandida.
+        '''
+        self.component.IsTotalRowExpanded(row)
+
+    def ModifyCell(self, row: int, column: str, value: str) -> None:
+        ''' Se a linha e a coluna identificarem uma célula editável válida e o valor tiver um tipo válido para essa célula,
+        o valor da célula será alterado. Caso contrário, uma exceção será gerada.
+        '''
+        self.component.ModifyCell(row, column, value)
+
+    def ModifyCheckBox(self, row: int, column: str, checked: bool) -> None:
+        ''' Se a linha e a coluna identificarem uma célula editável válida contendo uma caixa de seleção e o valor tiver um tipo válido para essa célula,
+        o valor da célula será alterado. Caso contrário, uma exceção será gerada.
+        '''
+        self.component.ModifyCheckBox(row, column, checked)
+
+    def MoveRows(self, from_row: int, to_row: int, dest_row: int) -> None:
+        ''' As linhas com um índice maior ou igual a from_row até um índice menor ou igual a to_row são movidas para a posição de dest_row.
+        Passar valores de índice inválidos como parâmetros gera uma exceção.
+        '''
+        self.component.MoveRows(from_row, to_row, dest_row)
+
+    def PressButton(self, row: int, column: str) -> None:
+        ''' Esta função emula o pressionamento de um botão colocado em uma célula específica.
+        Ela gera uma exceção se a célula não contiver um botão ou se nem mesmo existir.
+        '''
+        self.component.PressButton(row, column)
+
+    def PressButtonCurrentCell(self) -> None:
+        ''' Esta função emula o pressionamento de um botão colocado na célula atual.
+        Ela gera uma exceção se a célula não contiver um botão.
+        '''
+        self.component.PressButtonCurrentCell()
+
+    def PressColumnHeader(self, column: str) -> None:
+        ''' Esta função emula um clique do mouse no cabeçalho da coluna se o parâmetro identificar uma coluna válida.
+        Caso contrário, gera uma exceção.
+        '''
+        self.component.PressColumnHeader(column)
+
+    def PressEnter(self) -> None:
+        ''' Esta função emula a pressão da tecla Enter.
+        '''
+        self.component.PressEnter()
+
+    def PressF1(self) -> None:
+        ''' Esta função emula a pressão da tecla F1 enquanto o foco está na visualização da grade.
+        '''
+        self.component.PressF1()
+
+    def PressF4(self) -> None:
+        ''' Esta função emula a pressão da tecla F4.
+        '''
+        self.component.PressF4()
+
+    def PressToolbarButton(self, button_id: str) -> None:
+        ''' Esta função emula o clique em um botão na barra de ferramentas da visualização da grade.
+        '''
+        self.component.PressToolbarButton(button_id)
+
+    def PressToolbarContextButton(self, button_id: str) -> None:
+        ''' Esta função emula a abertura do menu de contexto na barra de ferramentas da visualização da grade.
+        '''
+        self.component.PressToolbarContextButton(button_id)
+
+    def PressTotalRow(self, row: int, column: str) -> None:
+        ''' Esta função emula a pressão do botão da linha total, que expande ou condensa as linhas agrupadas.
+        '''
+        self.component.PressTotalRow(row, column)
+
+    def PressTotalRowCurrentCell(self) -> None:
+        ''' Esta função difere de PressTotalRow apenas no fato de tentar pressionar o botão de expansão na célula atual.
+        '''
+        self.component.PressTotalRowCurrentCell()
+
+    def SelectAll(self) -> None:
+        ''' Esta função seleciona todo o conteúdo da grade (ou seja, todas as linhas e todas as colunas).
+        '''
+        self.component.SelectAll()
+
+    def SelectColumn(self, column: str) -> None:
+        ''' Esta função adiciona a coluna especificada à coleção das colunas selecionadas.
+        '''
+        self.component.SelectColumn(column)
+
+    def SelectionChanged(self) -> None:
+        ''' Esta função notifica o servidor que a seleção foi alterada.
+        '''
+        self.component.SelectionChanged()
+
+    def SelectToolbarMenuItem(self, item_id: str) -> None:
+        ''' Esta função emula a seleção de um item no menu de contexto da barra de ferramentas da visualização da grade.
+        '''
+        self.component.SelectToolbarMenuItem(item_id)
+
+    def SetColumnWidth(self, column: str, width: int) -> None:
+        ''' Esta função define a largura de uma coluna em caracteres.
+        '''
+        self.component.SetColumnWidth(column, width)
+
+    def SetCurrentCell(self, row: int, column: str) -> None:
+        ''' Se a linha e a coluna identificarem uma célula válida, essa célula se tornará a célula atual.
+        '''
+        self.component.SetCurrentCell(row, column)
+
+    def TriggerModified(self) -> None:
+        ''' Notifica o servidor sobre várias alterações nas células.
+        '''
+        self.component.TriggerModified()
+
+    def ColumnCount(self) -> int:
+        ''' Esta propriedade representa o número de colunas no controle.
+        '''
+        return self.component.ColumnCount
+
+    def ColumnOrder(self, order: object = None) -> object:
+        ''' Esta coleção contém todos os identificadores de coluna na ordem em que estão atualmente exibidos.
+        '''
+        # TODO Verificar retorno
+        if order is not None: self.component.ColumnOrder = order
+        return self.component.ColumnOrder
+
+    def CurrentCellColumn(self, column: str = None) -> str:
+        ''' A string que identifica uma coluna é o nome do campo definido no dicionário de dados do SAP.
+        '''
+        if column is not None: self.component.CurrentCellColumn = column
+        return self.component.CurrentCellColumn
+
+    def CurrentCellRow(self, row: int = None) -> int:
+        ''' O índice da linha atual varia de 0 ao número de linhas menos 1, com -1 sendo o índice da linha do título.
+        '''
+        if row is not None: self.component.CurrentCellRow = row
+        return self.component.CurrentCellRow
+
+    def FirstVisibleColumn(self, column: str = None) -> str:
+        ''' Esta propriedade representa a primeira coluna visível da área de rolagem da visualização da grade.
+        '''
+        if column is not None: self.component.FirstVisibleColumn = column
+        return self.component.FirstVisibleColumn
+
+    def FirstVisibleRow(self, row: int = None) -> int:
+        ''' Este é o índice da primeira linha visível na grade.
+        '''
+        if row is not None: self.component.FirstVisibleRow = row
+        return self.component.FirstVisibleRow
+
+    def FrozenColumnCount(self) -> int:
+        ''' Esta propriedade representa o número de colunas excluídas da rolagem horizontal.
+        '''
+        return self.component.FrozenColumnCount
+
+    def RowCount(self) -> int:
+        ''' Esta propriedade representa o número de linhas no controle.
+        '''
+        return self.component.RowCount
+
+    def SelectedCells(self, cells: object = None) -> object:
+        ''' A coleção de células selecionadas contém strings no formato "<índice da linha>,<identificador da coluna>", como "0,CARRID".
+        '''
+        # TODO Verificar retorno
+        if cells is not None: self.component.SelectedCells = cells
+        return self.component.SelectedCells
+
+    def SelectedColumns(self, columns: object = None) -> object:
+        ''' As colunas selecionadas estão disponíveis como uma coleção de strings, assim como a string CurrentCellColumn.
+        '''
+        # TODO Verificar retorno
+        if columns is not None:
+            self.component.SelectedColumns = columns
+        return self.component.SelectedColumns
+
+    def SelectedRows(self, rows: str = None) -> str:
+        ''' A string é uma lista separada por vírgulas de números de índice de linha ou intervalos de índice, como "1,2,4-8,10".
+        '''
+        if rows is not None:
+            self.component.SelectedRows = rows
+        return self.component.SelectedRows
+
+    def SelectionMode(self) -> str:
+        ''' Retorna o modo de seleção atual da grade.
+        '''
+        return self.component.SelectionMode
+
+    def Title(self) -> str:
+        ''' Esta propriedade representa o título do controle da grade.
+        '''
+        return self.component.Title
+
+    def ToolbarButtonCount(self) -> int:
+        ''' O número de botões da barra de ferramentas, incluindo separadores.
+        '''
+        return self.component.ToolbarButtonCount
+
+    def VisibleRowCount(self) -> int:
+        ''' Recupera o número de linhas visíveis da grade.
+        '''
+        return self.component.VisibleRowCount
+
 class SapGuiContainerShell(SapGuiShell):
     ''' Um GuiContainerShell é um wrapper para um conjunto de objetos GuiShell.
     GuiContainerShell estende o objeto GuiVContainer.
@@ -2236,4 +2759,3 @@ class SapGuiApplication(SapGuiContainer):
         ''' Esta propriedade retorna um objeto GuiUtils global.
         '''
         return self.component.Utils
-        
