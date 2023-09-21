@@ -30,6 +30,7 @@ OK:
 	- GuiTableControl
 	- GuiGridView
 	- GuiModalWindow
+	- GuiComboBox
 
 * Enumerations
 	- GuiComponentType
@@ -46,7 +47,6 @@ OK:
 TODO Components:
 
 Priority:
-	- GuiComboBox
 	- GuiComboBoxControl
 	- GuiComboBoxEntry
 	- GuiCTextField
@@ -1046,6 +1046,108 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiComboBox(SapGuiVComponent):
+    ''' O GuiComboBox é um pouco semelhante ao GuiCTextField, mas tem uma implementação completamente diferente.
+    Enquanto pressionar o botão da caixa de combinação de um GuiCTextField abrirá um novo dynpro ou controle no qual uma
+    seleção pode ser feita, o GuiComboBox recupera todas as opções possíveis na inicialização do servidor, para que a
+    seleção seja feita exclusivamente no cliente. GuiComboBox estende o objeto GuiVComponent. O prefixo do tipo é cmb, 
+    o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
+    
+    def SetKeySpace(self) -> None:
+        ''' Esta função define a propriedade key da caixa de combinação para o caractere de espaço. Foi introduzido para eCATT.
+        '''
+        self.component.SetKeySpace()
+
+    def CharHeight(self) -> int:
+        ''' Altura do GuiComboBox em métrica de caracteres.
+        '''
+        return self.component.CharHeight
+
+    def CharLeft(self) -> int:
+        ''' Coordenada esquerda do GuiComboBox em métrica de caracteres.
+        '''
+        return self.component.CharLeft
+
+    def CharTop(self) -> int:
+        ''' Coordenada superior do GuiComboBox em métrica de caracteres.
+        '''
+        return self.component.CharTop
+
+    def CharWidth(self) -> int:
+        ''' Largura do GuiComboBox em métrica de caracteres.
+        '''
+        return self.component.CharWidth
+
+    def CurListBoxEntry(self) -> SapGuiComboBoxEntry:
+        ''' A entrada atualmente focada na lista suspensa.
+        '''
+        return self.component.CurListBoxEntry
+
+    def Entries(self) -> SapGuiCollection:
+        ''' Todos os membros desta coleção são do tipo GuiComboBoxEntry e têm apenas duas propriedades, chave e valor, ambas do tipo String. O key data pode ser exibido no SAP GUI configurando as opções 'Show keys...' no diálogo de opções do SAP GUI.
+        '''
+        return self.component.Entries
+
+    def Flushing(self) -> bool:
+        ''' Alguns componentes, como botões de rádio, caixas de seleção ou caixas de combinação, podem causar uma round trip quando seu valor é alterado. Se for o caso, a propriedade Flushing é Verdadeira.
+        '''
+        return self.component.Flushing
+
+    def Highlighted(self) -> bool:
+        ''' Esta propriedade é Verdadeira se a flag Highlighted estiver definida no Screen Painter para a caixa de combinação.
+        '''
+        return self.component.Highlighted
+
+    def IsLeftLabel(self) -> bool:
+        ''' Esta propriedade é Verdadeira se a caixa de combinação tiver a flag 'assign left'.
+        '''
+        return self.component.IsLeftLabel
+
+    def IsListBoxActive(self) -> bool:
+        ''' Esta propriedade é Verdadeira se a lista suspensa da caixa de combinação estiver atualmente aberta.
+        '''
+        return self.component.IsListBoxActive
+
+    def IsRightLabel(self) -> bool:
+        ''' Esta propriedade é Verdadeira se a caixa de combinação tiver a flag 'assign right'.
+        '''
+        return self.component.IsRightLabel
+
+    def Key(self, key: str = None) -> str:
+        ''' Esta é a chave do item atualmente selecionado. Você pode alterar este item definindo a propriedade Key para um novo valor.
+        '''
+        if key is not None:
+            self.component.Key = key
+        return self.component.Key
+
+    def LeftLabel(self) -> str:
+        ''' Este rótulo foi definido no ABAP Screen Painter para ser o rótulo esquerdo da caixa de combinação.
+        '''
+        return self.component.LeftLabel
+
+    def Required(self) -> bool:
+        ''' Se a flag Required estiver definida para uma caixa de combinação, a entrada vazia não poderá ser selecionada na lista.
+        '''
+        return self.component.Required
+
+    def RightLabel(self) -> SapGuiVComponent:
+        ''' Este rótulo foi definido no ABAP Screen Painter para ser o rótulo direito da caixa de combinação.
+        '''
+        return self.component.RightLabel
+
+    def ShowKey(self) -> bool:
+        ''' Esta propriedade é Verdadeira se a caixa de combinação mostrar tanto as chaves quanto os valores (isso pode ser configurado definindo as opções 'Show keys...' no diálogo de opções do SAP GUI).
+        '''
+        return self.component.ShowKey
+
+    def Value(self, value: str = None) -> str:
+        ''' Este é o valor do item atualmente selecionado. Você pode alterar este item definindo a propriedade Value para um novo valor.
+        '''
+        if value is not None:
+            self.component.Value = value
+        return self.component.Value
 
 class SapGuiCheckBox(SapGuiVComponent):
     #TODO Fazer uma descrição
