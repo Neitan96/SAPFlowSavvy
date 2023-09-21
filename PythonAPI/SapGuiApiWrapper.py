@@ -32,6 +32,7 @@ OK:
 	- GuiModalWindow
 	- GuiComboBox
 	- GuiComboBoxEntry
+	- GuiComboBoxControl
 
 * Enumerations
 	- GuiComponentType
@@ -48,7 +49,6 @@ OK:
 TODO Components:
 
 Priority:
-	- GuiComboBoxControl
 	- GuiCTextField
 	- GuiCustomControl
 	- GuiInputFieldControl
@@ -1448,6 +1448,35 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiComboBoxControl(SapGuiShell):
+    #TODO Criar uma descrição
+    
+    def FireSelected(self) -> None:
+        ''' Envia evento "selecionado".
+        '''
+        self.component.FireSelected()
+    
+    def Entries(self) -> SapGuiCollection:
+        ''' As entradas são novamente uma GuiCollection com: key(index=0), text(index=1) o texto de cada entrada que você pode obter por meio desta coleção.
+        '''
+        return self.component.Entries
+    
+    def LabelText(self) -> str:
+        ''' Texto da etiqueta.
+        '''
+        return self.component.LabelText
+    
+    def Selected(self, select: str = None) -> str:
+        ''' A chave da entrada atualmente selecionada da caixa de combinação.
+        '''
+        if select is not None: self.component.Selected = select
+        return self.component.Selected
+    
+    def Text(self) -> str:
+        ''' Texto atual da caixa de combinação.
+        '''
+        return self.component.Text
 
 class SapGuiGridView(SapGuiShell):
     ''' A visualização em grade é semelhante ao controle de tabela dynpro, mas significativamente mais poderosa. '''
