@@ -29,6 +29,7 @@ OK:
 	- GuiContainerShell
 	- GuiTableControl
 	- GuiGridView
+	- GuiModalWindow
 
 * Enumerations
 	- GuiComponentType
@@ -44,51 +45,52 @@ OK:
  
 TODO Components:
 
-* Objects:
-	- GuiAbapEditor - N/a
-	- GuiApoGrid - N/a
-	- GuiBarChart
-	- GuiCalendar
-	- GuiChart
-	- GuiColorSelector
+Priority:
 	- GuiComboBox
 	- GuiComboBoxControl
 	- GuiComboBoxEntry
 	- GuiCTextField
 	- GuiCustomControl
+	- GuiInputFieldControl
+	- GuiLabel
+	- GuiPasswordField
+	- GuiRadioButton
+	- GuiStatusbar
+	- GuiStatusPane
+	- GuiTextedit
+	- GuiTextField
+	- GuiTitlebar
+	- GuiToolbar
+	- GuiToolbarControl
+	- GuiTree
+	- GuiUserArea
+
+* Objects:
+	- GuiAbapEditor - N/a
+	- GuiApoGrid
+	- GuiBarChart
+	- GuiCalendar
+	- GuiChart
+	- GuiColorSelector
 	- GuiDialogShell
 	- GuiEAIViewer2D
 	- GuiEAIViewer3D
 	- GuiGOSShell
 	- GuiGraphAdapt
 	- GuiHTMLViewer
-	- GuiInputFieldControl
-	- GuiLabel
 	- ContentGuiMainWindow
 	- GuiMap
 	- GuiMenubar
 	- GuiMessageWindow
-	- GuiModalWindow
 	- GuiNetChart
 	- GuiOfficeIntegration
 	- GuiOkCodeField
-	- GuiPasswordField
 	- GuiPicture
-	- GuiRadioButton
 	- GuiSapChart
 	- GuiSimpleContainer
 	- GuiSplit
 	- GuiSplitterContainer
 	- GuiStage
-	- GuiStatusbar
-	- GuiStatusPane
-	- GuiTextedit
-	- GuiTextField231
-	- GuiTitlebar
-	- GuiToolbar
-	- GuiToolbarControl
-	- GuiTree
-	- GuiUserArea
 	- GuiVHViewSwitch
 	- 
 '''
@@ -1224,127 +1226,6 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
 
-class SapGuiTableControl(SapGuiVContainer):
-    ''' O controle table é um elemento dynpro padrão, em contraste com o GuiCtrlGridView, que é semelhante.
-    O prefixo do tipo é tbl, o nome é o nome do campo retirado do dicionário de dados SAP.
-    '''
-    #TODO  Funções adicionais
-    
-    def ConfigureLayout(self) -> SapGuiModalWindow:
-        ''' Na caixa de diálogo de configuração o layout da tabela pode ser alterado. Esta caixa de diálogo é uma GuiModalWindow.
-        '''
-        return self.component.ConfigureLayout()
-    
-    def DeselectAllColumns(self) -> None:
-        ''' Esta função pode ser usada para controles de tabela com um botão que permite desmarcar todas as colunas em uma única etapa.
-        '''
-        return self.component.DeselectAllColumns()
-    
-    def GetAbsoluteRow(self, index: int) -> SapGuiTableRow:
-        ''' Ao contrário da coleção de linhas, a indexação suportada por esta função não redefine o índice após a rolagem,
-        mas conta as linhas começando pela primeira linha em relação à primeira posição de rolagem.
-        Se a linha selecionada não estiver visível no momento, uma exceção será gerada.
-        '''
-        return self.component.GetAbsoluteRow()
-    
-    def GetCell(self, row: int, column: int) -> SapGuiVComponent:
-        ''' Este método retorna uma determinada célula da tabela.
-        É mais eficiente do que acessar uma única célula usando coleções de linhas ou colunas.
-        '''
-        return self.component.GetCell(row, column)
-    
-    def ReorderTable(self, permutation: str) -> None:
-        ''' A permutação de parâmetros descreve uma nova ordem das colunas.
-        Por exemplo "1 3 2" moverá a coluna 3 para a segunda posição.
-        '''
-        # TODO Melhorar a função usando o nome das colunas
-        return self.component.ReorderTable(permutation)
-    
-    def SelectAllColumns(self) -> None:
-        ''' Esta função pode ser usada para controles de tabela com um botão que permite selecionar todas as colunas em uma única etapa.
-        '''
-        return self.component.SelectAllColumns()
-    
-    def CharHeight(self) -> int:
-        ''' Altura do GuiTableControl na métrica de caracteres.
-        '''
-        return self.component.CharHeight
-    
-    def CharLeft(self) -> int:
-        ''' Coordenada esquerda do GuiTableControl na métrica de caracteres.
-        '''
-        return self.component.CharLeft
-    
-    def CharTop(self) -> int:
-        ''' Coordenada superior do GuiTableControl na métrica de caracteres.
-        '''
-        return self.component.CharTop
-    
-    def CharWidth(self) -> int:
-        ''' Largura do GuiTableControl na métrica de caracteres.
-        '''
-        return self.component.CharWidth
-    
-    def ColSelectMode(self) -> int:
-        ''' Existem três modos diferentes para selecionar colunas ou linhas, que são definidos no tipo de enumeração GuiTableSelectionType.
-        '''
-        return self.component.ColSelectMode
-    
-    def Columns(self) -> SapGuiCollection:
-        ''' Os membros desta coleção são do tipo GuiTableColumn.
-        Portanto, eles não suportam propriedades como id ou nome.
-        '''
-        return self.component.Columns
-    
-    def CurrentCol(self) -> int:
-        ''' Índice baseado em zero da coluna atual.
-        '''
-        return self.component.CurrentCol
-    
-    def CurrentRow(self) -> int:
-        ''' Índice baseado em zero da linha atual.
-        '''
-        return self.component.CurrentRow
-    
-    def HorizontalScrollbar(self) -> SapGuiScrollbar:
-        ''' A barra de rolagem horizontal do controle de tabela.
-        '''
-        return self.component.HorizontalScrollbar
-    
-    def RowCount(self) -> int:
-        ''' Número de linhas na tabela. Isso inclui linhas invisíveis. Para o número de linhas visíveis está disponível a propriedade VisibleRowCount.
-        '''
-        return self.component.RowCount
-    
-    def Rows(self) -> SapGuiCollection:
-        ''' Os membros desta coleção são do tipo GuiTableRow.
-        A indexação começa com 0 para a primeira linha visível, independente da posição atual da barra de rolagem horizontal.
-        Após a rolagem, uma linha diferente terá o índice 0.
-        '''
-        return self.component.Rows
-    
-    def RowSelectMode(self) -> int:
-        ''' Existem três modos diferentes para selecionar colunas ou linhas,
-        que são definidos no tipo de enumeração GuiTableSelectionType.
-        '''
-        return self.component.RowSelectMode
-    
-    def TableFieldName(self) -> str:
-        ''' A propriedade name do controle de tabela contém o nome do programa ABAP além do nome do campo simples.
-        Esta propriedade contém apenas o nome do campo.
-        '''
-        return self.component.TableFieldName
-    
-    def VerticalScrollbar(self) -> SapGuiScrollbar:
-        ''' A barra de rolagem vertical do controle de tabela.
-        '''
-        return self.component.VerticalScrollbar
-    
-    def VisibleRowCount(self) -> int:
-        ''' Número de linhas visíveis na tabela. Para o número de todas as linhas a propriedade RowCount está disponível.
-        '''
-        return self.component.VisibleRowCount
-
 class SapGuiShell(SapGuiVContainer):
     ''' GuiShell é um objeto abstrato cuja interface é suportada por todos os controles.
     GuiShell estende o objeto GuiVContainer. O prefixo do tipo é shell, o nome é a última parte do id, shell[n].
@@ -2135,6 +2016,143 @@ class SapGuiFrameWindow(SapGuiVContainer):
         O painel de trabalho é a área entre as barras de ferramentas na parte superior da janela e a barra de status na parte inferior da janela.
         '''
         return self.component.WorkingPaneWidth
+
+class SapGuiModalWindow(SapGuiFrameWindow):
+    ''' Uma GuiModalWindow é uma caixa de diálogo pop-up.
+    '''
+    
+    def IsPopupDialog(self) -> bool:
+        ''' Algumas janelas modais representam caixas de diálogo pop-up.
+        Neste caso a propriedade IsPopupDialog é True.
+        As caixas de diálogo pop-up são identificadas verificando o nome da fonte ABAP e o número do dynpro.
+        '''
+        return self.component.IsPopupDialog
+    
+    def PopupDialogText(self) -> str:
+        ''' O texto dos campos de entrada da caixa de diálogo pop-up em formato concatenado.
+        '''
+        return self.component.PopupDialogText
+
+class SapGuiTableControl(SapGuiVContainer):
+    ''' O controle table é um elemento dynpro padrão, em contraste com o GuiCtrlGridView, que é semelhante.
+    O prefixo do tipo é tbl, o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
+    #TODO  Funções adicionais
+    
+    def ConfigureLayout(self) -> SapGuiModalWindow:
+        ''' Na caixa de diálogo de configuração o layout da tabela pode ser alterado. Esta caixa de diálogo é uma GuiModalWindow.
+        '''
+        return self.component.ConfigureLayout()
+    
+    def DeselectAllColumns(self) -> None:
+        ''' Esta função pode ser usada para controles de tabela com um botão que permite desmarcar todas as colunas em uma única etapa.
+        '''
+        return self.component.DeselectAllColumns()
+    
+    def GetAbsoluteRow(self, index: int) -> SapGuiTableRow:
+        ''' Ao contrário da coleção de linhas, a indexação suportada por esta função não redefine o índice após a rolagem,
+        mas conta as linhas começando pela primeira linha em relação à primeira posição de rolagem.
+        Se a linha selecionada não estiver visível no momento, uma exceção será gerada.
+        '''
+        return self.component.GetAbsoluteRow()
+    
+    def GetCell(self, row: int, column: int) -> SapGuiVComponent:
+        ''' Este método retorna uma determinada célula da tabela.
+        É mais eficiente do que acessar uma única célula usando coleções de linhas ou colunas.
+        '''
+        return self.component.GetCell(row, column)
+    
+    def ReorderTable(self, permutation: str) -> None:
+        ''' A permutação de parâmetros descreve uma nova ordem das colunas.
+        Por exemplo "1 3 2" moverá a coluna 3 para a segunda posição.
+        '''
+        # TODO Melhorar a função usando o nome das colunas
+        return self.component.ReorderTable(permutation)
+    
+    def SelectAllColumns(self) -> None:
+        ''' Esta função pode ser usada para controles de tabela com um botão que permite selecionar todas as colunas em uma única etapa.
+        '''
+        return self.component.SelectAllColumns()
+    
+    def CharHeight(self) -> int:
+        ''' Altura do GuiTableControl na métrica de caracteres.
+        '''
+        return self.component.CharHeight
+    
+    def CharLeft(self) -> int:
+        ''' Coordenada esquerda do GuiTableControl na métrica de caracteres.
+        '''
+        return self.component.CharLeft
+    
+    def CharTop(self) -> int:
+        ''' Coordenada superior do GuiTableControl na métrica de caracteres.
+        '''
+        return self.component.CharTop
+    
+    def CharWidth(self) -> int:
+        ''' Largura do GuiTableControl na métrica de caracteres.
+        '''
+        return self.component.CharWidth
+    
+    def ColSelectMode(self) -> int:
+        ''' Existem três modos diferentes para selecionar colunas ou linhas, que são definidos no tipo de enumeração GuiTableSelectionType.
+        '''
+        return self.component.ColSelectMode
+    
+    def Columns(self) -> SapGuiCollection:
+        ''' Os membros desta coleção são do tipo GuiTableColumn.
+        Portanto, eles não suportam propriedades como id ou nome.
+        '''
+        return self.component.Columns
+    
+    def CurrentCol(self) -> int:
+        ''' Índice baseado em zero da coluna atual.
+        '''
+        return self.component.CurrentCol
+    
+    def CurrentRow(self) -> int:
+        ''' Índice baseado em zero da linha atual.
+        '''
+        return self.component.CurrentRow
+    
+    def HorizontalScrollbar(self) -> SapGuiScrollbar:
+        ''' A barra de rolagem horizontal do controle de tabela.
+        '''
+        return self.component.HorizontalScrollbar
+    
+    def RowCount(self) -> int:
+        ''' Número de linhas na tabela. Isso inclui linhas invisíveis. Para o número de linhas visíveis está disponível a propriedade VisibleRowCount.
+        '''
+        return self.component.RowCount
+    
+    def Rows(self) -> SapGuiCollection:
+        ''' Os membros desta coleção são do tipo GuiTableRow.
+        A indexação começa com 0 para a primeira linha visível, independente da posição atual da barra de rolagem horizontal.
+        Após a rolagem, uma linha diferente terá o índice 0.
+        '''
+        return self.component.Rows
+    
+    def RowSelectMode(self) -> int:
+        ''' Existem três modos diferentes para selecionar colunas ou linhas,
+        que são definidos no tipo de enumeração GuiTableSelectionType.
+        '''
+        return self.component.RowSelectMode
+    
+    def TableFieldName(self) -> str:
+        ''' A propriedade name do controle de tabela contém o nome do programa ABAP além do nome do campo simples.
+        Esta propriedade contém apenas o nome do campo.
+        '''
+        return self.component.TableFieldName
+    
+    def VerticalScrollbar(self) -> SapGuiScrollbar:
+        ''' A barra de rolagem vertical do controle de tabela.
+        '''
+        return self.component.VerticalScrollbar
+    
+    def VisibleRowCount(self) -> int:
+        ''' Número de linhas visíveis na tabela. Para o número de todas as linhas a propriedade RowCount está disponível.
+        '''
+        return self.component.VisibleRowCount
 
 class SapGuiSessionInfo():
     ''' GuiSessionInfo é membro de todos os objetos GuiSession.
