@@ -39,6 +39,7 @@ OK:
 	- GuiToolbar
 	- GuiTitlebar
 	- GuiStatusbar
+	- GuiStatusPane
 
 * Enumerations
 	- GuiComponentType
@@ -61,7 +62,6 @@ Priority:
 	- GuiLabel
 	- GuiPasswordField
 	- GuiRadioButton
-	- GuiStatusPane
 	- GuiTextedit
 	- GuiTextField
 	- GuiToolbarControl
@@ -1134,6 +1134,14 @@ class SapGuiStatusbar(SapGuiVComponent):
         I - Information
         '''
         return self.component.MessageType
+
+class SapGuiStatusPane(SapGuiVComponent):
+    ''' O pai dos objetos GuiStatusPane é a barra de status (veja também Objeto GuiStatusbar).
+    Os objetos GuiStatusPane refletem as áreas individuais da barra de status, por exemplo "pane[0]"
+    refere-se à seção da barra de status onde as mensagens são exibidas. Veja também Objeto GuiStatusbar.
+    '''
+    
+    pass
 
 class SapGuiComboBoxEntry():
     
