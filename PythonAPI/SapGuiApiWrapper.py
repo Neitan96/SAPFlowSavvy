@@ -35,6 +35,7 @@ OK:
 	- GuiComboBoxControl
 	- GuiSapChart
 	- GuiChart
+	- GuiUserArea
 
 * Enumerations
 	- GuiComponentType
@@ -65,7 +66,6 @@ Priority:
 	- GuiToolbar
 	- GuiToolbarControl
 	- GuiTree
-	- GuiUserArea
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -1364,7 +1364,8 @@ class SapGuiContextMenu(SapGuiMenu):
     O tipo é mnu, o nome é o código de função que é enviado ao sistema quando o item de menu é selecionado.
     '''
     
-    pass
+    def Select(self) -> None:
+        self.component.Select
 
 class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     ''' Um objeto expõe a interface GuiVContainer se ela estiver visível e puder ter filhos.
@@ -1397,6 +1398,38 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiUserArea(SapGuiVContainer):
+    ''' A GuiUserArea compreende a área entre a barra de ferramentas e a barra de status para janelas do
+    tipo GuiMainWindow e a área entre a barra de título e a barra de ferramentas para janelas modais,
+    podendo também ser limitada por controles docker. Os elementos dynpro padrão podem ser encontrados apenas
+    nesta área, com exceção dos botões, que também são encontrados nas barras de ferramentas.
+    '''
+    
+    def FindByLabel(self, text: str, type: str) -> SapGuiComponent:
+        ''' Um método muito simples para encontrar um objeto é pesquisar especificando o texto do respectivo rótulo.
+        '''
+        return self.component.FindByLabel(text, type)
+    
+    def CurrentContextMenu(self) -> SapGuiContextMenu:
+        ''' Esta propriedade só é definida quando um menu de contexto está disponível no objeto shell.
+        '''
+        return self.component.CurrentContextMenu
+    
+    def HorizontalScrollbar(self) -> SapGuiScrollbar:
+        ''' A área do usuário é definida para ser rolável mesmo que as barras de rolagem nem sempre estejam visíveis.
+        '''
+        return self.component.HorizontalScrollbar
+    
+    def IsOTFPreview(self) -> bool:
+        ''' Esta propriedade é TRUE, caso seja exibido um Controle de Preview SAPScript na área do usuário.
+        '''
+        return self.component.IsOTFPreview
+    
+    def VerticalScrollbar(self) -> SapGuiScrollbar:
+        ''' A área do usuário é definida para ser rolável mesmo que as barras de rolagem nem sempre estejam visíveis.
+        '''
+        return self.component.VerticalScrollbar
 
 class SapGuiShell(SapGuiVContainer):
     ''' GuiShell é um objeto abstrato cuja interface é suportada por todos os controles.
