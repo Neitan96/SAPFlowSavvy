@@ -33,6 +33,7 @@ OK:
 	- GuiComboBox
 	- GuiComboBoxEntry
 	- GuiComboBoxControl
+	- GuiSapChart
 
 * Enumerations
 	- GuiComponentType
@@ -86,7 +87,6 @@ Priority:
 	- GuiOfficeIntegration
 	- GuiOkCodeField
 	- GuiPicture
-	- GuiSapChart
 	- GuiSimpleContainer
 	- GuiSplit
 	- GuiSplitterContainer
@@ -1448,6 +1448,10 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiSapChart(SapGuiShell):
+    # TODO Verificar classe
+    pass
 
 class SapGuiComboBoxControl(SapGuiShell):
     #TODO Criar uma descrição
