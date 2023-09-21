@@ -31,6 +31,7 @@ OK:
 	- GuiGridView
 	- GuiModalWindow
 	- GuiComboBox
+	- GuiComboBoxEntry
 
 * Enumerations
 	- GuiComponentType
@@ -48,7 +49,6 @@ TODO Components:
 
 Priority:
 	- GuiComboBoxControl
-	- GuiComboBoxEntry
 	- GuiCTextField
 	- GuiCustomControl
 	- GuiInputFieldControl
@@ -625,7 +625,17 @@ class SapGuiEnum():
     # TODO Verificar retorno e descrições das funções dessa classe
     
     def __init__(self, component: object):
+        self.class_attrs = ['component']
         self.component = component
+
+    def __getattr__(self, attr):
+        return getattr(self.component, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.component, attr, value)
     
     def Next(self, celt: int, rgvar, pceltFetched: int):
         return self.component.Next(celt, rgvar, pceltFetched)
@@ -699,7 +709,17 @@ class SapGuiScrollbar():
     #TODO Fazer mais funções de auxilio
     
     def __init__(self, component: object):
+        self.class_attrs = ['component']
         self.component = component
+
+    def __getattr__(self, attr):
+        return getattr(self.component, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.component, attr, value)
     
     def Maximum(self) -> int:
         ''' Esta é a posição máxima da barra de rolagem.
@@ -833,7 +853,17 @@ class SapGuiContainer(SapGuiComponent):
 class SapGuiUtils():
     
     def __init__(self, component: object):
+        self.class_attrs = ['component']
         self.component = component
+
+    def __getattr__(self, attr):
+        return getattr(self.component, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.component, attr, value)
         
     def CloseFile(self, file: int) -> None:
         ''' Esta função fecha um arquivo que foi aberto usando OpenFile.
@@ -874,7 +904,17 @@ class SapGuiCollection():
     '''
     
     def __init__(self, component: object):
+        self.class_attrs = ['component']
         self.component = component
+
+    def __getattr__(self, attr):
+        return getattr(self.component, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.component, attr, value)
     
     def Add(self, item):
         ''' Após a criação de uma GuiCollection, os itens podem ser adicionados chamando a função add.
@@ -1046,6 +1086,36 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiComboBoxEntry():
+    
+    def __init__(self, component: object):
+        self.class_attrs = ['component']
+        self.component = component
+
+    def __getattr__(self, attr):
+        return getattr(self.component, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.component, attr, value)
+    
+    def Key(self) -> str:
+        ''' Valor-chave da entrada da caixa de combinação.
+        '''
+        return self.component.Key
+    
+    def Pos(self) -> int:
+        ''' Posição da entrada da caixa de combinação. O intervalo vai de 1 ao número de entradas na caixa de combinação.
+        '''
+        return self.component.Pos
+    
+    def Value(self) -> str:
+        ''' Value of the combo box entry.
+        '''
+        return self.component.Value
 
 class SapGuiComboBox(SapGuiVComponent):
     ''' O GuiComboBox é um pouco semelhante ao GuiCTextField, mas tem uma implementação completamente diferente.
@@ -2263,7 +2333,17 @@ class SapGuiSessionInfo():
     '''
     
     def __init__(self, component: object):
+        self.class_attrs = ['component']
         self.component = component
+
+    def __getattr__(self, attr):
+        return getattr(self.component, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.component, attr, value)
     
     def ApplicationServer(self) -> str:
         ''' O nome do servidor de aplicação é definido somente se a sessão pertencer a uma conexão que
