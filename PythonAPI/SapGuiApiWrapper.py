@@ -47,6 +47,8 @@ OK:
 	- GuiRadioButton
 	- GuiPasswordField
 	- GuiLabel
+	- GuiCTextField
+	- GuiCustomControl
 
 * Enumerations
 	- GuiComponentType
@@ -63,8 +65,6 @@ OK:
 TODO Components:
 
 Priority:
-	- GuiCTextField
-	- GuiCustomControl
 	- GuiInputFieldControl
 	- GuiSimpleContainer
 	- GuiSplit
@@ -1354,6 +1354,19 @@ class SapGuiTextField(SapGuiVComponent):
         '''
         return self.component.RightLabel
 
+class SapGuiCTextField(SapGuiTextField):
+    ''' Se o cursor estiver definido em um campo de texto do tipo GuiCTextField,
+    um botão de caixa de combinação será exibido à direita do campo de texto.
+    Pressionar este botão equivale a pressionar a tecla F4. O botão não é representado no
+    modelo de objeto de script como um objeto separado; é considerado parte do campo de texto.
+    Não há outras diferenças entre GuiTextField e GuiCTextField. GuiCTextField estende o GuiTextField.
+    O prefixo do tipo é ctxt, o nome é o Fieldname retirado do dicionário de dados SAP.
+    '''
+    
+    # TODO Adicionar funções auxiliares
+    
+    pass
+
 class SapGuiPasswordField(SapGuiTextField):
     ''' A única diferença entre GuiTextField e GuiPasswordField é que a propriedade Text não pode ser lida para um campo de senha.
     O texto retornado está sempre vazio. Durante a gravação a senha também não é salva no script gravado. GuiPasswordField
@@ -1729,6 +1742,33 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiCustomControl(SapGuiVContainer):
+    ''' O GuiCustomControl é um objeto wrapper usado para colocar controles ActiveX em telas dynpro.
+    Embora GuiCustomControl seja um elemento dynpro, seus filhos são do tipo GuiContainerShell, que é um contêiner
+    para controles. GuiCustomControl estende o objeto GuiVContainer. O prefixo do tipo é cntl, o nome é o
+    nome do campo retirado do dicionário de dados SAP.
+    '''
+    
+    def CharHeight(self) -> int:
+        ''' Altura do GuiCustomControl em métrica de caracteres.
+        '''
+        return self.component.CharHeight
+
+    def CharLeft(self) -> int:
+        ''' Coordenada esquerda do GuiCustomControl em métrica de caracteres.
+        '''
+        return self.component.CharLeft
+
+    def CharTop(self) -> int:
+        ''' Coordenada superior do GuiCustomControl em métrica de caracteres.
+        '''
+        return self.component.CharTop
+
+    def CharWidth(self) -> int:
+        ''' Largura do GuiCustomControl em métrica de caracteres.
+        '''
+        return self.component.CharWidth
 
 class SapGuiToolbar(SapGuiVContainer):
     ''' Cada GuiFrameWindow possui uma GuiToolbar.
