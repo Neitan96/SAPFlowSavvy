@@ -51,6 +51,8 @@ OK:
 	- GuiCustomControl
 	- GuiInputFieldControl
 	- GuiSimpleContainer
+	- GuiSplit
+	- GuiSplitterContainer
 
 * Enumerations
 	- GuiComponentType
@@ -65,10 +67,6 @@ OK:
 	- GuiTableSelectionType
  
 TODO Components:
-
-Priority:
-	- GuiSplit
-	- GuiSplitterContainer
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -1924,6 +1922,61 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiSplitterContainer(SapGuiShell):
+    ''' O GuiSplitterContainer representa o elemento divisor dynpro, que foi introduzido
+    no Web Application Server ABAP no NetWeaver 7.1. O elemento divisor dynpro é semelhante
+    ao controle divisor baseado em activeX, mas é um elemento dynpro simples.
+    '''
+
+    def IsVertical(self) -> bool:
+        ''' Esta propriedade contém True se as células divisoras do GuiSplitterContainer estiverem alinhadas
+        verticalmente e False se estiverem alinhadas horizontalmente.
+        '''
+        return self.component.IsVertical
+
+    def SashPosition(self, position: int = None) -> int:
+        ''' Contém a posição da divisória do divisor em caracteres.
+        '''
+        if position is not None:
+            self.component.SashPosition = position
+        return self.component.SashPosition
+
+class SapGuiSplit(SapGuiShell):
+    # TODO Criar descrição
+
+    def GetColSize(self, Id: int) -> int:
+        ''' Obtém o tamanho da coluna do divisor especificado.
+        Id: O índice da coluna do divisor (começando com índice 1).
+        Retorna o tamanho da coluna do divisor especificado em porcentagem.
+        '''
+        return self.component.GetColSize(Id)
+
+    def GetRowSize(self, Id: int) -> int:
+        ''' Obtém o tamanho da linha do divisor especificado.
+        Id: O índice da linha do divisor (começando com índice 1).
+        Retorna o tamanho da linha do divisor especificado em porcentagem.
+        '''
+        return self.component.GetRowSize(Id)
+
+    def SetColSize(self, Id: int, Size: int):
+        ''' Define o tamanho da coluna do divisor especificado.
+        Id: O índice da coluna do divisor (começando com índice 1).
+        Size: O tamanho desejado em porcentagem.
+        '''
+        self.component.SetColSize(Id, Size)
+
+    def SetRowSize(self, Id: int, Size: int):
+        ''' Define o tamanho da linha do divisor especificado.
+        Id: O índice da linha do divisor (começando com índice 1).
+        Size: O tamanho desejado em porcentagem.
+        '''
+        self.component.SetRowSize(Id, Size)
+
+    def IsVertical(self) -> bool:
+        ''' Esta propriedade contém True se as células divisoras do GuiSplit estiverem alinhadas verticalmente e False se estiverem alinhadas horizontalmente.
+        '''
+        return self.component.IsVertical
 
 class SapGuiInputFieldControl(SapGuiShell):
     # TODO Criar descrição

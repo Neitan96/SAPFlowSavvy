@@ -48,6 +48,7 @@ session = sap_gui.GetSessionLoged()
   * Migo
   * /SCWM/PACK
   * ...
+* Função CastTo na classe base
 
 ## Aviso Legal
 
