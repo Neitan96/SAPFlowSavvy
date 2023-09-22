@@ -60,6 +60,7 @@ OK:
 	- GuiColorSelector
 	- GuiDialogShell
 	- GuiEAIViewer2D
+	- GuiEAIViewer3D
 
 * Enumerations
 	- GuiComponentType
@@ -76,7 +77,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiEAIViewer3D
 	- GuiGOSShell
 	- GuiGraphAdapt
 	- GuiHTMLViewer
@@ -1937,6 +1937,12 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiEAIViewer3D(SapGuiShell):
+    ''' O controle GuiEAIViewer3D é utilizado para visualizar imagens gráficas tridimensionais no sistema SAP.
+    '''
+    
+    pass
 
 class SapGuiEAIViewer2D(SapGuiShell):
     ''' O controle GuiEAIViewer2D é utilizado para visualizar imagens gráficas bidimensionais no sistema SAP.
