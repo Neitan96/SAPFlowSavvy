@@ -54,6 +54,7 @@ OK:
 	- GuiSplit
 	- GuiSplitterContainer
 	- GuiAbapEditor
+	- GuiApoGrid
 
 * Enumerations
 	- GuiComponentType
@@ -70,7 +71,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiApoGrid
 	- GuiBarChart
 	- GuiCalendar
 	- GuiColorSelector
@@ -1922,6 +1922,227 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiApoGrid(SapGuiShell):
+    ''' Observações
+    O GuiApoGrid é um objeto criado especificamente para aplicações SAP SCM.
+    Ele implementa um quadro de planejamento, semelhante a um controle GuiGridView.
+
+    As colunas e linhas são identificadas pela sua posição começando em zero:
+    0 <= linha <Contagem de linhas
+    0 <= coluna <Contagem de colunas
+    Após uma busca detalhada, as linhas são renumeradas para que o número de qualquer linha possa mudar. A rolagem horizontal não afeta o número de uma coluna.
+    '''
+
+    def CancelCut(self) -> None:
+        ''' Aborta a operação de corte.
+        '''
+        self.component.CancelCut()
+
+    def ClearSelection(self) -> None:
+        ''' Chamar clearSelection remove todas as seleções de linhas, colunas e células.
+        '''
+        self.component.ClearSelection()
+
+    def ContextMenu(self, coluna: int, linha: int) -> None:
+        ''' Chamar contextMenu emula a solicitação de menu de contexto.
+        '''
+        self.component.ContextMenu(coluna, linha)
+
+    def Cut(self) -> None:
+        ''' Corta as células selecionadas.
+        '''
+        self.component.Cut()
+
+    def DeselectCell(self, coluna: int, linha: int) -> None:
+        ''' Deseleciona as células especificadas. Esta função remove as células especificadas da coleção de células selecionadas.
+        '''
+        self.component.DeselectCell(coluna, linha)
+
+    def DeselectColumn(self, coluna: int) -> None:
+        ''' Esta função remove a coluna especificada da coleção de colunas selecionadas.
+        '''
+        self.component.DeselectColumn(coluna)
+
+    def DeselectRow(self, linha: int) -> None:
+        ''' Esta função remove a linha especificada da coleção de linhas selecionadas.
+        '''
+        self.component.DeselectRow(linha)
+
+    def DoubleClickCell(self, coluna: int, linha: int) -> None:
+        ''' Esta função emula um duplo clique do mouse em uma célula específica se os parâmetros forem válidos e gera uma exceção caso contrário.
+        '''
+        self.component.DoubleClickCell(coluna, linha)
+
+    def GetBgdColorInfo(self, linha: int, coluna: int) -> str:
+        ''' Esta função retorna a cor de fundo da célula especificada.
+        '''
+        return self.component.GetBgdColorInfo(linha, coluna)
+
+    def GetCellChangeable(self, coluna: int, linha: int) -> bool:
+        ''' Esta função retorna True se a célula especificada for editável.
+        '''
+        return self.component.GetCellChangeable(coluna, linha)
+
+    def GetCellFormat(self, coluna: int, linha: int) -> str:
+        ''' Retorna o formato da célula especificada.
+        '''
+        return self.component.GetCellFormat(coluna, linha)
+
+    def GetCellTooltip(self, coluna: int, linha: int) -> str:
+        ''' Esta função retorna a dica de ferramenta da célula especificada.
+        '''
+        return self.component.GetCellTooltip(coluna, linha)
+
+    def GetCellValue(self, coluna: int, linha: int) -> str:
+        ''' Esta função retorna o valor da célula especificada como uma string.
+        '''
+        return self.component.GetCellValue(coluna, linha)
+
+    def GetFgdColorInfo(self, linha: int, coluna: int) -> str:
+        ''' Esta função retorna a cor da fonte da célula especificada.
+        '''
+        return self.component.GetFgdColorInfo(linha, coluna)
+
+    def GetIconInfo(self, linha: int, coluna: int) -> str:
+        ''' Retorna informações do ícone da célula especificada.
+        '''
+        return self.component.GetIconInfo(linha, coluna)
+
+    def IsCellSelected(self, coluna: int, linha: int) -> bool:
+        ''' Retorna True se a célula especificada estiver selecionada.
+        '''
+        return self.component.IsCellSelected(coluna, linha)
+
+    def IsColSelected(self, coluna: int) -> bool:
+        ''' Retorna True se a coluna especificada estiver selecionada.
+        '''
+        return bool(self.component.IsColSelected(coluna))
+
+    def IsRowSelected(self, linha: int) -> bool:
+        ''' Retorna True se a linha especificada estiver selecionada.
+        '''
+        return bool(self.component.IsRowSelected(linha))
+
+    def Paste(self, valores_celula: object, num_colunas: int) -> int:
+        ''' Aciona uma operação de colar.
+        '''
+        return self.component.Paste(valores_celula, num_colunas)
+
+    def PressEnter(self) -> None:
+        ''' Emula a pressão da tecla Enter.
+        '''
+        self.component.PressEnter()
+
+    def SelectAll(self) -> None:
+        ''' Esta função seleciona todo o conteúdo da grade (ou seja, todas as linhas e colunas).
+        '''
+        self.component.SelectAll()
+
+    def SelectCell(self, coluna: int, linha: int) -> None:
+        ''' Seleciona a célula especificada.
+        '''
+        self.component.SelectCell(coluna, linha)
+
+    def SelectColumn(self, coluna: int) -> None:
+        ''' Seleciona a coluna especificada.
+        '''
+        self.component.SelectColumn(coluna)
+
+    def SelectRow(self, linha: int) -> None:
+        ''' Seleciona a linha especificada.
+        '''
+        self.component.SelectRow(linha)
+
+    def SetCellValue(self, coluna: int, linha: int, valor: str) -> str:
+        ''' Esta função insere o valor especificado na célula especificada.
+        '''
+        return self.component.SetCellValue(coluna, linha, valor)
+
+    def ColumnCount(self) -> int:
+        ''' Esta propriedade representa o número de colunas no controle.
+        '''
+        return self.component.ColumnCount
+
+    def CurrentCellColumn(self) -> int:
+        ''' O índice da coluna que contém a célula atual.
+        '''
+        return self.component.CurrentCellColumn
+
+    def CurrentCellRow(self) -> int:
+        ''' O índice da linha atual varia de 0 ao número de linhas menos 1, com -1 sendo o índice da linha do título.
+        '''
+        return self.component.CurrentCellRow
+
+    def FirstVisibleColumn(self) -> int:
+        ''' Esta propriedade representa a primeira coluna visível da área rolável do controle APOGrid.
+        '''
+        return self.component.FirstVisibleColumn
+
+    def FirstVisibleRow(self) -> int:
+        ''' Este é o índice da primeira linha visível na grade. Definir esta propriedade para um índice de linha inválido gerará uma exceção.
+        '''
+        return self.component.FirstVisibleRow
+
+    def FixedColumnsLeft(self) -> int:
+        ''' O número de colunas fixas no lado esquerdo da grade.
+        '''
+        return self.component.FixedColumnsLeft
+
+    def FixedColumnsRight(self) -> int:
+        ''' O número de colunas fixas no lado direito da grade.
+        '''
+        return self.component.FixedColumnsRight
+
+    def FixedRowsBottom(self) -> int:
+        ''' O número de linhas fixas na parte inferior da grade.
+        '''
+        return self.component.FixedRowsBottom
+
+    def FixedRowsTop(self) -> int:
+        ''' O número de linhas fixas na parte superior da grade.
+        '''
+        return self.component.FixedRowsTop
+
+    def RowCount(self) -> int:
+        ''' Esta propriedade representa o número de linhas no controle.
+        '''
+        return self.component.RowCount
+
+    def SelectedCells(self) -> object:
+        ''' A coleção de células selecionadas. Tentar definir esta propriedade como um valor inválido gerará uma exceção.
+        '''
+        return self.component.SelectedCells
+
+    def SelectedColumns(self) -> str:
+        ''' As colunas selecionadas estão disponíveis como uma coleção. Configurar esta propriedade pode gerar uma exceção se a nova coleção contiver uma coluna inválida.
+        '''
+        return self.component.SelectedColumns
+
+    def SelectedColumnsObject(self) -> object:
+        ''' Retorna a coleção de colunas selecionadas como um objeto.
+        '''
+        return self.component.SelectedColumnsObject
+
+    def SelectedRows(self) -> str:
+        ''' As linhas selecionadas estão disponíveis como uma coleção. Configurar esta propriedade pode gerar uma exceção se a nova coleção contiver uma linha inválida.
+        '''
+        return self.component.SelectedRows
+
+    def SelectedRowsObject(self) -> object:
+        ''' Retorna a coleção de linhas selecionadas como um objeto.
+        '''
+        return self.component.SelectedRowsObject
+
+    def VisibleColumnCount(self) -> int:
+        ''' Recupera o número de colunas visíveis da grade.
+        '''
+        return self.component.VisibleColumnCount
+
+    def VisibleRowCount(self) -> int:
+        ''' Recupera o número de linhas visíveis da grade.
+        '''
+        return self.component.VisibleRowCount
 
 class SapGuiAbapEditor(SapGuiShell):
     ''' O objeto GuiAbapEditor representa o novo controle do editor ABAP disponível a partir do SAP_BASIS release 6.20 (ver também SAP Note 930742).
