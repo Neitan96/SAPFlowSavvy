@@ -72,6 +72,7 @@ OK:
 	- GuiOfficeIntegration
 	- GuiOkCodeField
 	- GuiPicture
+	- GuiStage
 
 * Enumerations
 	- GuiComponentType
@@ -88,7 +89,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiStage
 	- GuiVHViewSwitch
 	- 
 '''
@@ -2029,6 +2029,29 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiStage(SapGuiShell):
+    ''' Para o controle de palco apenas estão disponíveis membros básicos do GuiShell.
+    A gravação e a reprodução não são possíveis.
+    '''
+
+    def ContextMenu(self, str_id: str) -> None:
+        ''' Chamar esta função abre um menu de contexto.
+        str_id: ID do menu de contexto.
+        '''
+        self.component.ContextMenu(str_id)
+
+    def DoubleClick(self, str_id: str) -> None:
+        ''' Esta função emula um clique duplo do mouse.
+        str_id: ID do elemento no qual ocorrerá o clique duplo.
+        '''
+        self.component.DoubleClick(str_id)
+
+    def SelectItems(self, str_items: str) -> None:
+        ''' Seleciona os itens especificados pelo parâmetro str_items.
+        str_items: Uma string contendo os itens a serem selecionados.
+        '''
+        self.component.SelectItems(str_items)
 
 class SapGuiPicture(SapGuiShell):
     ''' O controle de imagem exibe uma imagem em uma tela SAP GUI.
