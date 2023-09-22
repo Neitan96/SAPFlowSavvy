@@ -41,6 +41,7 @@ OK:
 	- GuiStatusbar
 	- GuiStatusPane
 	- GuiTree
+	- GuiToolbarControl
 
 * Enumerations
 	- GuiComponentType
@@ -65,7 +66,6 @@ Priority:
 	- GuiRadioButton
 	- GuiTextedit
 	- GuiTextField
-	- GuiToolbarControl
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -1554,6 +1554,81 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiToolbarControl(SapGuiShell):
+    # TODO Criar descrição
+    
+    def GetButtonChecked(self, button_pos: int) -> int:
+        ''' Retorna se o botão na posição especificada está atualmente marcado (pressionado).
+        '''
+        return self.component.GetButtonChecked(button_pos)
+
+    def GetButtonEnabled(self, button_pos: int) -> int:
+        ''' Indica se o botão na posição especificada pode ser pressionado.
+        '''
+        return self.component.GetButtonEnabled(button_pos)
+
+    def GetButtonIcon(self, button_pos: int) -> str:
+        ''' Retorna o nome do ícone do botão de barra de ferramentas especificado.
+        '''
+        return self.component.GetButtonIcon(button_pos)
+
+    def GetButtonId(self, button_pos: int) -> str:
+        ''' Retorna o ID do botão de barra de ferramentas especificado.
+        '''
+        return self.component.GetButtonId(button_pos)
+
+    def GetButtonText(self, button_pos: int) -> str:
+        ''' Retorna o texto do botão de barra de ferramentas especificado.
+        '''
+        return self.component.GetButtonText(button_pos)
+
+    def GetButtonTooltip(self, button_pos: int) -> str:
+        ''' Retorna a dica de ferramenta do botão de barra de ferramentas especificado.
+        '''
+        return self.component.GetButtonTooltip(button_pos)
+
+    def GetButtonType(self, button_pos: int) -> str:
+        ''' Retorna o tipo do botão de barra de ferramentas especificado. Valores possíveis são: "Button", "ButtonAndMenu", "Menu", "Separator", "Group", "CheckBox".
+        '''
+        return self.component.GetButtonType(button_pos)
+
+    def GetMenuItemIdFromPosition(self, pos: int) -> str:
+        ''' Esta função retorna o identificador do item de menu com índice Position.
+        '''
+        return self.component.GetMenuItemIdFromPosition(pos)
+
+    def PressButton(self, id: str) -> None:
+        ''' Esta função emula o pressionamento do botão com o ID fornecido.
+        '''
+        self.component.PressButton(id)
+
+    def PressContextButton(self, id: str) -> None:
+        ''' Esta função emula o pressionamento do botão de contexto com o ID fornecido.
+        '''
+        self.component.PressContextButton(id)
+
+    def SelectMenuItem(self, id: str) -> None:
+        ''' Esta função emula a seleção do item de menu com o ID fornecido.
+        '''
+        self.component.SelectMenuItem(id)
+
+    def SelectMenuItemByText(self, str_text: str) -> None:
+        ''' Esta função emula a seleção do item de menu pelo texto do item de menu.
+        '''
+        self.component.SelectMenuItemByText(str_text)
+
+    def ButtonCount(self) -> int:
+        ''' O número de botões da barra de ferramentas, incluindo separadores.
+        '''
+        return self.component.ButtonCount
+
+    def FocusedButton(self, focused_button_index: int = None) -> int:
+        ''' O índice baseado em zero do botão que atualmente tem o foco.
+        '''
+        if focused_button_index is not None:
+            self.component.FocusedButton = focused_button_index
+        return self.component.FocusedButton
 
 class SapGuiTree(SapGuiShell):
     ''' O Tree Control oferece suporte a três tipos de árvore.
