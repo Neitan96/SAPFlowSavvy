@@ -49,6 +49,7 @@ OK:
 	- GuiLabel
 	- GuiCTextField
 	- GuiCustomControl
+	- GuiInputFieldControl
 
 * Enumerations
 	- GuiComponentType
@@ -65,7 +66,6 @@ OK:
 TODO Components:
 
 Priority:
-	- GuiInputFieldControl
 	- GuiSimpleContainer
 	- GuiSplit
 	- GuiSplitterContainer
@@ -1869,6 +1869,42 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiInputFieldControl(SapGuiShell):
+    # TODO Criar descrição
+    
+    def Submit(self):
+        ''' Submete a entrada para a aplicação.
+        Esta função envia a entrada inserida para a aplicação.
+        '''
+        self.component.Submit()
+
+    def ButtonTooltip(self) -> str:
+        ''' Tooltip do botão de envio/consulta.
+        '''
+        return self.component.ButtonTooltip
+
+    def FindButtonActivated(self) -> bool:
+        ''' Esta propriedade é True quando o botão Find está ativo.
+        '''
+        return self.component.FindButtonActivated
+
+    def HistoryOpened(self) -> bool:
+        ''' Esta propriedade é True quando o histórico de entrada está aberto.
+        '''
+        return self.component.HistoryOpened
+
+    def LabelText(self) -> str:
+        ''' O texto do rótulo pertencente ao campo de entrada.
+        '''
+        return self.component.LabelText
+
+    def Text(self, new_text: str = None) -> str:
+        ''' Conteúdo de texto do campo de entrada em si.
+        '''
+        if new_text is not None:
+            self.component.Text = new_text
+        return self.component.Text
 
 class SapGuiTextedit(SapGuiShell):
     ''' O controle TextEdit é um controle de edição multilinha que oferece vários benefícios possíveis.
