@@ -64,6 +64,7 @@ OK:
 	- GuiGOSShell
 	- GuiGraphAdapt
 	- GuiHTMLViewer
+	- GuiMainWindow
 
 * Enumerations
 	- GuiComponentType
@@ -80,7 +81,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- ContentGuiMainWindow
 	- GuiMap
 	- GuiMenubar
 	- GuiMessageWindow
@@ -4558,6 +4558,54 @@ class SapGuiFrameWindow(SapGuiVContainer):
         O painel de trabalho é a área entre as barras de ferramentas na parte superior da janela e a barra de status na parte inferior da janela.
         '''
         return self.component.WorkingPaneWidth
+
+class SapGuiMainWindow(SapGuiFrameWindow):
+    ''' Esta janela representa a janela principal de uma sessão SAP GUI.
+    '''
+
+    def ResizeWorkingPane(self, width: int, height: int, throw_on_fail: bool) -> None:
+        ''' Redimensiona a janela para que a área de trabalho disponível tenha a largura e altura fornecidas em métrica de caracteres.
+        throw_on_fail: O parâmetro throw_on_fail foi adicionado para uso no SAP GUI for Java, pois alguns gerenciadores de janelas podem não suportar um redimensionamento de janela controlado pelo programa.
+        '''
+        self.component.ResizeWorkingPane(width, height, throw_on_fail)
+
+    def ResizeWorkingPaneEx(self, width: int, height: int, throw_on_fail: bool) -> None:
+        ''' Redimensiona a janela para que a área de trabalho disponível tenha a largura e altura fornecidas em pixels.
+        '''
+        self.component.ResizeWorkingPaneEx(width, height, throw_on_fail)
+
+    def ButtonbarVisible(self, visible: bool = None) -> bool:
+        ''' Esta propriedade é True se a barra de botões da aplicação, a barra de ferramentas inferior dentro do SAP GUI, estiver visível.
+        Configurar esta propriedade como False ocultará a barra de botões da aplicação.
+        '''
+        if visible is not None:
+            self.component.ButtonbarVisible = visible
+        return self.component.ButtonbarVisible
+
+    def StatusbarVisible(self, visible: bool = None) -> bool:
+        ''' Esta propriedade é True se a barra de status na parte inferior da janela SAP GUI estiver visível.
+        Configurar esta propriedade como False ocultará a barra de status.
+        Quando a barra de status está oculta, as mensagens serão exibidas em uma janela pop-up.
+        '''
+        if visible is not None:
+            self.component.StatusbarVisible = visible
+        return self.component.StatusbarVisible
+
+    def TitlebarVisible(self, visible: bool = None) -> bool:
+        ''' Esta propriedade é True se a barra de título estiver visível.
+        Configurar esta propriedade como False ocultará a barra de título.
+        '''
+        if visible is not None:
+            self.component.TitlebarVisible = visible
+        return self.component.TitlebarVisible
+
+    def ToolbarVisible(self, visible: bool = None) -> bool:
+        ''' Esta propriedade é True se a barra de ferramentas do sistema, a barra de ferramentas superior dentro do SAP GUI, estiver visível.
+        Configurar esta propriedade como False ocultará a barra de ferramentas do sistema.
+        '''
+        if visible is not None:
+            self.component.ToolbarVisible = visible
+        return self.component.ToolbarVisible
 
 class SapGuiModalWindow(SapGuiFrameWindow):
     ''' Uma GuiModalWindow é uma caixa de diálogo pop-up.
