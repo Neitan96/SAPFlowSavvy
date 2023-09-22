@@ -69,6 +69,7 @@ OK:
 	- GuiMenubar
 	- GuiMessageWindow
 	- GuiNetChart
+	- GuiOfficeIntegration
 
 * Enumerations
 	- GuiComponentType
@@ -85,7 +86,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiOfficeIntegration
 	- GuiOkCodeField
 	- GuiPicture
 	- GuiStage
@@ -2009,6 +2009,61 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiOfficeIntegration(SapGuiShell):
+    # TODO Criar descrição
+    
+    def AppendRow(self, name: str, row: str) -> None:
+        ''' Adiciona uma nova linha a uma tabela especificada pelo parâmetro "name" na coleção de tabelas.
+        O parâmetro "row" é a representação em base64 da linha binária.
+        '''
+        self.component.AppendRow(name, row)
+
+    def CloseDocument(self, cookie: int, ever_changed: int, changed_after_save: int) -> None:
+        ''' Envia o evento de fechamento do documento especificado pelo parâmetro "cookie" para o servidor.
+        O parâmetro "ever_changed" é do tipo Byte e indica se o documento foi alterado permanentemente.
+        O parâmetro "changed_after_save" é do tipo Byte e indica se o documento foi alterado após o salvamento.
+        '''
+        self.component.CloseDocument(cookie, ever_changed, changed_after_save)
+
+    def CustomEvent(self, cookie: int, event_name: str, param_count: int, *params) -> None:
+        ''' Envia o evento personalizado "eventName" para o servidor.
+        O documento especificado pelo parâmetro "cookie" é a fonte do evento.
+        Os parâmetros adicionais, "par1" a "par12", são opcionais e podem ser usados para enviar até 12 parâmetros para o evento personalizado.
+        '''
+        self.component.CustomEvent(cookie, event_name, param_count, *params)
+
+    def RemoveContent(self, name: str) -> None:
+        ''' Remove o conteúdo de uma tabela na coleção de tabelas.
+        O parâmetro "name" é o nome da tabela a ser removida.
+        '''
+        self.component.RemoveContent(name)
+
+    def SaveDocument(self, cookie: int, changed: int) -> None:
+        ''' Envia o evento de salvamento do documento especificado pelo parâmetro "cookie" para o servidor.
+        O parâmetro "changed" é do tipo Byte e indica se o documento foi alterado.
+        '''
+        self.component.SaveDocument(cookie, changed)
+
+    def SetDocument(self, index: int, document: str) -> None:
+        ''' Substitui ou adiciona um novo documento com o índice especificado.
+        O parâmetro "document" é a representação em base64 do documento binário.
+        '''
+        self.component.SetDocument(index, document)
+
+    def Document(self) -> object:
+        ''' O documento hospedado dentro do objeto GuiOfficeIntegration (somente leitura).
+        '''
+        return self.component.Document
+
+    def HostedApplication(self) -> int:
+        ''' Este índice identifica a aplicação hospedada no objeto GuiOfficeIntegration (somente leitura).
+        Valores possíveis são:
+        1 - Microsoft Word
+        2 - Microsoft Excel
+        3 - Microsoft Powerpoint
+        '''
+        return self.component.HostedApplication
 
 class SapGuiNetChart(SapGuiShell):
     ''' O GuiNetChart é uma ferramenta poderosa para exibir e modificar diagramas de relacionamento entre entidades.
