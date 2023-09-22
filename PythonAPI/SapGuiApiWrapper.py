@@ -70,6 +70,7 @@ OK:
 	- GuiMessageWindow
 	- GuiNetChart
 	- GuiOfficeIntegration
+	- GuiOkCodeField
 
 * Enumerations
 	- GuiComponentType
@@ -86,7 +87,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiOkCodeField
 	- GuiPicture
 	- GuiStage
 	- GuiVHViewSwitch
@@ -1084,6 +1084,26 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiOkCodeField(SapGuiVComponent):
+    ''' O GuiOkCodeField é colocado na barra de ferramentas superior da janela principal.
+    É uma caixa de combinação na qual comandos podem ser inseridos. Definir o texto de GuiOkCodeField
+    não executará o comando até que a comunicação do servidor seja iniciada, por exemplo, emulando a tecla Enter (VKey 0).
+    O prefixo do tipo é okcd, o nome está vazio.
+    '''
+    
+    def PressF1(self) -> None:
+        ''' Emule pressionando a tecla F1 enquanto o foco está no GuiOkCodeField.
+        '''
+        self.component.PressF1()
+    
+    def Opened(self) -> bool:
+        ''' Em designs SAP GUI mais recentes que o design Clássico, o GuiOkCodeField pode ser recolhido usando
+        o botão de seta à direita dele. No SAP GUI para Windows, o GuiOkCodeField também pode ser recolhido por
+        meio de uma configuração no registro do Windows.
+        Esta propriedade contém False se o GuiOkCodeField estiver recolhido.
+        '''
+        return self.component.Opened
 
 class SapGuiMessageWindow(SapGuiVComponent):
     # TODO Criar descrição
