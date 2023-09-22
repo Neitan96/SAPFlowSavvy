@@ -68,6 +68,7 @@ OK:
 	- GuiMap
 	- GuiMenubar
 	- GuiMessageWindow
+	- GuiNetChart
 
 * Enumerations
 	- GuiComponentType
@@ -84,7 +85,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiNetChart
 	- GuiOfficeIntegration
 	- GuiOkCodeField
 	- GuiPicture
@@ -2009,6 +2009,42 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiNetChart(SapGuiShell):
+    ''' O GuiNetChart é uma ferramenta poderosa para exibir e modificar diagramas de relacionamento entre entidades.
+    É de natureza muito técnica e só deve ser utilizado para gravação e reprodução,
+    pois a maioria dos parâmetros não pode ser determinada de outra forma.
+    '''
+
+    def GetLinkContent(self, link_id: int, text_id: int) -> str:
+        ''' Retorna o conteúdo do link.
+        link_id: Índice do link.
+        text_id: Valor interno a ser determinado durante a gravação.
+        '''
+        return self.component.GetLinkContent(link_id, text_id)
+
+    def GetNodeContent(self, node_id: int, text_id: int) -> str:
+        ''' Retorna o conteúdo do nó.
+        node_id: Índice do nó.
+        text_id: Valor interno a ser determinado durante a gravação.
+        '''
+        return self.component.GetNodeContent(node_id, text_id)
+
+    def SendData(self, data: str) -> None:
+        ''' Emula a saída de cada ação acionada no lado do controle. O resultado da ação é enviado para o servidor.
+        Atualmente, não é possível selecionar ou desselecionar objetos individuais no lado do cliente e reproduzir/criptografar essas ações "locais".
+        '''
+        self.component.SendData(data)
+
+    def LinkCount(self) -> int:
+        ''' Número de links na rede (somente leitura).
+        '''
+        return self.component.LinkCount
+
+    def NodeCount(self) -> int:
+        ''' Número de nós na rede (somente leitura).
+        '''
+        return self.component.NodeCount
 
 class SapGuiMap(SapGuiShell):
     ''' Para o controle do mapa, apenas membros básicos do GuiShell estão disponíveis.
