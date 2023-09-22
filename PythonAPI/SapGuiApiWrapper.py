@@ -56,6 +56,7 @@ OK:
 	- GuiAbapEditor
 	- GuiApoGrid
 	- GuiBarChart
+	- GuiCalendar
 
 * Enumerations
 	- GuiComponentType
@@ -72,7 +73,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiCalendar
 	- GuiColorSelector
 	- GuiDialogShell
 	- GuiEAIViewer2D
@@ -1922,6 +1922,143 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiCalendar(SapGuiShell):
+    ''' O controle de calendário pode ser usado para selecionar datas ou períodos únicos.
+    '''
+
+    def ContextMenu(self, CtxMenuId: int, CtxMenuCellRow: int, CtxMenuCellCol: int, DateBegin: str, DateEnd: str) -> None:
+        ''' Chama esta função para abrir um menu de contexto.
+
+        O parâmetro CtxMenuId indica o tipo de célula na qual o menu de contexto foi aberto:
+        Valor   Tipo de Célula  Descrição
+        0       Data            Invocação em uma célula com uma única data
+        1       Dia da Semana   Invocação em um botão para um determinado dia da semana
+        2       Semana          Invocação em um botão para uma semana específica
+        '''
+        self.component.ContextMenu(CtxMenuId, CtxMenuCellRow, CtxMenuCellCol, DateBegin, DateEnd)
+
+    def CreateDate(self, day: int, month: int, year: int) -> str:
+        ''' Cria uma data no formato "YYYYMMDD" a partir dos parâmetros de dia, mês e ano.
+        '''
+        return self.component.CreateDate(day, month, year)
+
+    def GetColor(self, from_color: str) -> int:
+        ''' Retorna a cor associada a partir do valor de cor especificado.
+        '''
+        return self.component.GetColor(from_color)
+
+    def GetColorInfo(self, Color: int) -> str:
+        ''' Retorna a explicação definida pela aplicação para cores semânticas usadas no GuiCalendar (começando com índice 0).
+        '''
+        return self.component.GetColorInfo(Color)
+
+    def GetDateTooltip(self, date: str) -> str:
+        ''' Retorna o texto de dica de ferramenta da data especificada no formato "YYYYMMDD".
+        '''
+        return self.component.GetDateTooltip(date)
+
+    def GetDay(self, date: str) -> int:
+        ''' Retorna o dia da data especificada no formato "YYYYMMDD".
+        '''
+        return self.component.GetDay(date)
+
+    def GetMonth(self, date: str) -> int:
+        ''' Retorna o mês da data especificada no formato "YYYYMMDD".
+        '''
+        return self.component.GetMonth(date)
+
+    def GetWeekday(self, date: str) -> str:
+        ''' Retorna o dia da semana da data especificada no formato "YYYYMMDD".
+        '''
+        return self.component.GetWeekday(date)
+
+    def GetWeekNumber(self, date: str) -> int:
+        ''' Retorna o número da semana da data especificada no formato "YYYYMMDD".
+        '''
+        return self.component.GetWeekNumber(date)
+
+    def GetYear(self, date: str) -> int:
+        ''' Retorna o ano da data especificada no formato "YYYYMMDD".
+        '''
+        return self.component.GetYear(date)
+
+    def IsWeekend(self, date: str) -> int:
+        ''' Retorna True se a data especificada pelo parâmetro estiver em um fim de semana.
+        '''
+        return self.component.IsWeekend(date)
+
+    def SelectMonth(self, month: int, year: int) -> None:
+        ''' Seleciona o mês especificado pelos parâmetros (começando com índice 1).
+        '''
+        self.component.SelectMonth(month, year)
+
+    def SelectRange(self, from_date: str, to_date: str) -> None:
+        ''' Seleciona o intervalo especificado pelos parâmetros (no formato "YYYYMMDD").
+        '''
+        self.component.SelectRange(from_date, to_date)
+
+    def SelectWeek(self, week: int, year: int) -> None:
+        ''' Seleciona a semana especificada pelos parâmetros (começando com índice 0).
+        '''
+        self.component.SelectWeek(week, year)
+
+    def EndSelection(self) -> str:
+        ''' O último dia do intervalo de datas selecionado (no formato "YYYYMMDD").
+        '''
+        return self.component.EndSelection
+
+    def FirstVisibleDate(self, date: str = None) -> str:
+        ''' Esta é a data mais antiga visível no controle de calendário.
+        '''
+        if date is not None:
+            self.component.FirstVisibleDate = date
+        return self.component.FirstVisibleDate
+
+    def FocusDate(self, date: str = None) -> str:
+        ''' A data atualmente focada (identificada pela borda de foco) no controle de calendário está disponível no formato "YYYYMMDD".
+        '''
+        if date is not None:
+            self.component.FocusDate = date
+        return self.component.FocusDate
+
+    def FocusedElement(self) -> int:
+        ''' Esta propriedade indica qual parte de um controle GuiCalendar composto atualmente tem o foco.
+        Os valores possíveis são:
+        0 - "InputField": O campo de entrada (seletor) para inserir manualmente uma data atualmente tem foco
+        1 - "Button": O botão de pressão para abrir o painel de navegação atualmente tem foco
+        2 - "Navigator": O painel de navegação pop-up está aberto e atualmente tem foco
+        '''
+        return self.component.FocusedElement
+
+    def Horizontal(self) -> bool:
+        ''' Esta propriedade contém True se o GuiCalendar tiver orientação horizontal, caso contrário, contém False.
+        '''
+        return self.component.Horizontal
+
+    def LastVisibleDate(self, date: str = None) -> str:
+        ''' A última data que está atualmente sendo exibida pelo GuiCalendar (no formato "YYYYMMDD").
+        '''
+        if date is not None:
+            self.component.LastVisibleDate = date
+        return self.component.LastVisibleDate
+
+    def SelectionInterval(self, interval: str = None) -> str:
+        ''' O intervalo é representado por duas strings de data concatenadas separadas por uma vírgula.
+        '''
+        if interval is not None:
+            self.component.SelectionInterval = interval
+        return self.component.SelectionInterval
+
+    def StartSelection(self) -> str:
+        ''' O primeiro dia do intervalo de datas selecionado (no formato "YYYYMMDD").
+        '''
+        return self.component.StartSelection
+
+    def Today(self) -> str:
+        ''' O dia atual (no formato "YYYYMMDD").
+        '''
+        return self.component.Today
 
 class SapGuiBarChart(SapGuiShell):
     ''' O GuiBarChart é uma ferramenta poderosa para exibir e modificar diagramas de escala de tempo.
