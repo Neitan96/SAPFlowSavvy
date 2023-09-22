@@ -59,6 +59,7 @@ OK:
 	- GuiCalendar
 	- GuiColorSelector
 	- GuiDialogShell
+	- GuiEAIViewer2D
 
 * Enumerations
 	- GuiComponentType
@@ -75,7 +76,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiEAIViewer2D
 	- GuiEAIViewer3D
 	- GuiGOSShell
 	- GuiGraphAdapt
@@ -1937,6 +1937,39 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiEAIViewer2D(SapGuiShell):
+    ''' O controle GuiEAIViewer2D é utilizado para visualizar imagens gráficas bidimensionais no sistema SAP.
+    O usuário pode realizar redlining sobre a imagem carregada. O wrapper de script para esse controle registra
+    todas as ações do usuário durante o processo de redlining e reproduz as mesmas ações quando o script gravado é reproduzido.
+    '''
+    
+    def annotationTextRequest(self, text: str) -> None:
+        # TODO Criar descrição
+        return self.component.annotationTextRequest(text)
+
+    def AnnotationEnabled(self, enabled: int = None) -> int:
+        ''' O valor desta propriedade é definido como 1 quando a marcação está ativada.
+        O controle wrapper começa a gravar as ações do usuário assim que esta propriedade é definida como valor 1.
+        '''
+        if enabled is not None:
+            self.component.AnnotationEnabled = enabled
+        return self.component.AnnotationEnabled
+
+    def AnnotationMode(self, mode: int = None) -> int:
+        ''' Durante a marcação, o modo de marcação selecionado é armazenado nesta propriedade.
+        '''
+        if mode is not None:
+            self.component.AnnotationMode = mode
+        return self.component.AnnotationMode
+
+    def RedliningStream(self, stream: str = None) -> str:
+        ''' Esta propriedade armazena a camada de marcação como um objeto BLOB (Binary Large Data Object).
+        Durante a gravação, todo o BLOB é copiado para o script gerado.
+        '''
+        if stream is not None:
+            self.component.RedliningStream = stream
+        return self.component.RedliningStream
 
 class SapGuiColorSelector(SapGuiShell):
     ''' GuiColorSelector exibe um conjunto de cores para seleção.
