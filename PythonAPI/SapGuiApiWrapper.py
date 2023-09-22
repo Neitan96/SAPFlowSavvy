@@ -65,6 +65,7 @@ OK:
 	- GuiGraphAdapt
 	- GuiHTMLViewer
 	- GuiMainWindow
+	- GuiMap
 
 * Enumerations
 	- GuiComponentType
@@ -81,7 +82,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiMap
 	- GuiMenubar
 	- GuiMessageWindow
 	- GuiNetChart
@@ -1944,6 +1944,13 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiMap(SapGuiShell):
+    ''' Para o controle do mapa, apenas membros básicos do GuiShell estão disponíveis.
+    A gravação e a reprodução não são possíveis.
+    '''
+    
+    pass
 
 class SapGuiHTMLViewer(SapGuiShell):
     ''' O GuiHTMLViewer é usado para exibir um documento HTML dentro do SAP GUI.
