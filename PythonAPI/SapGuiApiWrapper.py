@@ -42,6 +42,7 @@ OK:
 	- GuiStatusPane
 	- GuiTree
 	- GuiToolbarControl
+	- GuiTextField
 
 * Enumerations
 	- GuiComponentType
@@ -65,7 +66,6 @@ Priority:
 	- GuiPasswordField
 	- GuiRadioButton
 	- GuiTextedit
-	- GuiTextField
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -1086,6 +1086,112 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiTextField(SapGuiVComponent):
+    ''' GuiTextField estende o objeto GuiVComponent. O prefixo do tipo é txt, o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
+
+    def GetListProperty(self, property_name: str) -> str:
+        ''' Retorna uma propriedade de lista específica.
+        Para mais informações, consulte a documentação sobre o método GetListProperty no objeto GuiLabel.
+        '''
+        return self.component.GetListProperty(property_name)
+
+    def GetListPropertyNonRec(self, property_name: str) -> str:
+        ''' Este método retorna informações compiladas no servidor para aprimorar as listas ABAP com informações de acessibilidade.
+        Consulte GuiLabel::GetListProperty para uma descrição dos atributos disponíveis. 
+        Ao contrário do método GetListProperty, o GetListPropertyNonRec retornará apenas informações definidas para o elemento
+        específico e ignorará propriedades de lista definidas para elementos pai.
+        '''
+        return self.component.GetListPropertyNonRec(property_name)
+
+    def CaretPosition(self, caret_position: int = None) -> int:
+        ''' A posição do cursor dentro de um campo de texto.
+        '''
+        if caret_position is not None:
+            self.component.CaretPosition = caret_position
+        return self.component.CaretPosition
+
+    def DisplayedText(self) -> str:
+        ''' Esta propriedade contém o texto conforme exibido na tela, incluindo espaços em branco precedentes ou subsequentes.
+            Esses espaços em branco são removidos da propriedade de texto.
+        '''
+        return self.component.DisplayedText
+
+    def Highlighted(self) -> bool:
+        ''' Esta propriedade é True se a flag Highlighted estiver definida no screen painter para o elemento dynpro.
+        '''
+        return self.component.Highlighted
+
+    def HistoryCurEntry(self) -> str:
+        ''' Texto da entrada atualmente focada na lista de histórico.
+        '''
+        return self.component.HistoryCurEntry
+
+    def HistoryCurIndex(self) -> int:
+        ''' Índice atualmente focado na lista suspensa de histórico.
+        '''
+        return self.component.HistoryCurIndex
+
+    def HistoryIsActive(self) -> bool:
+        ''' Esta propriedade é True se o histórico local do campo de entrada estiver atualmente aberto.
+        '''
+        return self.component.HistoryIsActive
+
+    def HistoryList(self) -> object:
+        ''' Lista de entradas na caixa de histórico local.
+        '''
+        return self.component.HistoryList
+
+    def IsHotspot(self) -> bool:
+        ''' Elementos dynpro, como rótulos, podem ser configurados para causar uma ida e volta quando clicados. Nesse caso, o cursor do mouse muda para a forma de mão. Isso é chamado de hot spot.
+        '''
+        return self.component.IsHotspot
+
+    def IsLeftLabel(self) -> bool:
+        ''' Esta propriedade é True se o componente tiver a flag 'assign left'.
+        '''
+        return self.component.IsLeftLabel
+
+    def IsListElement(self) -> bool:
+        ''' Esta propriedade é True se o elemento estiver em uma lista ABAP, não em uma tela dynpro.
+        '''
+        return self.component.IsListElement
+
+    def IsOField(self) -> bool:
+        ''' OField é um elemento especial de dynpro ABAP, o Output Field. Esses campos podem ser definidos programaticamente com um valor em tempo de execução. Nesse aspecto, eles diferem dos rótulos. No entanto, eles não podem ser usados para inserir dados, portanto, não são campos de entrada.
+        '''
+        return self.component.IsOField
+
+    def IsRightLabel(self) -> bool:
+        ''' Esta propriedade é True se o componente tiver a flag 'assign right'.
+        '''
+        return self.component.IsRightLabel
+
+    def LeftLabel(self) -> object:
+        ''' Este rótulo foi definido no ABAP Screen Painter para ser o rótulo esquerdo do controle.
+        '''
+        return self.component.LeftLabel
+
+    def MaxLength(self) -> int:
+        ''' O comprimento máximo do texto que pode ser escrito em um campo de texto é contado em unidades de código. Em clientes não Unicode, essas unidades são equivalentes a bytes.
+        '''
+        return self.component.MaxLength
+
+    def Numerical(self) -> bool:
+        ''' Se esta flag estiver definida, apenas números e caracteres especiais podem ser escritos no campo de texto.
+        '''
+        return self.component.Numerical
+
+    def Required(self) -> bool:
+        ''' Esta propriedade é True se o componente for um valor obrigatório para a tela.
+        '''
+        return self.component.Required
+
+    def RightLabel(self) -> object:
+        ''' Este rótulo foi definido no ABAP Screen Painter para ser o rótulo direito do controle.
+        '''
+        return self.component.RightLabel
 
 class SapGuiStatusbar(SapGuiVComponent):
     ''' GuiStatusbar representa a mensagem que exibe parte da barra de status na parte inferior da janela SAP GUI.
