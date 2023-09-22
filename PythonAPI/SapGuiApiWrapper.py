@@ -67,6 +67,7 @@ OK:
 	- GuiMainWindow
 	- GuiMap
 	- GuiMenubar
+	- GuiMessageWindow
 
 * Enumerations
 	- GuiComponentType
@@ -83,7 +84,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiMessageWindow
 	- GuiNetChart
 	- GuiOfficeIntegration
 	- GuiOkCodeField
@@ -1084,6 +1084,63 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiMessageWindow(SapGuiVComponent):
+    # TODO Criar descrição
+    
+    def FocusedButton(self) -> int:
+        ''' Índice baseado em zero do botão que atualmente tem foco (somente leitura).
+        '''
+        return self.component.FocusedButton
+
+    def HelpButtonHelpText(self, help_text: str = None) -> str:
+        ''' Texto de ajuda do botão de ajuda (leitura/escrita).
+        '''
+        if help_text is not None:
+            self.component.HelpButtonHelpText = help_text
+        return self.component.HelpButtonHelpText
+
+    def HelpButtonText(self, text: str = None) -> str:
+        ''' Texto do botão de ajuda (leitura/escrita).
+        '''
+        if text is not None:
+            self.component.HelpButtonText = text
+        return self.component.HelpButtonText
+
+    def MessageText(self, text: str = None) -> str:
+        ''' Texto da mensagem (leitura/escrita).
+        '''
+        if text is not None:
+            self.component.MessageText = text
+        return self.component.MessageText
+
+    def MessageType(self, message_type: int = None) -> int:
+        ''' Tipo de mensagem (leitura/escrita).
+        '''
+        if message_type is not None:
+            self.component.MessageType = message_type
+        return self.component.MessageType
+
+    def OKButtonHelpText(self, help_text: str = None) -> str:
+        ''' Texto de ajuda do botão OK (leitura/escrita).
+        '''
+        if help_text is not None:
+            self.component.OKButtonHelpText = help_text
+        return self.component.OKButtonHelpText
+
+    def OKButtonText(self, text: str = None) -> str:
+        ''' Texto do botão OK (leitura/escrita).
+        '''
+        if text is not None:
+            self.component.OKButtonText = text
+        return self.component.OKButtonText
+
+    def Visible(self, visible: bool = None) -> bool:
+        ''' Esta propriedade é True se o controle é visível, e False se estiver oculto (leitura/escrita).
+        '''
+        if visible is not None:
+            self.component.Visible = visible
+        return self.component.Visible
 
 class GuiLabel(SapGuiVComponent):
     # TODO criar descrição
