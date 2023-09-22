@@ -16,12 +16,12 @@ Este repositório é uma coleção de APIs desenvolvidas em *Python* e *VBA* pro
 
 ## Principais características
 
-- Constantes de **TCodes** comuns do SAP para uso rápido.
+- (*Em andamento*) Constantes de **TCodes** comuns do SAP para uso rápido.
 - **Multi-linguagem**: Disponível para *Python* e para *VBA*(com algumas limitações).
 - **Classes Wrapper**(Embrulho) da API do Sap Gui para facilitar o code-complete.
 - Classes Wrapper **documentadas em português** dispensando a consulta constante na documentação oficial do SAP.
-- **Funções customizadas** nas classes Wrapper para auxiliar no dia a dia.
-- **Scripts complexos pré-programados**, como:
+- (*Em andamento*) **Funções customizadas** nas classes Wrapper para auxiliar no dia a dia.
+- (*Em andamento*) **Scripts complexos pré-programados**, como:
   - ***Armazenamento de credenciais:*** Faz o armazenamento das credenciais do SAP para o usuário não precisar ficar logando manualmente, ótimo para scripts autônomos.
   - ***Login no SAP:*** Faz o login no SAP Verificando todas as possibilidades, login e senha errados, caixas pos login(tentativas de logins, multi-login, copyrigth, timeout), caso não tenha sessão aberta.
 
@@ -41,7 +41,6 @@ session = sap_gui.GetSessionLoged()
 ## Melhorias futuras
 * Documentações e tutoriais
 * Fluxograma do componentes SAP Gui
-* Wrapper dos componentes do SAP Gui
 * Registro de execução e erros
 * Funções para lidar com GridView
   * Selecão, alteração e criação de layouts
