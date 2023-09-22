@@ -61,6 +61,7 @@ OK:
 	- GuiDialogShell
 	- GuiEAIViewer2D
 	- GuiEAIViewer3D
+	- GuiGOSShell
 
 * Enumerations
 	- GuiComponentType
@@ -77,7 +78,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiGOSShell
 	- GuiGraphAdapt
 	- GuiHTMLViewer
 	- ContentGuiMainWindow
@@ -1740,6 +1740,13 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiGOSShell(SapGuiVContainer):
+    ''' O GuiGosShell está disponível apenas no modo Novo Design Visual.
+    O prefixo do tipo é shellcont, o nome é a última parte do id, shellcont[n].
+    '''
+    
+    pass
 
 class SapGuiDialogShell(SapGuiVContainer):
     ''' O GuiDialogShell é uma janela externa usada como contêiner para outros shells, por exemplo,
