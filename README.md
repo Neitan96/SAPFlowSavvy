@@ -14,7 +14,18 @@ Este repositório é uma coleção de APIs desenvolvidas em *Python* e *VBA* pro
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/neitan96/)
 [![Instagram](https://img.shields.io/badge/Instagram-Profile-orange?style=flat&logo=instagram)](https://www.instagram.com/neitan96/)
 
-## Exemplos:
+## Principais características
+
+- Constantes de **TCodes** comuns do SAP para uso rápido.
+- **Multi-linguagem**: Disponível para *Python* e para *VBA*(com algumas limitações).
+- **Classes Wrapper**(Embrulho) da API do Sap Gui para facilitar o code-complete.
+- Classes Wrapper **documentadas em português** dispensando a consulta constante na documentação oficial do SAP.
+- **Funções customizadas** nas classes Wrapper para auxiliar no dia a dia.
+- **Scripts complexos pré-programados**, como:
+  - ***Armazenamento de credenciais:*** Faz o armazenamento das credenciais do SAP para o usuário não precisar ficar logando manualmente, ótimo para scripts autônomos.
+  - ***Login no SAP:*** Faz o login no SAP Verificando todas as possibilidades, login e senha errados, caixas pos login(tentativas de logins, multi-login, copyrigth, timeout), caso não tenha sessão aberta.
+
+## Exemplos
 
 #### **Python:**
 ```python
@@ -27,7 +38,7 @@ session = sap_gui.GetSessionLoged()
 ' TODO
 ```
 
-## Melhorias futuras:
+## Melhorias futuras
 * Documentações e tutoriais
 * Fluxograma do componentes SAP Gui
 * Wrapper dos componentes do SAP Gui
@@ -49,6 +60,13 @@ session = sap_gui.GetSessionLoged()
   * /SCWM/PACK
   * ...
 * Função CastTo na classe base
+
+## Links úteis SAP
+
+- [SAP GUI Scripting API - Pdf](https://help.sap.com/doc/9215986e54174174854b0af6bb14305a/760.01/en-US/sap_gui_scripting_api_761.pdf)
+- [SAP GUI Scripting API - Web](https://help.sap.com/docs/sap_gui_for_windows/b47d018c3b9b45e897faf66a6c0885a8/babdf65f4d0a4bd8b40f5ff132cb12fa.html)
+- [TCodes do SAP](https://www.sap-tcodes.org/)
+- [SAP Datasheet](https://www.sapdatasheet.org/)
 
 ## Aviso Legal
 

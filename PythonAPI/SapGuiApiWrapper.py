@@ -1,99 +1,4 @@
 '''
-OK:
-* Objects
-	- GuiComponent
-	- GuiContainer
-	- GuiComponentCollection Collection
-	- GuiApplication
-	- GuiUtils
-	- GuiConnection
-	- GuiSession
-	- GuiCollection
-	- GuiSessionInfo
-	- GuiVComponent
-	- GuiVContainer
-	- GuiFrameWindow
-	- GuiScrollbar
-	- GuiScrollContainer
-	- GuiTabStrip
-	- GuiTab
-	- GuiTableRow
-	- GuiTableColumn
-	- GuiMenu
-	- GuiContextMenu
-	- GuiBox
-	- GuiButton
-	- GuiCheckBox
-	- GuiEnum
-	- GuiShell
-	- GuiContainerShell
-	- GuiTableControl
-	- GuiGridView
-	- GuiModalWindow
-	- GuiComboBox
-	- GuiComboBoxEntry
-	- GuiComboBoxControl
-	- GuiSapChart
-	- GuiChart
-	- GuiUserArea
-	- GuiToolbar
-	- GuiTitlebar
-	- GuiStatusbar
-	- GuiStatusPane
-	- GuiTree
-	- GuiToolbarControl
-	- GuiTextField
-	- GuiTextedit
-	- GuiRadioButton
-	- GuiPasswordField
-	- GuiLabel
-	- GuiCTextField
-	- GuiCustomControl
-	- GuiInputFieldControl
-	- GuiSimpleContainer
-	- GuiSplit
-	- GuiSplitterContainer
-	- GuiAbapEditor
-	- GuiApoGrid
-	- GuiBarChart
-	- GuiCalendar
-	- GuiColorSelector
-	- GuiDialogShell
-	- GuiEAIViewer2D
-	- GuiEAIViewer3D
-	- GuiGOSShell
-	- GuiGraphAdapt
-	- GuiHTMLViewer
-	- GuiMainWindow
-	- GuiMap
-	- GuiMenubar
-	- GuiMessageWindow
-	- GuiNetChart
-	- GuiOfficeIntegration
-	- GuiOkCodeField
-	- GuiPicture
-	- GuiStage
-
-* Enumerations
-	- GuiComponentType
-	- GuiErrorType
-	- GuiEventType281
-	- GuiImageType
-	- GuiMagicDispIDs
-	- GuiMessageBoxOption
-	- GuiMessageBoxResult
-	- GuiMessageBoxType
-	- GuiScrollbarType
-	- GuiTableSelectionType
- 
-TODO Components:
-
-* Objects:
-	- GuiVHViewSwitch
-	- 
-'''
-
-'''
 - Application - Representa a aplicação SAP GUI.
   - Connection - Representa a conexão a um servidor SAP.
     - Session - Representa uma sessão SAP.
@@ -1084,6 +989,16 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiVHViewSwitch(SapGuiVComponent):
+    ''' GuiVHViewSwitch representa o objeto “View Switch” que foi introduzido com o tema Belize no SAP GUI.
+    O View Switch é colocado na área de cabeçalho da janela principal do SAP GUI e pode ser usado para selecionar diferentes visualizações
+    dentro de um aplicativo.
+    Muitas telas podem ser exibidas de diferentes maneiras (por exemplo, como uma árvore ou uma lista).
+    Para mudar de uma visualização para outra de forma confortável, essas telas podem fazer uso do View Switch.
+    '''
+    
+    pass
 
 class SapGuiOkCodeField(SapGuiVComponent):
     ''' O GuiOkCodeField é colocado na barra de ferramentas superior da janela principal.
