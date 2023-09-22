@@ -58,6 +58,7 @@ OK:
 	- GuiBarChart
 	- GuiCalendar
 	- GuiColorSelector
+	- GuiDialogShell
 
 * Enumerations
 	- GuiComponentType
@@ -74,7 +75,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiDialogShell
 	- GuiEAIViewer2D
 	- GuiEAIViewer3D
 	- GuiGOSShell
@@ -1740,6 +1740,21 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiDialogShell(SapGuiVContainer):
+    ''' O GuiDialogShell é uma janela externa usada como contêiner para outros shells, por exemplo,
+    uma barra de ferramentas. O prefixo do tipo é shellcont, o nome é a última parte do id, shellcont[n].
+    '''
+
+    def Fechar(self):
+        ''' Este método fecha a janela externa.
+        '''
+        self.component.Fechar()
+
+    def Title(self) -> str:
+        ''' Título do diálogo.
+        '''
+        return self.component.Title
 
 class SapGuiSimpleContainer(SapGuiVContainer):
     ''' Este contêiner representa subtelas não roláveis. Ele não possui nenhuma funcionalidade
