@@ -44,6 +44,7 @@ OK:
 	- GuiToolbarControl
 	- GuiTextField
 	- GuiTextedit
+	- GuiRadioButton
 
 * Enumerations
 	- GuiComponentType
@@ -65,7 +66,6 @@ Priority:
 	- GuiInputFieldControl
 	- GuiLabel
 	- GuiPasswordField
-	- GuiRadioButton
 	- GuiSimpleContainer
 	- GuiSplit
 	- GuiSplitterContainer
@@ -1086,6 +1086,76 @@ class SapGuiVComponent(SapGuiComponent):
         ''' Altura do componente em pixels.
         '''
         return self.component.Height
+
+class SapGuiRadioButton(SapGuiVComponent):
+    ''' O prefixo do tipo é rad, o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
+    
+    def Select(self) -> None:
+        ''' Selecionar um botão de opção automaticamente desmarca todos os outros botões dentro do mesmo grupo.
+        Isso pode causar uma viagem de ida e volta ao servidor, dependendo da definição do botão no screen painter.
+        '''
+        self.component.Select()
+    
+    def CharHeight(self) -> int:
+        ''' Altura do GuiRadioButton em métrica de caracteres.
+        '''
+        return self.component.CharHeight
+
+    def CharLeft(self) -> int:
+        ''' Coordenada esquerda do GuiRadioButton em métrica de caracteres.
+        '''
+        return self.component.CharLeft
+
+    def CharTop(self) -> int:
+        ''' Coordenada superior do GuiRadioButton em métrica de caracteres.
+        '''
+        return self.component.CharTop
+
+    def CharWidth(self) -> int:
+        ''' Largura do GuiRadioButton em métrica de caracteres.
+        '''
+        return self.component.CharWidth
+
+    def Flushing(self) -> bool:
+        ''' Alguns componentes, como botões de rádio ou caixas de seleção, podem causar uma viagem de ida e volta quando seu valor é alterado. Se for o caso, a propriedade Flushing é True.
+        '''
+        return self.component.Flushing
+
+    def GroupCount(self) -> int:
+        ''' O número de botões de rádio no mesmo grupo ao qual o objeto atual pertence.
+        '''
+        return self.component.GroupCount
+
+    def GroupMembers(self) -> object:
+        ''' A coleção de objetos GuiRadioButton pertencentes ao mesmo grupo de botões de rádio.
+        '''
+        return self.component.GroupMembers
+
+    def GroupPos(self) -> int:
+        ''' A posição do botão de rádio no respectivo grupo de botões de rádio (varia de 1 a GroupCount).
+        '''
+        return self.component.GroupPos
+
+    def IsLeftLabel(self) -> bool:
+        ''' Esta propriedade é True se o componente tiver a flag 'assign left'.
+        '''
+        return self.component.IsLeftLabel
+
+    def IsRightLabel(self) -> bool:
+        ''' Esta propriedade é True se o componente tiver a flag 'assign right'.
+        '''
+        return self.component.IsRightLabel
+
+    def LeftLabel(self) -> object:
+        ''' Rótulo esquerdo do GuiRadioButton. O rótulo é atribuído no Screen Painter, usando a flag 'assign left'.
+        '''
+        return self.component.LeftLabel
+
+    def RightLabel(self) -> object:
+        ''' Rótulo direito do GuiRadioButton. Esta propriedade é definida no Screen Painter usando a flag 'assign right'.
+        '''
+        return self.component.RightLabel
 
 class SapGuiTextField(SapGuiVComponent):
     ''' GuiTextField estende o objeto GuiVComponent. O prefixo do tipo é txt, o nome é o nome do campo retirado do dicionário de dados SAP.
