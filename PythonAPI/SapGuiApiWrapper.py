@@ -45,6 +45,8 @@ OK:
 	- GuiTextField
 	- GuiTextedit
 	- GuiRadioButton
+	- GuiPasswordField
+	- GuiLabel
 
 * Enumerations
 	- GuiComponentType
@@ -64,8 +66,6 @@ Priority:
 	- GuiCTextField
 	- GuiCustomControl
 	- GuiInputFieldControl
-	- GuiLabel
-	- GuiPasswordField
 	- GuiSimpleContainer
 	- GuiSplit
 	- GuiSplitterContainer
@@ -1087,6 +1087,97 @@ class SapGuiVComponent(SapGuiComponent):
         '''
         return self.component.Height
 
+class GuiLabel(SapGuiVComponent):
+    # TODO criar descrição
+
+    def GetListProperty(self, property: str) -> str:
+        ''' Retorna propriedades de contêineres em geral.
+        property: A propriedade que você deseja obter. Consulte a documentação para opções disponíveis.
+        Retorna o valor da propriedade especificada.
+        '''
+        # TODO Verificar documentação novamente e fazer funções auxiliares
+        return self.component.GetListProperty(property)
+
+    def GetListPropertyNonRec(self, property: str) -> str:
+        ''' Retorna informações compiladas no servidor para aprimorar as listas ABAP com informações de acessibilidade.
+        Veja GuiLabel::GetListProperty para uma descrição dos atributos disponíveis.
+        Ao contrário do método GetListProperty, GetListPropertyNonRec só retornará informações definidas para o elemento específico 
+        e ignorará as propriedades definidas para elementos pai.
+        property: A propriedade que você deseja obter. Consulte a documentação para opções disponíveis.
+        Retorna o valor da propriedade especificada.
+        '''
+        return self.component.GetListPropertyNonRec(property)
+
+    def CaretPosition(self, caret_position: int = None) -> int:
+        ''' Definir a posição do cursor dentro de um rótulo é possível, mesmo que não seja visualizada como um cursor pelo SAP GUI.
+        No entanto, a posição é transmitida para o servidor, para que a lógica da aplicação ABAP possa depender dessa posição.
+        '''
+        if caret_position is not None:
+            self.component.CaretPosition = caret_position
+        return self.component.CaretPosition
+
+    def ColorIndex(self) -> int:
+        ''' Este número define o índice da cor da lista deste elemento.
+        '''
+        return self.component.ColorIndex
+
+    def ColorIntensified(self) -> bool:
+        ''' Esta propriedade é True se a flag Intensified estiver definida no screen painter para este elemento dynpro.
+        '''
+        return self.component.ColorIntensified
+
+    def ColorInverse(self) -> bool:
+        ''' Esta propriedade é True se o estilo de cor inversa estiver definido no screen painter para o elemento.
+        '''
+        return self.component.ColorInverse
+
+    def DisplayedText(self) -> str:
+        ''' Esta propriedade contém o texto conforme exibido na tela, incluindo espaços em branco precedentes ou subsequentes.
+        Esses espaços em branco são removidos da propriedade de texto.
+        '''
+        return self.component.DisplayedText
+
+    def Highlighted(self) -> bool:
+        ''' Esta propriedade é True se a flag Highlighted estiver definida no screen painter para o elemento dynpro.
+        '''
+        return self.component.Highlighted
+
+    def IsHotspot(self) -> bool:
+        ''' Elementos dynpro, como rótulos, podem ser configurados para causar uma viagem de ida e volta quando clicados.
+        Nesse caso, o cursor do mouse muda para a forma de mão. Isso é chamado de ponto de acesso.
+        '''
+        return self.component.IsHotspot
+
+    def IsLeftLabel(self) -> bool:
+        ''' Esta propriedade é definida se o rótulo foi atribuído como rótulo esquerdo de outro controle.
+        '''
+        return self.component.IsLeftLabel
+
+    def IsListElement(self) -> bool:
+        ''' Esta propriedade é True se o elemento estiver em uma lista ABAP, não em uma tela dynpro.
+        '''
+        return self.component.IsListElement
+
+    def IsRightLabel(self) -> bool:
+        ''' Esta propriedade é definida se o rótulo foi atribuído como rótulo direito de outro controle.
+        '''
+        return self.component.IsRightLabel
+
+    def MaxLength(self) -> int:
+        ''' O comprimento máximo do texto de um rótulo é contado em unidades de código. Em clientes não Unicode, essas unidades são equivalentes a bytes.
+        '''
+        return self.component.MaxLength
+
+    def Numerical(self) -> bool:
+        ''' Esta bandeira é True se o rótulo só puder conter números.
+        '''
+        return self.component.Numerical
+
+    def RowText(self) -> str:
+        ''' Esta propriedade está disponível apenas em telas de lista ABAP. Ela retorna o texto da linha inteira que contém o componente atual.
+        '''
+        return self.component.RowText
+
 class SapGuiRadioButton(SapGuiVComponent):
     ''' O prefixo do tipo é rad, o nome é o nome do campo retirado do dicionário de dados SAP.
     '''
@@ -1262,6 +1353,14 @@ class SapGuiTextField(SapGuiVComponent):
         ''' Este rótulo foi definido no ABAP Screen Painter para ser o rótulo direito do controle.
         '''
         return self.component.RightLabel
+
+class SapGuiPasswordField(SapGuiTextField):
+    ''' A única diferença entre GuiTextField e GuiPasswordField é que a propriedade Text não pode ser lida para um campo de senha.
+    O texto retornado está sempre vazio. Durante a gravação a senha também não é salva no script gravado. GuiPasswordField
+    estende o GuiTextField. O prefixo do tipo é pwd, o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
+
+    pass
 
 class SapGuiStatusbar(SapGuiVComponent):
     ''' GuiStatusbar representa a mensagem que exibe parte da barra de status na parte inferior da janela SAP GUI.
