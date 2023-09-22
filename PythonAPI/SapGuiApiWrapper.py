@@ -66,6 +66,7 @@ OK:
 	- GuiHTMLViewer
 	- GuiMainWindow
 	- GuiMap
+	- GuiMenubar
 
 * Enumerations
 	- GuiComponentType
@@ -82,7 +83,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiMenubar
 	- GuiMessageWindow
 	- GuiNetChart
 	- GuiOfficeIntegration
@@ -1740,6 +1740,14 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiMenubar(SapGuiVContainer):
+    ''' Apenas a janela principal possui uma barra de menu.
+    Os filhos da barra de menu são menus. GuiMenubar estende o objeto GuiVContainer.
+    O prefixo e o nome do tipo são mbar.
+    '''
+    
+    pass
 
 class SapGuiGOSShell(SapGuiVContainer):
     ''' O GuiGosShell está disponível apenas no modo Novo Design Visual.
