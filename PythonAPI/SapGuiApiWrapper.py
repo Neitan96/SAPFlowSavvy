@@ -57,6 +57,7 @@ OK:
 	- GuiApoGrid
 	- GuiBarChart
 	- GuiCalendar
+	- GuiColorSelector
 
 * Enumerations
 	- GuiComponentType
@@ -73,7 +74,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiColorSelector
 	- GuiDialogShell
 	- GuiEAIViewer2D
 	- GuiEAIViewer3D
@@ -1922,6 +1922,15 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiColorSelector(SapGuiShell):
+    ''' GuiColorSelector exibe um conjunto de cores para seleção.
+    '''
+
+    def ChangeSelection(self, i: int) -> None:
+        ''' Esta função emula a seleção da cor pelo usuário na posição de índice especificada.
+        '''
+        self.component.ChangeSelection(i)
 
 class SapGuiCalendar(SapGuiShell):
     ''' O controle de calendário pode ser usado para selecionar datas ou períodos únicos.
