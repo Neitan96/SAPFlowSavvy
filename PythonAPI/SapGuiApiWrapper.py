@@ -50,6 +50,7 @@ OK:
 	- GuiCTextField
 	- GuiCustomControl
 	- GuiInputFieldControl
+	- GuiSimpleContainer
 
 * Enumerations
 	- GuiComponentType
@@ -66,7 +67,6 @@ OK:
 TODO Components:
 
 Priority:
-	- GuiSimpleContainer
 	- GuiSplit
 	- GuiSplitterContainer
 
@@ -1742,6 +1742,61 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
         # TODO
         return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+
+class SapGuiSimpleContainer(SapGuiVContainer):
+    ''' Este contêiner representa subtelas não roláveis. Ele não possui nenhuma funcionalidade
+    além das interfaces herdadas.
+    O prefixo do tipo é sub, o nome é gerado a partir das configurações do dicionário de dados.
+    '''
+
+    def GetListProperty(self, property: str) -> str:
+        ''' Obtém uma propriedade da lista.
+        property: A propriedade que você deseja obter. Consulte a documentação do objeto GuiLabel para obter mais informações.
+        Retorna o valor da propriedade especificada.
+        '''
+        return self.component.GetListProperty(property)
+
+    def GetListPropertyNonRec(self, property: str) -> str:
+        ''' Obtém uma propriedade da lista sem considerar propriedades de elementos pai.
+        property: A propriedade que você deseja obter. Consulte a documentação do objeto GuiLabel para obter mais informações.
+        Retorna o valor da propriedade especificada, ignorando propriedades de elementos pai.
+        '''
+        return self.component.GetListPropertyNonRec(property)
+
+    def IsListElement(self) -> bool:
+        ''' Esta propriedade é True se o elemento estiver em uma lista ABAP, não em uma tela dynpro.
+        '''
+        return self.component.IsListElement
+
+    def IsStepLoop(self) -> bool:
+        ''' Esta propriedade é True se o contêiner for um contêiner de loop de etapa.
+        '''
+        return self.component.IsStepLoop
+
+    def LoopColCount(self) -> int:
+        ''' Se o contêiner for um contêiner de loop de etapa, esta propriedade conterá o número de colunas no loop de etapa.
+        '''
+        return self.component.LoopColCount
+
+    def LoopCurrentCol(self) -> int:
+        ''' Se o contêiner for um contêiner de loop de etapa, esta propriedade conterá o número atual da linha no loop de etapa.
+        '''
+        return self.component.LoopCurrentCol
+
+    def LoopCurrentColCount(self) -> int:
+        ''' Se o contêiner for um contêiner de loop de etapa, esta propriedade conterá o número de colunas na linha atual do loop de etapa.
+        '''
+        return self.component.LoopCurrentColCount
+
+    def LoopCurrentRow(self) -> int:
+        ''' Se o contêiner for um contêiner de loop de etapa, esta propriedade conterá o número atual da coluna no loop de etapa.
+        '''
+        return self.component.LoopCurrentRow
+
+    def LoopRowCount(self) -> int:
+        ''' Se o contêiner for um contêiner de loop de etapa, esta propriedade conterá o número de linhas no loop de etapa.
+        '''
+        return self.component.LoopRowCount
 
 class SapGuiCustomControl(SapGuiVContainer):
     ''' O GuiCustomControl é um objeto wrapper usado para colocar controles ActiveX em telas dynpro.
