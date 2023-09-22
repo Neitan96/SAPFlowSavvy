@@ -43,6 +43,7 @@ OK:
 	- GuiTree
 	- GuiToolbarControl
 	- GuiTextField
+	- GuiTextedit
 
 * Enumerations
 	- GuiComponentType
@@ -65,7 +66,9 @@ Priority:
 	- GuiLabel
 	- GuiPasswordField
 	- GuiRadioButton
-	- GuiTextedit
+	- GuiSimpleContainer
+	- GuiSplit
+	- GuiSplitterContainer
 
 * Objects:
 	- GuiAbapEditor - N/a
@@ -87,9 +90,6 @@ Priority:
 	- GuiOfficeIntegration
 	- GuiOkCodeField
 	- GuiPicture
-	- GuiSimpleContainer
-	- GuiSplit
-	- GuiSplitterContainer
 	- GuiStage
 	- GuiVHViewSwitch
 	- 
@@ -1660,6 +1660,164 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiTextedit(SapGuiShell):
+    ''' O controle TextEdit é um controle de edição multilinha que oferece vários benefícios possíveis.
+    No que diz respeito aos scripts, a possibilidade de proteger partes do texto contra edição pelo usuário
+    é especialmente útil. GuiTextedit estende o objeto GuiShell.
+    '''
+
+    def ContextMenu(self) -> None:
+        ''' Chamar ContextMenu emula a solicitação de menu de contexto.
+        '''
+        self.component.ContextMenu()
+
+    def DoubleClick(self) -> None:
+        ''' Esta função emula um clique duplo do mouse.
+        Para definir a seleção, a função setSelectionIndexes pode ser chamada antecipadamente.
+        '''
+        self.component.DoubleClick()
+
+    def GetLineText(self, n_line: int) -> str:
+        ''' Retorna o texto da linha especificada.
+        '''
+        return self.component.GetLineText(n_line)
+
+    def GetUnprotectedTextPart(self, part: int) -> str:
+        ''' Esta função recupera o conteúdo de uma parte de texto desprotegida usando o índice baseado em zero, part.
+        '''
+        return self.component.GetUnprotectedTextPart(part)
+
+    def IsBreakpointLine(self, n_line: int) -> int:
+        ''' Retorna VERDADEIRO se a linha especificada contiver um ponto de interrupção.
+        '''
+        return self.component.IsBreakpointLine(n_line)
+
+    def IsCommentLine(self, n_line: int) -> int:
+        ''' Retorna VERDADEIRO se a linha especificada for uma linha de comentário.
+        '''
+        return self.component.IsCommentLine(n_line)
+
+    def IsHighlightedLine(self, n_line: int) -> int:
+        ''' Retorna VERDADEIRO se a linha especificada estiver destacada.
+        '''
+        return self.component.IsHighlightedLine(n_line)
+
+    def IsProtectedLine(self, n_line: int) -> int:
+        ''' Retorna VERDADEIRO se a linha especificada estiver protegida.
+        '''
+        return self.component.IsProtectedLine(n_line)
+
+    def IsSelectedLine(self, n_line: int) -> int:
+        ''' Retorna VERDADEIRO se a linha especificada estiver selecionada.
+        '''
+        return self.component.IsSelectedLine(n_line)
+
+    def ModifiedStatusChanged(self, status: int) -> None:
+        ''' Esta função emula a alteração do status modificado.
+        '''
+        self.component.ModifiedStatusChanged(status)
+
+    def MultipleFilesDropped(self, files: list) -> None:
+        ''' Emula uma operação de arrastar e soltar, na qual vários arquivos são soltos no controle de texto.
+        A lista contém, para cada arquivo, o nome completo do arquivo como uma string.
+        '''
+        self.component.MultipleFilesDropped(files)
+
+    def PressF1(self) -> None:
+        ''' Esta função emula a pressão da tecla F1 no teclado.
+        '''
+        self.component.PressF1()
+
+    def PressF4(self) -> None:
+        ''' Esta função emula a pressão da tecla F4 no teclado.
+        '''
+        self.component.PressF4()
+
+    def SetSelectionIndexes(self, start: int, end: int) -> None:
+        ''' Esta função define a faixa de texto visualmente selecionada. start e end são índices absolutos de caracteres baseados em zero.
+        start corresponde à posição onde a seleção começa e end é a posição do primeiro caractere após a seleção. 
+        Observe que definir start igual a end resulta na definição do cursor nessa posição.
+        '''
+        self.component.SetSelectionIndexes(start, end)
+
+    def SetUnprotectedTextPart(self, part: int, text: str) -> int:
+        ''' Esta função atribui o conteúdo do texto à parte de texto desprotegida com índice baseado em zero, part.
+        A função retorna True se foi possível realizar a atribuição. Caso contrário, retorna False.
+        '''
+        return self.component.SetUnprotectedTextPart(part, text)
+
+    def SingleFileDropped(self, filename: str) -> None:
+        ''' Esta função emula a queda de um único arquivo com o caminho do diretório fileName.
+        '''
+        self.component.SingleFileDropped(filename)
+
+    def CurrentColumn(self) -> int:
+        ''' O número da coluna na qual o cursor de texto está atualmente posicionado.
+        '''
+        return self.component.CurrentColumn
+
+    def CurrentLine(self) -> int:
+        ''' O número da linha na qual o cursor de texto está atualmente posicionado.
+        '''
+        return self.component.CurrentLine
+
+    def FirstVisibleLine(self, line_number: int = None) -> int:
+        ''' A primeira linha visível é visualizada na borda superior do controle.
+        '''
+        if line_number is not None:
+            self.component.FirstVisibleLine = line_number
+        return self.component.FirstVisibleLine
+
+    def LastVisibleLine(self) -> int:
+        ''' O número da última linha que está atualmente visível.
+        '''
+        return self.component.LastVisibleLine
+
+    def LineCount(self) -> int:
+        ''' O número de todas as linhas no documento atual.
+        '''
+        return self.component.LineCount
+
+    def NumberOfUnprotectedTextParts(self) -> int:
+        ''' O número de partes de texto não protegidas, que estão contidas.
+        '''
+        return self.component.NumberOfUnprotectedTextParts
+
+    def SelectedText(self) -> str:
+        ''' O texto atualmente selecionado.
+        '''
+        return self.component.SelectedText
+
+    def SelectionEndColumn(self) -> int:
+        ''' O número da coluna na qual a seleção atual termina.
+        '''
+        return self.component.SelectionEndColumn
+
+    def SelectionEndLine(self) -> int:
+        ''' O número da linha na qual a seleção atual termina.
+        '''
+        return self.component.SelectionEndLine
+
+    def SelectionIndexEnd(self) -> int:
+        ''' Recupera o índice de caractere absoluto, baseado em zero, do ponto final da faixa de texto visualmente selecionada, ou seja, a posição onde a seleção termina.
+        '''
+        return self.component.SelectionIndexEnd
+
+    def SelectionIndexStart(self) -> int:
+        ''' Recupera o índice de caractere absoluto, baseado em zero, do ponto de partida da faixa de texto visualmente selecionada, ou seja, a posição onde a seleção começa.
+        '''
+        return self.component.SelectionIndexStart
+
+    def SelectionStartColumn(self) -> int:
+        ''' O número da coluna na qual a seleção atual começa.
+        '''
+        return self.component.SelectionStartColumn
+
+    def SelectionStartLine(self) -> int:
+        ''' O número da linha na qual a seleção atual começa.
+        '''
+        return self.component.SelectionStartLine
 
 class SapGuiToolbarControl(SapGuiShell):
     # TODO Criar descrição
