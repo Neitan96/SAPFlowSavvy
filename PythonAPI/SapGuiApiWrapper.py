@@ -55,6 +55,7 @@ OK:
 	- GuiSplitterContainer
 	- GuiAbapEditor
 	- GuiApoGrid
+	- GuiBarChart
 
 * Enumerations
 	- GuiComponentType
@@ -71,7 +72,6 @@ OK:
 TODO Components:
 
 * Objects:
-	- GuiBarChart
 	- GuiCalendar
 	- GuiColorSelector
 	- GuiDialogShell
@@ -1922,6 +1922,47 @@ class SapGuiShell(SapGuiVContainer):
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
         '''
         return self.component.SubType
+
+class SapGuiBarChart(SapGuiShell):
+    ''' O GuiBarChart é uma ferramenta poderosa para exibir e modificar diagramas de escala de tempo.
+    O objeto é de natureza muito técnica. Deve ser utilizado apenas para gravação e reprodução,
+    pois a maioria dos parâmetros não pode ser determinada de outra forma.
+    '''
+
+    def BarCount(self, chart_id: int) -> int:
+        ''' Retorna o número de barras no gráfico especificado.
+        '''
+        return self.component.BarCount(chart_id)
+
+    def GetBarContent(self, chart_id: int, bar_id: int, text_id: int) -> str:
+        ''' Retorna o conteúdo da barra especificada.
+        '''
+        return self.component.GetBarContent(chart_id, bar_id, text_id)
+
+    def GetGridLineContent(self, chart_id: int, grid_line_id: int, text_id: int) -> str:
+        ''' Retorna o conteúdo da linha de grade especificada.
+        '''
+        return self.component.GetGridLineContent(chart_id, grid_line_id, text_id)
+
+    def GridCount(self, chart_id: int) -> int:
+        ''' Retorna o número de grades dentro do gráfico especificado.
+        '''
+        return self.component.GridCount(chart_id)
+
+    def LinkCount(self, chart_id: int) -> int:
+        ''' Retorna o número de links dentro do gráfico especificado.
+        '''
+        return self.component.LinkCount(chart_id)
+
+    def SendData(self, dados: str) -> None:
+        ''' Envia dados para o servidor.
+        '''
+        self.component.SendData(dados)
+
+    def ChartCount(self) -> int:
+        ''' Número de gráficos.
+        '''
+        return self.component.ChartCount
 
 class SapGuiApoGrid(SapGuiShell):
     ''' Observações
