@@ -1,12 +1,12 @@
-# SapGuiApiHelper - Automatização Simplificada do SAP
+# SAPFlowSavvy - Toolkit de automatização para SAP Gui
 
-![GitHub](https://img.shields.io/github/license/Neitan96/SapGuiApiHelper)
+![GitHub](https://img.shields.io/github/license/Neitan96/SAPFlowSavvy)
 ![Static Badge](https://img.shields.io/badge/version-developing-blue)
-![GitHub last commit](https://img.shields.io/github/last-commit/Neitan96/SapGuiApiHelper)
+![GitHub last commit](https://img.shields.io/github/last-commit/Neitan96/SAPFlowSavvy)
 [![Python](https://img.shields.io/badge/python-3.9.6%2B-blue)](https://www.python.org/downloads/release/python-396/)
 [![VBA](https://img.shields.io/badge/VBA-Excel-green)](https://docs.microsoft.com/en-us/office/vba/api/overview/excel)
 
-Este repositório é uma coleção de APIs desenvolvidas em *Python* e *VBA* projetadas para simplificar e acelerar a criação de automações no SAP GUI (Graphical User Interface). O SAP GUI é uma ferramenta poderosa para interagir com sistemas SAP, mas sua automação muitas vezes requer códigos extensos e complexos. Nossas APIs têm como objetivo resolver esse problema, fornecendo funcionalidades pré-fabricadas que permitem que você automatize tarefas SAP de forma eficiente e sem a necessidade de codificação extensiva.
+Este repositório é uma coleção de APIs desenvolvidas em *Python* e *VBA* projetadas para simplificar e acelerar a criação de automações no SAP GUI. O SAP GUI é uma ferramenta poderosa para interagir com sistemas SAP, mas sua automação muitas vezes requer códigos extensos e complexos. Essa APIs têm como objetivo resolver esse problema, fornecendo funcionalidades pré-fabricadas que permite que você automatize tarefas SAP de forma eficiente e sem a necessidade de codificação extensiva.
 
 ## Autor - **Nathan Almeida** (Neitan96):
 
