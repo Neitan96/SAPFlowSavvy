@@ -1,54 +1,82 @@
+'''
+SapGuiApiWrapper
+
+Este arquivo contém enums e classes wrapper do SAP GUI Scripting API, com algumas funções extras.
+
+Funções Adicionais nos Wrapper:
+
+- SapGuiConnection:
+  - SessionsList() -> [SapGuiSession]: Retorna uma list com as sessões.
+  
+- SapGuiConnection:
+  - ConnectionsList() -> [SapGuiConnection]: Retorna uma list com as conexões.
+  - OpenNewSession() -> SapGuiSession: Abre uma nova sessão na conexão.
+  - SessionsUser() -> [SapGuiSession]: Obtém todas sessões do usuário.
+  
+- SapGuiComponentCollection:
+  - ToList() -> [object]: Retorna uma list com todos os itens da coleção.
+  - LastItem() -> object: Retona o útimo item da coleção.
+
+- SapGuiCollection:
+  - ToList() -> [object]: Retorna uma list com todos os itens da coleção.
+  - LastItem() -> object: Retona o útimo item da coleção.
+
+'''
+
+from __future__ import annotations
+import win32com
+
 class SapGuiComponentType:
-    GuiApplication = 10  # Aplicação: Representa a aplicação SAP GUI em si, permitindo interagir com todo o ambiente SAP.
-    GuiBox = 62  # Caixa: Uma caixa de diálogo ou janela usada para exibir informações ou solicitar entrada do usuário.
-    GuiButton = 40  # Botão: Um botão clicável que normalmente dispara ações ou comandos quando pressionado.
-    GuiCheckBox = 42  # Caixa de Seleção: Uma caixa que pode ser marcada ou desmarcada para indicar uma escolha ou opção.
-    GuiCollection = 120  # Coleção: Representa uma coleção de elementos ou objetos SAP GUI, permitindo operações em massa.
-    GuiComboBox = 34  # Caixa de Combinação: Uma caixa de texto com uma lista suspensa de opções que o usuário pode selecionar.
-    GuiComponent = 0  # Componente: O componente base que pode representar qualquer elemento na interface do SAP GUI.
-    GuiComponentCollection = 128  # Coleção de Componentes: Uma coleção de componentes SAP GUI, útil para gerenciar vários elementos.
-    GuiConnection = 11  # Conexão: Representa uma conexão com um servidor SAP, permitindo a seleção de diferentes sessões.
-    GuiContainer = 70  # Contêiner: Um elemento que pode conter outros componentes, como um grupo de botões ou campos.
-    GuiContainerShell = 51  # Shell de Contêiner: Um shell que contém componentes em uma hierarquia de árvore.
-    GuiContextMenu = 127  # Menu de Contexto: Um menu contextual que oferece opções específicas do contexto para um componente.
-    GuiCTextField = 32  # Campo de Texto Curto: Um campo de entrada de texto para entrada de dados breve.
-    GuiCustomControl = 50  # Controle Personalizado: Um componente personalizado criado para atender a requisitos específicos.
-    GuiDialogShell = 125  # Shell de Diálogo: Uma janela de diálogo que normalmente exibe informações detalhadas ou solicitações ao usuário.
-    GuiDockShell = 126  # Shell de Ancoragem: Um shell de ancoragem usado para ancorar janelas em áreas específicas da interface.
-    GuiFrameWindow = 20  # Janela de Quadro: Uma janela de quadro que pode conter outros elementos, como caixas de diálogo.
-    GuiGOSShell = 123  # Shell de SOS: Um shell usado para exibir mensagens do sistema SAP e mensagens de erro.
-    GuiLabel = 30  # Rótulo: Um rótulo de texto usado para exibir informações ou etiquetar outros componentes.
-    GuiListContainer = 73  # Contêiner de Lista: Um contêiner que exibe uma lista de itens, como uma lista de seleção.
-    GuiMainWindow = 21  # Janela Principal: A janela principal da aplicação SAP GUI, que contém a maioria dos elementos da interface.
-    GuiMenu = 110  # Menu: Um menu suspenso que fornece acesso a várias opções e comandos.
-    GuiMenubar = 111  # Barra de Menu: A barra de menu superior que contém menus e comandos.
-    GuiMessageWindow = 23  # Janela de Mensagem: Uma janela que exibe mensagens e notificações do sistema SAP.
-    GuiModalWindow = 22  # Janela Modal: Uma janela que bloqueia a interação com outras partes da interface até ser fechada.
-    GuiOkCodeField = 35  # Campo de Código OK: Um campo de entrada de código que pode ser usado para inserir comandos específicos.
-    GuiPasswordField = 33  # Campo de Senha: Um campo de entrada de senha usado para entrada segura de senhas.
-    GuiRadioButton = 41  # Botão de Opção: Uma opção que pode ser selecionada entre várias opções mutuamente exclusivas.
-    GuiScrollbar = 100  # Barra de Rolagem: Uma barra que permite rolar o conteúdo de uma área maior.
-    GuiScrollContainer = 72  # Contêiner de Rolagem: Um contêiner que suporta rolagem de conteúdo.
-    GuiSession = 12  # Sessão: Representa uma sessão de comunicação com um servidor SAP.
-    GuiSessionInfo = 121  # Informações de Sessão: Fornece informações sobre a sessão SAP atual.
-    GuiShell = 122  # Shell: Uma janela de nível superior que pode conter outros componentes.
-    GuiSimpleContainer = 71  # Contêiner Simples: Um contêiner simples que contém outros componentes.
-    GuiSplitterContainer = 75  # Contêiner de Divisão: Um contêiner que suporta divisão de áreas com barras divisórias.
-    GuiSplitterShell = 124  # Shell de Divisão: Um shell que suporta divisão de áreas com barras divisórias.
-    GuiStatusbar = 103  # Barra de Status: Uma barra na parte inferior da interface que exibe informações de status.
-    GuiStatusPane = 43  # Painel de Status: Um painel dentro da barra de status que pode exibir informações adicionais.
-    GuiTab = 91  # Guia: Uma guia que permite alternar entre diferentes conjuntos de conteúdo.
-    GuiTableColumn = 81  # Coluna de Tabela: Uma coluna em uma tabela que contém dados tabulares.
-    GuiTableControl = 80  # Controle de Tabela: Um controle que exibe dados tabulares em linhas e colunas.
-    GuiTableRow = 82  # Linha de Tabela: Uma linha em uma tabela que contém dados tabulares.
-    GuiTabStrip = 90  # Tira de Guia: Uma tira de guias que permite alternar entre várias guias.
-    GuiTextField = 31  # Campo de Texto: Um campo de entrada de texto para entrada de dados.
-    GuiTitlebar = 102  # Barra de Título: A barra superior de uma janela que exibe o título e os botões de controle.
-    GuiToolbar = 101  # Barra de Ferramentas: Uma barra que contém botões de ação e comandos frequentemente usados.
     GuiUnknown = -1  # Desconhecido: Um componente cujo tipo não é reconhecido ou não está definido.
-    GuiUserArea = 74  # Área do Usuário: Uma área que pode conter componentes personalizados ou elementos específicos do usuário.
+    GuiComponent = 0  # Componente: O componente base que pode representar qualquer elemento na interface do SAP GUI.
     GuiVComponent = 1  # VComponent: Um tipo específico de componente visual.
     GuiVContainer = 2  # VContainer: Um tipo específico de contêiner visual.
+    GuiApplication = 10  # Aplicação: Representa a aplicação SAP GUI em si, permitindo interagir com todo o ambiente SAP.
+    GuiConnection = 11  # Conexão: Representa uma conexão com um servidor SAP, permitindo a seleção de diferentes sessões.
+    GuiSession = 12  # Sessão: Representa uma sessão de comunicação com um servidor SAP.
+    GuiFrameWindow = 20  # Janela de Quadro: Uma janela de quadro que pode conter outros elementos, como caixas de diálogo.
+    GuiMainWindow = 21  # Janela Principal: A janela principal da aplicação SAP GUI, que contém a maioria dos elementos da interface.
+    GuiModalWindow = 22  # Janela Modal: Uma janela que bloqueia a interação com outras partes da interface até ser fechada.
+    GuiMessageWindow = 23  # Janela de Mensagem: Uma janela que exibe mensagens e notificações do sistema SAP.
+    GuiLabel = 30  # Rótulo: Um rótulo de texto usado para exibir informações ou etiquetar outros componentes.
+    GuiTextField = 31  # Campo de Texto: Um campo de entrada de texto para entrada de dados.
+    GuiCTextField = 32  # Campo de Texto Curto: Um campo de entrada de texto para entrada de dados breve.
+    GuiPasswordField = 33  # Campo de Senha: Um campo de entrada de senha usado para entrada segura de senhas.
+    GuiComboBox = 34  # Caixa de Combinação: Uma caixa de texto com uma lista suspensa de opções que o usuário pode selecionar.
+    GuiOkCodeField = 35  # Campo de Código OK: Um campo de entrada de código que pode ser usado para inserir comandos específicos.
+    GuiButton = 40  # Botão: Um botão clicável que normalmente dispara ações ou comandos quando pressionado.
+    GuiRadioButton = 41  # Botão de Opção: Uma opção que pode ser selecionada entre várias opções mutuamente exclusivas.
+    GuiCheckBox = 42  # Caixa de Seleção: Uma caixa que pode ser marcada ou desmarcada para indicar uma escolha ou opção.
+    GuiStatusPane = 43  # Painel de Status: Um painel dentro da barra de status que pode exibir informações adicionais.
+    GuiCustomControl = 50  # Controle Personalizado: Um componente personalizado criado para atender a requisitos específicos.
+    GuiContainerShell = 51  # Shell de Contêiner: Um shell que contém componentes em uma hierarquia de árvore.
+    GuiBox = 62  # Caixa: Uma caixa de diálogo ou janela usada para exibir informações ou solicitar entrada do usuário.
+    GuiContainer = 70  # Contêiner: Um elemento que pode conter outros componentes, como um grupo de botões ou campos.
+    GuiSimpleContainer = 71  # Contêiner Simples: Um contêiner simples que contém outros componentes.
+    GuiScrollContainer = 72  # Contêiner de Rolagem: Um contêiner que suporta rolagem de conteúdo.
+    GuiListContainer = 73  # Contêiner de Lista: Um contêiner que exibe uma lista de itens, como uma lista de seleção.
+    GuiUserArea = 74  # Área do Usuário: Uma área que pode conter componentes personalizados ou elementos específicos do usuário.
+    GuiSplitterContainer = 75  # Contêiner de Divisão: Um contêiner que suporta divisão de áreas com barras divisórias.
+    GuiTableControl = 80  # Controle de Tabela: Um controle que exibe dados tabulares em linhas e colunas.
+    GuiTableColumn = 81  # Coluna de Tabela: Uma coluna em uma tabela que contém dados tabulares.
+    GuiTableRow = 82  # Linha de Tabela: Uma linha em uma tabela que contém dados tabulares.
+    GuiTabStrip = 90  # Tira de Guia: Uma tira de guias que permite alternar entre várias guias.
+    GuiTab = 91  # Guia: Uma guia que permite alternar entre diferentes conjuntos de conteúdo.
+    GuiScrollbar = 100  # Barra de Rolagem: Uma barra que permite rolar o conteúdo de uma área maior.
+    GuiToolbar = 101  # Barra de Ferramentas: Uma barra que contém botões de ação e comandos frequentemente usados.
+    GuiTitlebar = 102  # Barra de Título: A barra superior de uma janela que exibe o título e os botões de controle.
+    GuiStatusbar = 103  # Barra de Status: Uma barra na parte inferior da interface que exibe informações de status.
+    GuiMenu = 110  # Menu: Um menu suspenso que fornece acesso a várias opções e comandos.
+    GuiMenubar = 111  # Barra de Menu: A barra de menu superior que contém menus e comandos.
+    GuiCollection = 120  # Coleção: Representa uma coleção de elementos ou objetos SAP GUI, permitindo operações em massa.
+    GuiSessionInfo = 121  # Informações de Sessão: Fornece informações sobre a sessão SAP atual.
+    GuiShell = 122  # Shell: Uma janela de nível superior que pode conter outros componentes.
+    GuiGOSShell = 123  # Shell de SOS: Um shell usado para exibir mensagens do sistema SAP e mensagens de erro.
+    GuiSplitterShell = 124  # Shell de Divisão: Um shell que suporta divisão de áreas com barras divisórias.
+    GuiDialogShell = 125  # Shell de Diálogo: Uma janela de diálogo que normalmente exibe informações detalhadas ou solicitações ao usuário.
+    GuiDockShell = 126  # Shell de Ancoragem: Um shell de ancoragem usado para ancorar janelas em áreas específicas da interface.
+    GuiContextMenu = 127  # Menu de Contexto: Um menu contextual que oferece opções específicas do contexto para um componente.
+    GuiComponentCollection = 128  # Coleção de Componentes: Uma coleção de componentes SAP GUI, útil para gerenciar vários elementos.
     GuiVHViewSwitch = 129  # VHViewSwitch: Um tipo de interruptor de exibição usado em componentes visuais.
 
 class SapGuiErrorType:
@@ -479,11 +507,6 @@ class SapGuiTableSelectionType:
     NO_SELECTION = 0 # Nenhuma seleção é possível. (0)
     SINGLE_SELECTION = 1 # Uma coluna/linha pode ser selecionada. (1)
 
-class SapTypeInstance():
-    @staticmethod
-    def GetInstance(sap_object: object):
-        return SapGuiComponent(sap_object)
-
 class SapGuiEnum():
     # TODO Fazer descrição
     # TODO Verificar retorno e descrições das funções dessa classe
@@ -615,18 +638,18 @@ class SapGuiComponentCollection(SapGuiComponent):
         ''' Esta função retorna o membro da coleção na posição index, onde o index pode variar de 0 a contagem-1.
         Se nenhum membro puder ser encontrado para o índice fornecido e on_raise for True, a exceção Gui_Err_Enumerator_Index (614) será gerada.
         '''
-        if on_raise: return self.component.ElementAt(index)
+        if on_raise: return SapTypeInstance().GetInstance(self.component.ElementAt(index))
         else:
-            try: return self.component.ElementAt(index)
+            try: return SapTypeInstance().GetInstance(self.component.ElementAt(index))
             except: return None
     
     def Item(self, index: int, on_raise: bool = True) -> SapGuiComponent:
         ''' Esta função retorna o membro da coleção na posição index, onde o index pode variar de 0 a contagem-1.
         Se nenhum membro puder ser encontrado para o índice fornecido e on_raise for True, a exceção Gui_Err_Enumerator_Index (614) será gerada.
         '''
-        if on_raise: return self.component.Item(index)
+        if on_raise: return SapTypeInstance().GetInstance(self.component.Item(index))
         else:
-            try: return self.component.Item(index)
+            try: return SapTypeInstance().GetInstance(self.component.Item(index))
             except: return None
     
     def Count(self) -> int:
@@ -639,13 +662,18 @@ class SapGuiComponentCollection(SapGuiComponent):
         '''
         return self.component.Length
     
-    def ToArray(self) -> [object]:
-        ''' Retorna uma array com todos os itens da coleção
+    def ToList(self) -> [SapGuiComponent]:
+        ''' Retorna uma list com todos os itens da coleção.
         '''
         itens = []
         for index in range(0, self.Count()):
             itens.append(self.Item(index))
         return itens
+    
+    def LastItem(self) -> SapGuiComponent:
+        ''' Retona o útimo item da coleção.
+        '''
+        return self.ElementAt(self.Count()-1)
 
 class SapGuiTableColumn(SapGuiComponentCollection):
     # TODO Fazer uma descrição
@@ -807,6 +835,19 @@ class SapGuiCollection():
         ''' O número de elementos na coleção.
         '''
         return self.component.Length
+    
+    def ToList(self) -> [object]:
+        ''' Retorna uma list com todos os itens da coleção.
+        '''
+        itens = []
+        for index in range(0, self.Count()):
+            itens.append(self.Item(index))
+        return itens
+    
+    def LastItem(self) -> object:
+        ''' Retona o útimo item da coleção.
+        '''
+        return self.ElementAt(self.Count()-1)
     
     def GetType(self) -> str:
         ''' As informações de tipo podem ser usadas para determinar quais propriedades e métodos um objeto suporta.
@@ -1038,7 +1079,7 @@ class SapGuiMessageWindow(SapGuiVComponent):
             self.component.Visible = visible
         return self.component.Visible
 
-class GuiLabel(SapGuiVComponent):
+class SapGuiLabel(SapGuiVComponent):
     # TODO criar descrição
 
     def GetListProperty(self, property: str) -> str:
@@ -1815,7 +1856,7 @@ class SapGuiToolbar(SapGuiVContainer):
     
     pass
 
-class SapGuiToolbar(SapGuiVContainer):
+class SapGuiTitlebar(SapGuiVContainer):
     ''' A barra de título só é exibida e exposta como um objeto separado no modo Novo Design Visual.
     O prefixo do tipo e o nome do GuiTitlebar são titl.
     Em algumas transações a barra de título pode conter objetos do tipo GuiGosShell.
@@ -5388,10 +5429,29 @@ class SapGuiConnection(SapGuiContainer):
         '''
         return SapGuiComponentCollection(self.component.Sessions)
     
-    def SessionsArray(self) -> [SapGuiSession]:
-        ''' Retorna uma array com as sessões
+    def SessionsList(self) -> [SapGuiSession]:
+        ''' Retorna uma list com as sessões
         '''
-        return self.Sessions().ToArray()
+        return self.Sessions().ToList()
+    
+    def OpenNewSession(self) -> SapGuiSession:
+        ''' Abre uma nova sessão na conexão.
+        '''
+        for session in self.SessionsList().reverse():
+            session_count = self.Sessions().Count()
+            session.CreateSession()
+            if self.Sessions().Count() > session_count:
+                return self.Sessions().LastItem()
+    
+    def SessionsUser(self, user_name: str) -> [SapGuiSession]:
+        ''' Obtém todas sessões do usuário.
+        '''
+        return list(filter(lambda session: session.Info().User() == user_name, self.SessionsList()))
+    
+    def SessionsInTransaction(self, transaction: str) -> [SapGuiSession]:
+        ''' Obtém todas sessões do usuário.
+        '''
+        return list(filter(lambda session: session.Info().Transaction() == transaction, self.SessionsList()))
 
 class SapGuiApplication(SapGuiContainer):
     ''' O GuiApplication representa o processo no qual ocorre toda a atividade SAP GUI.
@@ -5470,10 +5530,10 @@ class SapGuiApplication(SapGuiContainer):
         '''
         return SapGuiComponentCollection(self.component.Connections)
     
-    def ConnectionsArray(self) -> [SapGuiConnection]:
-        ''' Retorna uma array com as conexões
+    def ConnectionsList(self) -> [SapGuiConnection]:
+        ''' Retorna uma list com as conexões
         '''
-        return self.Connections().ToArray()
+        return self.Connections().ToList()
     
     def HistoryEnabled(self, enable: bool = None) -> bool:
         ''' A função de histórico local pode ser habilitada ou desabilitada usando esta propriedade.
@@ -5532,3 +5592,146 @@ class SapGuiApplication(SapGuiContainer):
         ''' Esta propriedade retorna um objeto GuiUtils global.
         '''
         return self.component.Utils
+
+class SapGuiAuto():
+    @staticmethod
+    def GetSapGuiObject():
+        return win32com.client.GetObject("SAPGUI")
+    
+    @staticmethod
+    def GetSapApplication() -> SapGuiApplication:
+        return SapGuiApplication(SapGuiAuto.GetSapGuiObject().GetScriptingEngine)
+
+class SapTypeInstance():
+    @staticmethod
+    def GetInstance(sap_object: object):
+        id = sap_object.TypeAsNumber
+        if id == 0: return SapGuiComponent(sap_object)
+        if id == 1: return SapGuiVComponent(sap_object)
+        if id == 2: return SapGuiVContainer(sap_object)
+        if id == 10: return SapGuiApplication(sap_object)
+        if id == 11: return SapGuiConnection(sap_object)
+        if id == 12: return SapGuiSession(sap_object)
+        if id == 20: return SapGuiFrameWindow(sap_object)
+        if id == 21: return SapGuiMainWindow(sap_object)
+        if id == 22: return SapGuiModalWindow(sap_object)
+        if id == 23: return SapGuiMessageWindow(sap_object)
+        if id == 30: return SapGuiLabel(sap_object)
+        if id == 31: return SapGuiTextField(sap_object)
+        if id == 32: return SapGuiCTextField(sap_object)
+        if id == 33: return SapGuiPasswordField(sap_object)
+        if id == 34: return SapGuiComboBox(sap_object)
+        if id == 35: return SapGuiOkCodeField(sap_object)
+        if id == 40: return SapGuiButton(sap_object)
+        if id == 41: return SapGuiRadioButton(sap_object)
+        if id == 42: return SapGuiCheckBox(sap_object)
+        if id == 43: return SapGuiStatusPane(sap_object)
+        if id == 50: return SapGuiCustomControl(sap_object)
+        if id == 51: return SapGuiContainerShell(sap_object)
+        if id == 62: return SapGuiBox(sap_object)
+        if id == 70: return SapGuiContainer(sap_object)
+        if id == 71: return SapGuiSimpleContainer(sap_object)
+        if id == 72: return SapGuiScrollContainer(sap_object)
+        # if id == 73: return SapGuiListContainer(sap_object)
+        if id == 74: return SapGuiUserArea(sap_object)
+        if id == 75: return SapGuiSplitterContainer(sap_object)
+        if id == 80: return SapGuiTableControl(sap_object)
+        if id == 81: return SapGuiTableColumn(sap_object)
+        if id == 82: return SapGuiTableRow(sap_object)
+        if id == 90: return SapGuiTabStrip(sap_object)
+        if id == 91: return SapGuiTab(sap_object)
+        if id == 100: return SapGuiScrollbar(sap_object)
+        if id == 101: return SapGuiToolbar(sap_object)
+        if id == 102: return SapGuiTitlebar(sap_object)
+        if id == 103: return SapGuiStatusbar(sap_object)
+        if id == 110: return SapGuiMenu(sap_object)
+        if id == 111: return SapGuiMenubar(sap_object)
+        if id == 120: return SapGuiCollection(sap_object)
+        if id == 121: return SapGuiSessionInfo(sap_object)
+        if id == 122: return SapGuiShell(sap_object)
+        if id == 123: return SapGuiGOSShell(sap_object)
+        # if id == 124: return SapGuiSplitterShell(sap_object)
+        if id == 125: return SapGuiDialogShell(sap_object)
+        #if id == 126: return SapGuiDockShell(sap_object)
+        if id == 127: return SapGuiContextMenu(sap_object)
+        if id == 128: return SapGuiComponentCollection(sap_object)
+        if id == 129: return SapGuiVHViewSwitch(sap_object)
+        return None
+
+class SapCastTo():
+    
+    def __init__(self, component: object) -> None:
+        self.component = component
+    
+    def GuiComponent(self) -> SapGuiComponent: return SapGuiComponent(self.component)
+    def GuiScrollbar(self) -> SapGuiScrollbar: return SapGuiScrollbar(self.component)
+    def GuiComponentCollection(self) -> SapGuiComponentCollection: return SapGuiComponentCollection(self.component)
+    def GuiTableColumn(self) -> SapGuiTableColumn: return SapGuiTableColumn(self.component)
+    def GuiTableRow(self) -> SapGuiTableRow: return SapGuiTableRow(self.component)
+    def GuiContainer(self) -> SapGuiContainer: return SapGuiContainer(self.component)
+    def GuiUtils(self) -> SapGuiUtils: return SapGuiUtils(self.component)
+    def GuiCollection(self) -> SapGuiCollection: return SapGuiCollection(self.component)
+    def GuiVComponent(self) -> SapGuiVComponent: return SapGuiVComponent(self.component)
+    def GuiVHViewSwitch(self) -> SapGuiVHViewSwitch: return SapGuiVHViewSwitch(self.component)
+    def GuiOkCodeField(self) -> SapGuiOkCodeField: return SapGuiOkCodeField(self.component)
+    def GuiMessageWindow(self) -> SapGuiMessageWindow: return SapGuiMessageWindow(self.component)
+    def GuiLabel(self) -> SapGuiLabel: return SapGuiLabel(self.component)
+    def GuiRadioButton(self) -> SapGuiRadioButton: return SapGuiRadioButton(self.component)
+    def GuiTextField(self) -> SapGuiTextField: return SapGuiTextField(self.component)
+    def GuiCTextField(self) -> SapGuiCTextField: return SapGuiCTextField(self.component)
+    def GuiPasswordField(self) -> SapGuiPasswordField: return SapGuiPasswordField(self.component)
+    def GuiStatusbar(self) -> SapGuiStatusbar: return SapGuiStatusbar(self.component)
+    def GuiStatusPane(self) -> SapGuiStatusPane: return SapGuiStatusPane(self.component)
+    def GuiComboBoxEntry(self) -> SapGuiComboBoxEntry: return SapGuiComboBoxEntry(self.component)
+    def GuiComboBox(self) -> SapGuiComboBox: return SapGuiComboBox(self.component)
+    def GuiCheckBox(self) -> SapGuiCheckBox: return SapGuiCheckBox(self.component)
+    def GuiButton(self) -> SapGuiButton: return SapGuiButton(self.component)
+    def GuiBox(self) -> SapGuiBox: return SapGuiBox(self.component)
+    def GuiMenu(self) -> SapGuiMenu: return SapGuiMenu(self.component)
+    def GuiContextMenu(self) -> SapGuiContextMenu: return SapGuiContextMenu(self.component)
+    def GuiVContainer(self) -> SapGuiVContainer: return SapGuiVContainer(self.component)
+    def GuiMenubar(self) -> SapGuiMenubar: return SapGuiMenubar(self.component)
+    def GuiGOSShell(self) -> SapGuiGOSShell: return SapGuiGOSShell(self.component)
+    def GuiDialogShell(self) -> SapGuiDialogShell: return SapGuiDialogShell(self.component)
+    def GuiSimpleContainer(self) -> SapGuiSimpleContainer: return SapGuiSimpleContainer(self.component)
+    def GuiCustomControl(self) -> SapGuiCustomControl: return SapGuiCustomControl(self.component)
+    def GuiToolbar(self) -> SapGuiToolbar: return SapGuiToolbar(self.component)
+    def GuiTitlebar(self) -> SapGuiTitlebar: return SapGuiTitlebar(self.component)
+    def GuiUserArea(self) -> SapGuiUserArea: return SapGuiUserArea(self.component)
+    def GuiShell(self) -> SapGuiShell: return SapGuiShell(self.component)
+    def GuiStage(self) -> SapGuiStage: return SapGuiStage(self.component)
+    def GuiPicture(self) -> SapGuiPicture: return SapGuiPicture(self.component)
+    def GuiOfficeIntegration(self) -> SapGuiOfficeIntegration: return SapGuiOfficeIntegration(self.component)
+    def GuiNetChart(self) -> SapGuiNetChart: return SapGuiNetChart(self.component)
+    def GuiMap(self) -> SapGuiMap: return SapGuiMap(self.component)
+    def GuiHTMLViewer(self) -> SapGuiHTMLViewer: return SapGuiHTMLViewer(self.component)
+    def GuiGraphAdapt(self) -> SapGuiGraphAdapt: return SapGuiGraphAdapt(self.component)
+    def GuiEAIViewer3D(self) -> SapGuiEAIViewer3D: return SapGuiEAIViewer3D(self.component)
+    def GuiEAIViewer2D(self) -> SapGuiEAIViewer2D: return SapGuiEAIViewer2D(self.component)
+    def GuiColorSelector(self) -> SapGuiColorSelector: return SapGuiColorSelector(self.component)
+    def GuiCalendar(self) -> SapGuiCalendar: return SapGuiCalendar(self.component)
+    def GuiBarChart(self) -> SapGuiBarChart: return SapGuiBarChart(self.component)
+    def GuiApoGrid(self) -> SapGuiApoGrid: return SapGuiApoGrid(self.component)
+    def GuiAbapEditor(self) -> SapGuiAbapEditor: return SapGuiAbapEditor(self.component)
+    def GuiSplitterContainer(self) -> SapGuiSplitterContainer: return SapGuiSplitterContainer(self.component)
+    def GuiSplit(self) -> SapGuiSplit: return SapGuiSplit(self.component)
+    def GuiInputFieldControl(self) -> SapGuiInputFieldControl: return SapGuiInputFieldControl(self.component)
+    def GuiTextedit(self) -> SapGuiTextedit: return SapGuiTextedit(self.component)
+    def GuiToolbarControl(self) -> SapGuiToolbarControl: return SapGuiToolbarControl(self.component)
+    def GuiTree(self) -> SapGuiTree: return SapGuiTree(self.component)
+    def GuiChart(self) -> SapGuiChart: return SapGuiChart(self.component)
+    def GuiSapChart(self) -> SapGuiSapChart: return SapGuiSapChart(self.component)
+    def GuiComboBoxControl(self) -> SapGuiComboBoxControl: return SapGuiComboBoxControl(self.component)
+    def GuiGridView(self) -> SapGuiGridView: return SapGuiGridView(self.component)
+    def GuiContainerShell(self) -> SapGuiContainerShell: return SapGuiContainerShell(self.component)
+    def GuiTab(self) -> SapGuiTab: return SapGuiTab(self.component)
+    def GuiTabStrip(self) -> SapGuiTabStrip: return SapGuiTabStrip(self.component)
+    def GuiScrollContainer(self) -> SapGuiScrollContainer: return SapGuiScrollContainer(self.component)
+    def GuiFrameWindow(self) -> SapGuiFrameWindow: return SapGuiFrameWindow(self.component)
+    def GuiMainWindow(self) -> SapGuiMainWindow: return SapGuiMainWindow(self.component)
+    def GuiModalWindow(self) -> SapGuiModalWindow: return SapGuiModalWindow(self.component)
+    def GuiTableControl(self) -> SapGuiTableControl: return SapGuiTableControl(self.component)
+    def GuiSessionInfo(self) -> SapGuiSessionInfo: return SapGuiSessionInfo(self.component)
+    def GuiSession(self) -> SapGuiSession: return SapGuiSession(self.component)
+    def GuiConnection(self) -> SapGuiConnection: return SapGuiConnection(self.component)
+    def GuiApplication(self) -> SapGuiApplication: return SapGuiApplication(self.component)
