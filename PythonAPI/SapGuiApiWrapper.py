@@ -10,7 +10,7 @@ Funções Adicionais nos Wrapper:
   
 - SapGuiConnection:
   - ConnectionsList() -> [SapGuiConnection]: Retorna uma list com as conexões.
-  - OpenNewSession() -> SapGuiSession: Abre uma nova sessão na conexão.
+  - CreateSession() -> SapGuiSession: Abre uma nova sessão na conexão.
   - SessionsUser() -> [SapGuiSession]: Obtém todas sessões do usuário.
   - SessionsInTransaction() -> [SapGuiSession]: Obtém todas sessões que está na transação.
   
@@ -22,11 +22,88 @@ Funções Adicionais nos Wrapper:
   - ToList() -> [object]: Retorna uma list com todos os itens da coleção.
   - LastItem() -> object: Retona o útimo item da coleção.
 
+- SapGuiFrameWindow:
+  - SetFocusWindows() -> None: Isso faz o windows focar na janela indepedente do estado atual do mesmo.
+
+- SapGuiSession:
+  - GetAlertStatusPane() -> SapGuiStatusPane: Obtém a barra de alerta principal.
+
+- SapGuiStatusPane:
+  - HasInText(text: str) -> bool: Verifica se tem um texto específico dentro do texto do painel.
+
 '''
 
 from __future__ import annotations
 from SapTCodes import *
 import win32com
+
+class SapKeys:
+    ENTER = 0
+    F1 = 1
+    F2 = 2
+    F3 = 3
+    F4 = 4
+    F5 = 5
+    F6 = 6
+    F7 = 7
+    F8 = 8
+    F9 = 9
+    F10 = 10
+    CTRL_S = 11
+    F12 = 12
+    SHIFT_F1 = 13
+    SHIFT_F2 = 14
+    SHIFT_F3 = 15
+    SHIFT_F4 = 16
+    SHIFT_F5 = 17
+    SHIFT_F6 = 18
+    SHIFT_F7 = 19
+    SHIFT_F8 = 20
+    SHIFT_F9 = 21
+    SHIFT_CTRL_0 = 22
+    SHIFT_F11 = 23
+    SHIFT_F12 = 24
+    CTRL_F1 = 25
+    CTRL_F2 = 26
+    CTRL_F3 = 27
+    CTRL_F4 = 28
+    CTRL_F5 = 29
+    CTRL_F6 = 30
+    CTRL_F7 = 31
+    CTRL_F8 = 32
+    CTRL_F9 = 33
+    CTRL_F10 = 34
+    CTRL_F11 = 35
+    CTRL_F12 = 36
+    CTRL_SHIFT_F1 = 37
+    CTRL_SHIFT_F2 = 38
+    CTRL_SHIFT_F3 = 39
+    CTRL_SHIFT_F4 = 40
+    CTRL_SHIFT_F5 = 41
+    CTRL_SHIFT_F6 = 42
+    CTRL_SHIFT_F7 = 43
+    CTRL_SHIFT_F8 = 44
+    CTRL_SHIFT_F9 = 45
+    CTRL_SHIFT_F10 = 46
+    CTRL_SHIFT_F11 = 47
+    CTRL_SHIFT_F12 = 48
+    CTRL_E = 70
+    CTRL_F = 71
+    CTRL_BAR = 72
+    CTRL_BACKSLASH = 73
+    CTRL_N = 74
+    CTRL_O = 75
+    CTRL_X = 76
+    CTRL_C = 77
+    CTRL_V = 78
+    CTRL_Z = 79
+    CTRL_PAGEUP = 80
+    PAGEUP = 81
+    PAGEDOWN = 82
+    CTRL_PAGEDOWN = 83
+    CTRL_G = 84
+    CTRL_R = 85
+    CTRL_P = 86
 
 class SapGuiComponentType:
     GuiUnknown = -1  # Desconhecido: Um componente cujo tipo não é reconhecido ou não está definido.
@@ -672,7 +749,7 @@ class SapGuiComponentCollection(SapGuiComponent):
         '''
         itens = []
         for index in range(0, self.Count()):
-            itens.append(self.Item(index))
+            itens.append(SapTypeInstance.GetInstance(self.Item(index)))
         return itens
     
     def LastItem(self) -> SapGuiComponent:
@@ -735,12 +812,14 @@ class SapGuiContainer(SapGuiComponent):
     Exemplos desta interface são janelas e subtelas, barras de ferramentas ou controles com filhos, como o controle divisor.
     '''
     
-    def FindById(self, id: str, on_raise: bool = False) -> object:
+    def FindById(self, id: str, on_raise: bool = True) -> object | SapGuiComponent:
         ''' Pesquise nos descendentes do objeto um determinado objeto que corresponde ao ID.
         Se nenhum descendente com o ID fornecido puder ser encontrado, a função gera uma exceção,
         a menos que o parâmetro opcional on_raise seja definido como False.
         '''
-        return SapTypeInstance.GetInstance(self.component.findById(id, on_raise))
+        result = self.component.findById(id, on_raise)
+        if result is not None: return SapTypeInstance.GetInstance(result)
+        return None
     
     def Children(self) -> SapGuiComponentCollection:
         ''' Esta coleção contém todos os filhos diretos do objeto.
@@ -1426,6 +1505,11 @@ class SapGuiStatusPane(SapGuiVComponent):
     refere-se à seção da barra de status onde as mensagens são exibidas. Veja também Objeto GuiStatusbar.
     '''
     
+    def HasInText(self, text: str) -> bool:
+        ''' Verifica se tem um texto específico dentro do texto do painel.
+        '''
+        return self.Text() is not None and text in self.Text()
+    
     pass
 
 class SapGuiComboBoxEntry():
@@ -1714,31 +1798,58 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
     GuiVContainer estende o objeto GuiContainer e o objeto GuiVComponent.
     '''
     
-    def FindAllByName(self, name: str, type: str) -> SapGuiComponentCollection:
+    def FindAllByName(self, name: str, type: str, on_raise: bool = True) -> SapGuiComponentCollection:
         ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
         No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção quando FindAllByName ou FindAllByNameEx forem usados.
         '''
-        return SapGuiComponentCollection(self.component.FindAllByName(name, type))
+        result = None
+        if on_raise: result = self.component.FindAllByName(name, type)
+        else:
+            try: result = self.component.FindAllByName(name, type)
+            except: pass
+        
+        if result is not None: return SapGuiComponentCollection(result)
+        return None
     
-    def FindAllByNameEx(self, name: str, type: int) -> SapGuiComponentCollection:
+    def FindAllByNameEx(self, name: str, type: int, on_raise: bool = True) -> SapGuiComponentCollection:
         ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
         No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção quando FindAllByName ou FindAllByNameEx forem usados.
         '''
-        return SapGuiComponentCollection(self.component.FindAllByNameEx(name, type))
+        result = None
+        if on_raise: result = self.component.FindAllByNameEx(name, type)
+        else:
+            try: result = self.component.FindAllByNameEx(name, type)
+            except: pass
+        
+        if result is not None: return SapGuiComponentCollection(result)
+        return None
     
-    def FindByName(self, name: str, type: str) -> SapGuiComponent:
-        # TODO
+    def FindByName(self, name: str, type: str, on_raise: bool = True) -> SapGuiComponent:
         ''' Ao contrário de FindById, esta função não garante um resultado único.
         Ele simplesmente retornará o primeiro descendente que corresponda aos parâmetros de nome e tipo.
         Esta é uma descrição mais natural do objeto do que o ID complexo, mas só faz sentido em objetos dynpro,
         pois a maioria dos outros objetos não tem um nome significativo. Se nenhum descendente com nome
         e tipo correspondentes for encontrado, a função gera uma exceção.
         '''
-        return SapTypeInstance.GetInstance(self.component.FindByName(name, type))
+        result = None
+        if on_raise: result = self.component.FindByName(name, type)
+        else:
+            try: result = self.component.FindByName(name, type)
+            except: pass
+        
+        if result is not None: return SapTypeInstance.GetInstance(result)
+        return None
     
-    def FindByNameEx(self, name: str, type: int) -> SapGuiComponent:
-        # TODO
-        return SapTypeInstance.GetInstance(self.component.FindByNameEx(name, type))
+    def FindByNameEx(self, name: str, type: int, on_raise: bool = True) -> SapGuiComponentCollection:
+        # TODO Criar descrição
+        result = None
+        if on_raise: result = self.component.FindByNameEx(name, type)
+        else:
+            try: result = self.component.FindByNameEx(name, type)
+            except: pass
+        
+        if result is not None: return SapGuiComponentCollection(result)
+        return None
 
 class SapGuiMenubar(SapGuiVContainer):
     ''' Apenas a janela principal possui uma barra de menu.
@@ -1876,10 +1987,17 @@ class SapGuiUserArea(SapGuiVContainer):
     nesta área, com exceção dos botões, que também são encontrados nas barras de ferramentas.
     '''
     
-    def FindByLabel(self, text: str, type: str) -> SapGuiComponent:
+    def FindByLabel(self, text: str, type: str, on_raise: bool = True) -> SapGuiComponent:
         ''' Um método muito simples para encontrar um objeto é pesquisar especificando o texto do respectivo rótulo.
         '''
-        return self.component.FindByLabel(text, type)
+        result = None
+        if on_raise: result = self.component.FindByLabel(text, type)
+        else:
+            try: result = self.component.FindByLabel(text, type)
+            except: pass
+        
+        if result is not None: return SapTypeInstance.GetInstance(result)
+        return None
     
     def CurrentContextMenu(self) -> SapGuiContextMenu:
         ''' Esta propriedade só é definida quando um menu de contexto está disponível no objeto shell.
@@ -4678,6 +4796,12 @@ class SapGuiFrameWindow(SapGuiVContainer):
         '''
         self.component.Restore()
     
+    def SetFocusWindows(self) -> None:
+        ''' Isso faz o windows focar na janela indepedente do estado atual do mesmo.
+        '''
+        self.Minimize()
+        self.Maximize()
+    
     def SendVKey(self, v_key: int) -> None:
         ''' A chave virtual VKey é executada na janela. As VKeys são definidas no pintor de menus.
         '''
@@ -5113,10 +5237,15 @@ class SapGuiSession(SapGuiContainer):
     É, portanto, o ponto de acesso para aplicações, que gravam as ações de um usuário em relação a uma tarefa específica ou reproduzem essas ações.
     '''
     
+    def GetAlertStatusPane(self) -> SapGuiStatusPane:
+        ''' Obtém a barra de alerta principal.
+        '''
+        return self.FindById(SapFields.ALERT_STATUS_PANE, False)
+    
     def Parent(self) -> SapGuiConnection:
         ''' Obtém a conexão da sessão
         '''
-        return super().Parent()
+        return SapGuiConnection(super().Parent)
     
     def AsStdNumberFormat(self, number: str) -> str:
         ''' Dependendo do formato numérico do sistema, o sinal de menos dos números pode ser colocado à direita do número.
@@ -5134,7 +5263,7 @@ class SapGuiSession(SapGuiContainer):
         ''' Esta função abre uma nova sessão, que é então visualizada por uma nova janela principal.
         Isso se assemelha ao comando "/o" que pode ser executado no campo de comando.
         '''
-        conn = self.GetParent()
+        conn = self.Parent()
         ses_count = conn.Sessions().Count()
         self.component.CreateSession()
         if ses_count < conn.Sessions().Count():
@@ -5166,7 +5295,9 @@ class SapGuiSession(SapGuiContainer):
         Se nenhum componente for encontrado, uma exceção será gerada, a menos que raise seja definido como False.
         Nesse caso, um objeto None é retornado.
         '''
-        return SapGuiCollection(self.component.FindByPosition(x, y, on_raise))
+        result = self.component.FindByPosition(x, y, on_raise)
+        if result is not None: return SapGuiCollection(result)
+        return None
     
     def GetIconResourceName(self, text: str) -> str:
         ''' No SAP GUI, os ícones são frequentemente descritos como texto no formato @nn@, onde nn é um número.
@@ -5412,6 +5543,9 @@ class SapGuiConnection(SapGuiContainer):
     As conexões podem ser abertas a partir do SAP Logon ou dos métodos openConnection e openConnectionByConnectionString do GuiApplication.
     '''
     
+    def Parent(self) -> SapGuiApplication:
+        return SapGuiApplication(super().Parent)
+    
     def CloseConnection(self) -> None:
         ''' Este método fecha uma conexão junto com todas as suas sessões.
         '''
@@ -5453,7 +5587,7 @@ class SapGuiConnection(SapGuiContainer):
         '''
         return self.Sessions().ToList()
     
-    def OpenNewSession(self) -> SapGuiSession:
+    def CreateSession(self) -> SapGuiSession:
         ''' Abre uma nova sessão na conexão.
         '''
         for session in self.SessionsList().reverse():
@@ -5549,10 +5683,13 @@ class SapGuiApplication(SapGuiContainer):
         '''
         return SapGuiComponentCollection(self.component.Connections)
     
-    def ConnectionsList(self) -> [SapGuiConnection]:
+    def ConnectionsList(self, description: str = None) -> [SapGuiConnection]:
         ''' Retorna uma list com as conexões
         '''
-        return self.Connections().ToList()
+        if description is None:
+            return self.Connections().ToList()
+        
+        return list(filter(lambda conn: conn.Description() == description, self.ConnectionsList(None)))
     
     def HistoryEnabled(self, enable: bool = None) -> bool:
         ''' A função de histórico local pode ser habilitada ou desabilitada usando esta propriedade.

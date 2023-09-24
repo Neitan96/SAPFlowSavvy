@@ -21,12 +21,13 @@ class SapCommands:
 
 class SapFields:
     #Geral
-    ALERTS_BAR = 'wnd[0]/sbar/pane[0]'
+    ALERT_STATUS_PANE = 'wnd[0]/sbar/pane[0]'
     
     # Tela de login
     LOGIN_USERNAME = 'wnd[0]/usr/txtRSYST-BNAME'
     LOGIN_PASSWORD = 'wnd[0]/usr/pwdRSYST-BCODE'
     LOGIN_MANDT = 'wnd[0]/usr/txtRSYST-MANDT'
+    LOGIN_LANGUAGE = 'wnd[0]/usr/txtRSYST-LANGU'
     
     #Pop-up número de tentativas falhadas
     POP_UP_COUNT_FAILS_ICON = 'wnd[1]/usr/txtIK1'
