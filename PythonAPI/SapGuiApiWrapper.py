@@ -25,6 +25,7 @@ Funções Adicionais nos Wrapper:
 '''
 
 from __future__ import annotations
+from SapTCodes import *
 import win32com
 
 class SapGuiComponentType:
@@ -556,14 +557,14 @@ class SapGuiComponent():
         '''
         return self.component.ContainerType
     
-    def GetId(self) -> str:
+    def Id(self) -> str:
         ''' Um ID de objeto é um identificador textual exclusivo para o objeto.
         Isso é construído em uma formatação semelhante a URL, começando no GuiApplication
         e detalhando o respectivo objeto.
         '''
         return self.component.Id
     
-    def GetName(self) -> str:
+    def Name(self) -> str:
         ''' A propriedade name é especialmente útil ao trabalhar com scripts simples que acessam apenas campos de tela.
         Nesse caso um campo pode ser encontrado usando seu nome e informações de tipo,
         que é mais fácil de ler do que um ID possivelmente muito longo. No entanto,
@@ -571,24 +572,27 @@ class SapGuiComponent():
         '''
         return self.component.Name
     
-    def GetParent(self) -> object:
+    def Parent(self) -> SapGuiComponent:
         ''' O objeto pai acima na hierarquia de tempo de execução.
         Um objeto está sempre na coleção filhos de seu pai.
         '''
         return SapTypeInstance.GetInstance(self.component.Parent)
     
-    def GetType(self) -> str:
+    def Type(self) -> str:
         ''' Nome do tipo do objeto.
         As informações de tipo de GuiComponent podem ser usadas para determinar quais propriedades e métodos um objeto suporta.
         '''
         return self.component.Type
     
-    def GetTypeAsNumber(self) -> int:
+    def TypeAsNumber(self) -> int:
         '''Embora a propriedade Type seja um valor de string,
         A propriedade TypeAsNumber é um valor numerico que pode ser usado alternativamente para identificar o tipo de um objeto.
         Foi adicionado para melhor desempenho em métodos como FindByIdEx.
         '''
         return self.component.TypeAsNumber
+    
+    def CastTo(self) -> SapCastTo:
+        return SapCastTo(self.component)
 
 class SapGuiScrollbar():
     ''' A classe GuiScrollbar é uma classe utilitária usada, por exemplo, em GuiScrollContainer ou GuiTableControl.
@@ -4599,13 +4603,11 @@ class SapGuiFrameWindow(SapGuiVContainer):
     O próprio GuiFrameWindow é uma interface abstrata. GuiFrameWindow estende o objeto GuiVContainer. O prefixo do tipo é wnd, o nome
     é wnd mais o número da janela entre colchetes.
     '''
-    #TODO:
     
     def Close(self) -> None:
         ''' A função tenta fechar a janela. Tentar fechar a última janela principal de uma sessão não terá sucesso imediato
         a caixa de diálogo 'Você realmente deseja fazer logoff?' será exibida primeiro.
         '''
-        # TODO: Colocar um parâmetro para ignorar a caixa de diálogo ao fecha a última janela
         self.component.Close()
     
     def CompBitmap(self, filename_1: str, filename_2: str) -> int:
@@ -4672,7 +4674,7 @@ class SapGuiFrameWindow(SapGuiVContainer):
     
     def Restore(self) -> None:
         ''' Isso restaurará uma janela de seu estado iconificado. 
-        ão é possível restaurar uma janela específica de uma sessão, tanto a janela principal quanto todos os modais existentes serão restaurados.
+        não é possível restaurar uma janela específica de uma sessão, tanto a janela principal quanto todos os modais existentes serão restaurados.
         '''
         self.component.Restore()
     
@@ -5111,6 +5113,11 @@ class SapGuiSession(SapGuiContainer):
     É, portanto, o ponto de acesso para aplicações, que gravam as ações de um usuário em relação a uma tarefa específica ou reproduzem essas ações.
     '''
     
+    def Parent(self) -> SapGuiConnection:
+        ''' Obtém a conexão da sessão
+        '''
+        return super().Parent()
+    
     def AsStdNumberFormat(self, number: str) -> str:
         ''' Dependendo do formato numérico do sistema, o sinal de menos dos números pode ser colocado à direita do número.
         Usando esta função, o sinal de menos é movido para a esquerda.
@@ -5123,12 +5130,23 @@ class SapGuiSession(SapGuiContainer):
         '''
         return self.component.ClearErrorList()
     
-    def CreateSession(self) -> None:
+    def CreateSession(self) -> SapGuiSession:
         ''' Esta função abre uma nova sessão, que é então visualizada por uma nova janela principal.
         Isso se assemelha ao comando "/o" que pode ser executado no campo de comando.
         '''
-        # TODO: Retorna a sessão aberta
-        return self.component.CreateSession()
+        conn = self.GetParent()
+        ses_count = conn.Sessions().Count()
+        self.component.CreateSession()
+        if ses_count < conn.Sessions().Count():
+            return conn.Sessions().LastItem()
+        
+        return None
+    
+    def CloseSession(self, ignore_popup_logoff: bool = False) -> None:
+        if ignore_popup_logoff and self.Parent().Sessions().Count() <= 1:
+            self.SendCommand(SapCommands.CLOSE_ALL_SESSIONS)
+        else:
+            self.SendCommand(SapCommands.CLOSE_SESSION)
     
     def EnableJawsEvents(self) -> None:
         ''' Habilite o envio de eventos para o leitor de tela Freedom Scientific JAWS,
@@ -5664,75 +5682,75 @@ class SapCastTo():
     def __init__(self, component: object) -> None:
         self.component = component
     
-    def GuiComponent(self) -> SapGuiComponent: return SapGuiComponent(self.component)
-    def GuiScrollbar(self) -> SapGuiScrollbar: return SapGuiScrollbar(self.component)
-    def GuiComponentCollection(self) -> SapGuiComponentCollection: return SapGuiComponentCollection(self.component)
-    def GuiTableColumn(self) -> SapGuiTableColumn: return SapGuiTableColumn(self.component)
-    def GuiTableRow(self) -> SapGuiTableRow: return SapGuiTableRow(self.component)
-    def GuiContainer(self) -> SapGuiContainer: return SapGuiContainer(self.component)
-    def GuiUtils(self) -> SapGuiUtils: return SapGuiUtils(self.component)
-    def GuiCollection(self) -> SapGuiCollection: return SapGuiCollection(self.component)
-    def GuiVComponent(self) -> SapGuiVComponent: return SapGuiVComponent(self.component)
-    def GuiVHViewSwitch(self) -> SapGuiVHViewSwitch: return SapGuiVHViewSwitch(self.component)
-    def GuiOkCodeField(self) -> SapGuiOkCodeField: return SapGuiOkCodeField(self.component)
-    def GuiMessageWindow(self) -> SapGuiMessageWindow: return SapGuiMessageWindow(self.component)
-    def GuiLabel(self) -> SapGuiLabel: return SapGuiLabel(self.component)
-    def GuiRadioButton(self) -> SapGuiRadioButton: return SapGuiRadioButton(self.component)
-    def GuiTextField(self) -> SapGuiTextField: return SapGuiTextField(self.component)
-    def GuiCTextField(self) -> SapGuiCTextField: return SapGuiCTextField(self.component)
-    def GuiPasswordField(self) -> SapGuiPasswordField: return SapGuiPasswordField(self.component)
-    def GuiStatusbar(self) -> SapGuiStatusbar: return SapGuiStatusbar(self.component)
-    def GuiStatusPane(self) -> SapGuiStatusPane: return SapGuiStatusPane(self.component)
-    def GuiComboBoxEntry(self) -> SapGuiComboBoxEntry: return SapGuiComboBoxEntry(self.component)
-    def GuiComboBox(self) -> SapGuiComboBox: return SapGuiComboBox(self.component)
-    def GuiCheckBox(self) -> SapGuiCheckBox: return SapGuiCheckBox(self.component)
-    def GuiButton(self) -> SapGuiButton: return SapGuiButton(self.component)
-    def GuiBox(self) -> SapGuiBox: return SapGuiBox(self.component)
-    def GuiMenu(self) -> SapGuiMenu: return SapGuiMenu(self.component)
-    def GuiContextMenu(self) -> SapGuiContextMenu: return SapGuiContextMenu(self.component)
-    def GuiVContainer(self) -> SapGuiVContainer: return SapGuiVContainer(self.component)
-    def GuiMenubar(self) -> SapGuiMenubar: return SapGuiMenubar(self.component)
-    def GuiGOSShell(self) -> SapGuiGOSShell: return SapGuiGOSShell(self.component)
-    def GuiDialogShell(self) -> SapGuiDialogShell: return SapGuiDialogShell(self.component)
-    def GuiSimpleContainer(self) -> SapGuiSimpleContainer: return SapGuiSimpleContainer(self.component)
-    def GuiCustomControl(self) -> SapGuiCustomControl: return SapGuiCustomControl(self.component)
-    def GuiToolbar(self) -> SapGuiToolbar: return SapGuiToolbar(self.component)
-    def GuiTitlebar(self) -> SapGuiTitlebar: return SapGuiTitlebar(self.component)
-    def GuiUserArea(self) -> SapGuiUserArea: return SapGuiUserArea(self.component)
-    def GuiShell(self) -> SapGuiShell: return SapGuiShell(self.component)
-    def GuiStage(self) -> SapGuiStage: return SapGuiStage(self.component)
-    def GuiPicture(self) -> SapGuiPicture: return SapGuiPicture(self.component)
-    def GuiOfficeIntegration(self) -> SapGuiOfficeIntegration: return SapGuiOfficeIntegration(self.component)
-    def GuiNetChart(self) -> SapGuiNetChart: return SapGuiNetChart(self.component)
-    def GuiMap(self) -> SapGuiMap: return SapGuiMap(self.component)
-    def GuiHTMLViewer(self) -> SapGuiHTMLViewer: return SapGuiHTMLViewer(self.component)
-    def GuiGraphAdapt(self) -> SapGuiGraphAdapt: return SapGuiGraphAdapt(self.component)
-    def GuiEAIViewer3D(self) -> SapGuiEAIViewer3D: return SapGuiEAIViewer3D(self.component)
-    def GuiEAIViewer2D(self) -> SapGuiEAIViewer2D: return SapGuiEAIViewer2D(self.component)
-    def GuiColorSelector(self) -> SapGuiColorSelector: return SapGuiColorSelector(self.component)
-    def GuiCalendar(self) -> SapGuiCalendar: return SapGuiCalendar(self.component)
-    def GuiBarChart(self) -> SapGuiBarChart: return SapGuiBarChart(self.component)
-    def GuiApoGrid(self) -> SapGuiApoGrid: return SapGuiApoGrid(self.component)
-    def GuiAbapEditor(self) -> SapGuiAbapEditor: return SapGuiAbapEditor(self.component)
-    def GuiSplitterContainer(self) -> SapGuiSplitterContainer: return SapGuiSplitterContainer(self.component)
-    def GuiSplit(self) -> SapGuiSplit: return SapGuiSplit(self.component)
-    def GuiInputFieldControl(self) -> SapGuiInputFieldControl: return SapGuiInputFieldControl(self.component)
-    def GuiTextedit(self) -> SapGuiTextedit: return SapGuiTextedit(self.component)
-    def GuiToolbarControl(self) -> SapGuiToolbarControl: return SapGuiToolbarControl(self.component)
-    def GuiTree(self) -> SapGuiTree: return SapGuiTree(self.component)
-    def GuiChart(self) -> SapGuiChart: return SapGuiChart(self.component)
-    def GuiSapChart(self) -> SapGuiSapChart: return SapGuiSapChart(self.component)
-    def GuiComboBoxControl(self) -> SapGuiComboBoxControl: return SapGuiComboBoxControl(self.component)
-    def GuiGridView(self) -> SapGuiGridView: return SapGuiGridView(self.component)
-    def GuiContainerShell(self) -> SapGuiContainerShell: return SapGuiContainerShell(self.component)
-    def GuiTab(self) -> SapGuiTab: return SapGuiTab(self.component)
-    def GuiTabStrip(self) -> SapGuiTabStrip: return SapGuiTabStrip(self.component)
-    def GuiScrollContainer(self) -> SapGuiScrollContainer: return SapGuiScrollContainer(self.component)
-    def GuiFrameWindow(self) -> SapGuiFrameWindow: return SapGuiFrameWindow(self.component)
-    def GuiMainWindow(self) -> SapGuiMainWindow: return SapGuiMainWindow(self.component)
-    def GuiModalWindow(self) -> SapGuiModalWindow: return SapGuiModalWindow(self.component)
-    def GuiTableControl(self) -> SapGuiTableControl: return SapGuiTableControl(self.component)
-    def GuiSessionInfo(self) -> SapGuiSessionInfo: return SapGuiSessionInfo(self.component)
-    def GuiSession(self) -> SapGuiSession: return SapGuiSession(self.component)
-    def GuiConnection(self) -> SapGuiConnection: return SapGuiConnection(self.component)
-    def GuiApplication(self) -> SapGuiApplication: return SapGuiApplication(self.component)
+    def Component(self) -> SapGuiComponent: return SapGuiComponent(self.component)
+    def Scrollbar(self) -> SapGuiScrollbar: return SapGuiScrollbar(self.component)
+    def ComponentCollection(self) -> SapGuiComponentCollection: return SapGuiComponentCollection(self.component)
+    def TableColumn(self) -> SapGuiTableColumn: return SapGuiTableColumn(self.component)
+    def TableRow(self) -> SapGuiTableRow: return SapGuiTableRow(self.component)
+    def Container(self) -> SapGuiContainer: return SapGuiContainer(self.component)
+    def Utils(self) -> SapGuiUtils: return SapGuiUtils(self.component)
+    def Collection(self) -> SapGuiCollection: return SapGuiCollection(self.component)
+    def VComponent(self) -> SapGuiVComponent: return SapGuiVComponent(self.component)
+    def VHViewSwitch(self) -> SapGuiVHViewSwitch: return SapGuiVHViewSwitch(self.component)
+    def OkCodeField(self) -> SapGuiOkCodeField: return SapGuiOkCodeField(self.component)
+    def MessageWindow(self) -> SapGuiMessageWindow: return SapGuiMessageWindow(self.component)
+    def Label(self) -> SapGuiLabel: return SapGuiLabel(self.component)
+    def RadioButton(self) -> SapGuiRadioButton: return SapGuiRadioButton(self.component)
+    def TextField(self) -> SapGuiTextField: return SapGuiTextField(self.component)
+    def CTextField(self) -> SapGuiCTextField: return SapGuiCTextField(self.component)
+    def PasswordField(self) -> SapGuiPasswordField: return SapGuiPasswordField(self.component)
+    def Statusbar(self) -> SapGuiStatusbar: return SapGuiStatusbar(self.component)
+    def StatusPane(self) -> SapGuiStatusPane: return SapGuiStatusPane(self.component)
+    def ComboBoxEntry(self) -> SapGuiComboBoxEntry: return SapGuiComboBoxEntry(self.component)
+    def ComboBox(self) -> SapGuiComboBox: return SapGuiComboBox(self.component)
+    def CheckBox(self) -> SapGuiCheckBox: return SapGuiCheckBox(self.component)
+    def Button(self) -> SapGuiButton: return SapGuiButton(self.component)
+    def Box(self) -> SapGuiBox: return SapGuiBox(self.component)
+    def Menu(self) -> SapGuiMenu: return SapGuiMenu(self.component)
+    def ContextMenu(self) -> SapGuiContextMenu: return SapGuiContextMenu(self.component)
+    def VContainer(self) -> SapGuiVContainer: return SapGuiVContainer(self.component)
+    def Menubar(self) -> SapGuiMenubar: return SapGuiMenubar(self.component)
+    def GOSShell(self) -> SapGuiGOSShell: return SapGuiGOSShell(self.component)
+    def DialogShell(self) -> SapGuiDialogShell: return SapGuiDialogShell(self.component)
+    def SimpleContainer(self) -> SapGuiSimpleContainer: return SapGuiSimpleContainer(self.component)
+    def CustomControl(self) -> SapGuiCustomControl: return SapGuiCustomControl(self.component)
+    def Toolbar(self) -> SapGuiToolbar: return SapGuiToolbar(self.component)
+    def Titlebar(self) -> SapGuiTitlebar: return SapGuiTitlebar(self.component)
+    def UserArea(self) -> SapGuiUserArea: return SapGuiUserArea(self.component)
+    def Shell(self) -> SapGuiShell: return SapGuiShell(self.component)
+    def Stage(self) -> SapGuiStage: return SapGuiStage(self.component)
+    def Picture(self) -> SapGuiPicture: return SapGuiPicture(self.component)
+    def OfficeIntegration(self) -> SapGuiOfficeIntegration: return SapGuiOfficeIntegration(self.component)
+    def NetChart(self) -> SapGuiNetChart: return SapGuiNetChart(self.component)
+    def Map(self) -> SapGuiMap: return SapGuiMap(self.component)
+    def HTMLViewer(self) -> SapGuiHTMLViewer: return SapGuiHTMLViewer(self.component)
+    def GraphAdapt(self) -> SapGuiGraphAdapt: return SapGuiGraphAdapt(self.component)
+    def EAIViewer3D(self) -> SapGuiEAIViewer3D: return SapGuiEAIViewer3D(self.component)
+    def EAIViewer2D(self) -> SapGuiEAIViewer2D: return SapGuiEAIViewer2D(self.component)
+    def ColorSelector(self) -> SapGuiColorSelector: return SapGuiColorSelector(self.component)
+    def Calendar(self) -> SapGuiCalendar: return SapGuiCalendar(self.component)
+    def BarChart(self) -> SapGuiBarChart: return SapGuiBarChart(self.component)
+    def ApoGrid(self) -> SapGuiApoGrid: return SapGuiApoGrid(self.component)
+    def AbapEditor(self) -> SapGuiAbapEditor: return SapGuiAbapEditor(self.component)
+    def SplitterContainer(self) -> SapGuiSplitterContainer: return SapGuiSplitterContainer(self.component)
+    def Split(self) -> SapGuiSplit: return SapGuiSplit(self.component)
+    def InputFieldControl(self) -> SapGuiInputFieldControl: return SapGuiInputFieldControl(self.component)
+    def Textedit(self) -> SapGuiTextedit: return SapGuiTextedit(self.component)
+    def ToolbarControl(self) -> SapGuiToolbarControl: return SapGuiToolbarControl(self.component)
+    def Tree(self) -> SapGuiTree: return SapGuiTree(self.component)
+    def Chart(self) -> SapGuiChart: return SapGuiChart(self.component)
+    def SapChart(self) -> SapGuiSapChart: return SapGuiSapChart(self.component)
+    def ComboBoxControl(self) -> SapGuiComboBoxControl: return SapGuiComboBoxControl(self.component)
+    def GridView(self) -> SapGuiGridView: return SapGuiGridView(self.component)
+    def ContainerShell(self) -> SapGuiContainerShell: return SapGuiContainerShell(self.component)
+    def Tab(self) -> SapGuiTab: return SapGuiTab(self.component)
+    def TabStrip(self) -> SapGuiTabStrip: return SapGuiTabStrip(self.component)
+    def ScrollContainer(self) -> SapGuiScrollContainer: return SapGuiScrollContainer(self.component)
+    def FrameWindow(self) -> SapGuiFrameWindow: return SapGuiFrameWindow(self.component)
+    def MainWindow(self) -> SapGuiMainWindow: return SapGuiMainWindow(self.component)
+    def ModalWindow(self) -> SapGuiModalWindow: return SapGuiModalWindow(self.component)
+    def TableControl(self) -> SapGuiTableControl: return SapGuiTableControl(self.component)
+    def SessionInfo(self) -> SapGuiSessionInfo: return SapGuiSessionInfo(self.component)
+    def Session(self) -> SapGuiSession: return SapGuiSession(self.component)
+    def Connection(self) -> SapGuiConnection: return SapGuiConnection(self.component)
+    def Application(self) -> SapGuiApplication: return SapGuiApplication(self.component)

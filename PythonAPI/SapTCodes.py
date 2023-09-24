@@ -12,6 +12,13 @@ class SapPrograms:
     LOGIN = 'SAPMSYST' # Tela de login
     MAIN_MENU = 'SAPLSMTR_NAVIGATION' # Menu principal
 
+class SapCommands:
+    CLOSE_SESSION = '/i'
+    CLOSE_ALL_SESSIONS = '/nex'
+    DEBUG = '/h'
+    RETURN_MENU = '/n'
+    POPUP_SESSIONS = '/o'
+
 class SapFields:
     #Geral
     ALERTS_BAR = 'wnd[0]/sbar/pane[0]'
