@@ -4,11 +4,10 @@ from SapTCodes import *
 
 import os
 import re
+import time
 import pymsgbox
+import pywinauto
 import configparser
-
-class SavvyParameters():
-    pass #TODO
 
 class SavvyHelper():
     @staticmethod
@@ -253,6 +252,8 @@ class SavvyCredentials():
         
         conn_session = SavvyCredentials.__ConnNameToSession(conn_name)
         
+        if not parse.has_section(conn_session): return False
+        
         user_name = parse[conn_session]['username']
         password = parse[conn_session]['password']
         
@@ -281,3 +282,229 @@ class SavvyCredentials():
                 self.credentials[conn_name] = [user_name, password]
         
         return True
+
+class SapInit():
+    ''' Classe para inicialização do SAP, vai desde iniciar o programa até fazer login
+    '''
+    
+    def __init__(self, login_storage_method: str = 'FileTemp', \
+                    login_force_method = 'Force', login_wait_seconds = 10, \
+                    login_mandt = '300', login_language = 'PT', \
+                    login_file_storage = os.path.expanduser('~\\sapusercredentials.creds'), \
+                    sap_logon_path: str = r'C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe') -> None:
+        '''
+        Parameters
+        ----------
+        auto_start : bool, optional
+            Se deseja iniciar automaticamente o SAP caso esteja fechado
+        login_storage_method : str, optional
+            O tipo de armazenamento de login, sendo:
+            * 'FileTemp' para armazenar em arquivo
+            * 'InputBox' pede as credenciais por meio de inputbox e armazena apenas no cahe
+            * 'Wait' Espera o usuário logar e continua o script
+        login_force_method : str, optional
+            A tratativa para quando ao fazer login o usuário já estiver logado, sendo:
+            * 'Force' para derrubar o usuário
+            * 'Exit' finaliza o script
+            * 'Wait' Espera o usuário deslogar da outra máquina
+        login_wait_seconds : int, optional
+            O intervalo de tempo em segundos entre as checagens de liberação do login
+            para o caso do login_force_method ser 'Wait'
+        login_storage_method : str, optional
+            O tipo de armazenamento de login, sendo:
+            * 'FileTemp' para armazenar em arquivo
+            * 'InputBox' pede as credenciais por meio de inputbox e armazena apenas no cahe
+            * 'Wait' Espera o usuário logar e continua o script
+        sap_logon_path : str, optional
+            Caminho do arquivo do executavel do SAP Logon.
+        '''
+        
+        if login_storage_method == 'Wait': self.credentials = None
+        elif login_storage_method == 'InputBox': self.credentials = SavvyCredentials(file_path=None)
+        else: self.credentials = SavvyCredentials(file_path=login_file_storage)
+        
+        self.login_force_method = login_force_method
+        self.login_wait_seconds = login_wait_seconds
+        self.login_mandt = login_mandt
+        self.login_language = login_language
+        self.sap_logon_path = sap_logon_path
+        
+        self.regex_timeout_tile = 'SAP GUI for Windows .*'
+    
+    def __filter_buttons_no(self, element):
+        return element.element_info.class_name == 'Button' \
+            and element.element_info.control_type == 'Button' \
+            and (element.element_info.rich_text == 'Não' \
+                    or element.element_info.rich_text == 'No')
+            
+    def __filter_windows_titles(self, window):
+        return 'SAP GUI for Windows' in window.element_info.rich_text
+    
+    def CloseAllTimeOutPopups(self):
+        try:
+            popup_app = pywinauto.Application(backend='uia').connect(title_re='SAP GUI for Windows .*', found_index=0)
+            windows_search = list(filter(self.__filter_windows_titles, popup_app.windows()))
+
+            for popup_window in windows_search:
+                elements = list(filter(self.__filter_buttons_no, popup_window.children()))
+                for element in elements:
+                    element.click()
+        except: pass
+    
+    
+    def SapRunning(self) -> bool:
+        ''' Verifica se o SAP Logon está sendo executado
+        '''
+        try:
+            SapObj = SapGuiAuto.GetSapGuiObject()
+            return type(SapObj) == win32com.client.CDispatch
+        except: pass
+        return False
+    
+    def StartProcess(self, step_check: int = 5, wait_seconds: int = 30) -> bool:
+        ''' Inicia o SAP Logon
+
+        Abre o executável do SAP Logon de acordo com o argumento sap_logon_path,
+        caso já esteja aberto a função não é executada.
+
+        Parameters
+        ----------
+        step_check : int, optional
+            Interval de tempo entre as verificações de abertura do SAP Logon
+        wait_seconds : int, optional
+            Tempo máximo de espera para o SAP Logon abrir.
+        '''
+        
+        if self.SapRunning(): return True
+            
+        try:
+            os.startfile(self.sap_logon_path)
+        except:
+            SavvyLogger.Error('SAP Init', 'Erro ao iniciar o programa do SAP')
+            return False
+    
+        while wait_seconds > 0:
+            wait_seconds -= step_check
+            time.sleep(step_check)
+            if self.SapRunning(): return True
+            
+        return self.SapRunning()
+        
+    
+    def KillProcess(self) -> None:
+        ''' Força a finalização do SAP. '''
+        os.system('taskkill -f -im saplogon.exe')
+        
+    def LoginAfterSignIn(self, session: SapGuiSession) -> SapGuiSession:
+        
+        field_count_fails = session.FindById(SapFields.POP_UP_COUNT_FAILS_LABEL_LINE_1, False)
+        if field_count_fails is not None: session.SendKey(SapKeys.ENTER)
+        
+        copy_r = session.FindById('wnd[1]', False)
+        if copy_r is not None and copy_r.Text == 'Copyright':
+            session.SendKey(SapKeys.ENTER)
+        
+        if not session.Info().Transaction() == SapTransactions.LOGIN:
+            session.SendCommand(SapCommands.RETURN_MENU)
+        
+        return session
+
+    def LoginSignIn(self, session: SapGuiSession, try_max: int = 3) -> SapGuiSession:
+        ''' Realiza o login no SAP
+        
+        Parameters
+        ----------
+        session : SapSession
+            Sessão na tela de login
+        try_max : int
+            Máxima de tentativas falhas de login com credenciais inválidas
+        '''
+        if session is None or session.component is None or not session.ConnectedSap():
+            return None
+        
+        session = self.LoginAfterSignIn(session)
+        
+        if not session.Info().Transaction() == SapTransactions.LOGIN:
+            return session
+        
+        if self.credentials is None:
+            session.ActiveWindow().SetFocusWindows()
+            while session.info.CheckTransaction(SapTransactions.LOGIN):
+                time.sleep(1)
+            return session
+
+        conn_name = session.Parent().Description()
+        user_name, password = self.credentials.GetCredentials(conn_name)
+        if not SavvyHelper.CheckStrings(user_name, password): return False
+        
+        try:
+            session.FindById(SapFields.LOGIN_MANDT).Text(self.login_mandt)
+            session.FindById(SapFields.LOGIN_LANGUAGE).Text(self.login_language)
+            session.FindById(SapFields.LOGIN_USERNAME).Text(user_name)
+            session.FindById(SapFields.LOGIN_PASSWORD).Text(password)
+            session.SendKey(SapKeys.ENTER)
+        except:
+            SavvyLogger.Error('SAP Init', 'Erro ao preencher as credenciais de login')
+            return False
+        
+        if not session.ConnectedSap():
+            self.credentials.ClearCredentials(conn_name)
+            return None
+        
+        if session.GetAlertStatusPane().HasInText('logon)'):
+            self.credentials.ClearCredentials(conn_name)
+            if try_max > 0:
+                return self.LoginSignIn(session, try_max - 1)
+            return None
+        
+        force_sign_bnt = session.FindById(SapFields.POPUP_MULTI_LOGIN_RAD_FORCE, False)
+        force_sign_bnt: SapGuiRadioButton
+        
+        if force_sign_bnt is not None:
+            if self.login_force_method == 'Exit':
+                session.ActiveWindow().SendKey(SapKeys.F12)
+                return None
+            
+            if self.login_force_method == 'Force':
+                force_sign_bnt.Select()
+                session.ActiveWindow().SendKey(SapKeys.ENTER)
+                
+            if self.login_force_method == 'Wait':
+                conn_name = session.Parent().Description()
+                sap_app = session.Parent().Parent()
+                session.ActiveWindow().SendKey(SapKeys.F12)
+                time.sleep(self.login_wait_seconds)
+                
+                new_session = sap_app.OpenConnection(conn_name, True).Sessions().LastItem()
+                return self.LoginSignIn(new_session, try_max)
+        
+        return self.LoginAfterSignIn(session)
+
+    def GetSessionLoged(self, conn_name: str, reuse_conn:bool = True, reuse_sessions:bool = True) -> SapGuiSession:
+        self.CloseAllTimeOutPopups()
+        if not self.StartProcess(): return None
+        sap_app = SapGuiAuto.GetSapApplication()
+        if sap_app is None: return None
+        
+        connections = []
+        if reuse_conn: connections = sap_app.ConnectionsList(conn_name)
+        
+        if len(connections) <= 0:
+            conn = sap_app.OpenConnection(conn_name, True)
+            if conn is None: return None
+            connections = [conn]
+        
+        if reuse_sessions:
+            for conn in connections:
+                sessions = conn.SessionsInTransaction(SapTransactions.MAIN_MENU)
+                if len(sessions) > 0: return sessions[0]
+                
+        for conn in connections:
+            sessions = conn.SessionsInTransaction(SapTransactions.LOGIN)
+            if len(sessions) > 0: return self.LoginSignIn(sessions[0])
+        
+        return None
+
+sap_init = SapInit()
+session = sap_init.GetSessionLoged(SapConnNames.EWM)
+print('End')

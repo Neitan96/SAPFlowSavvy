@@ -35,7 +35,7 @@ Funções Adicionais nos Wrapper:
 
 from __future__ import annotations
 from SapTCodes import *
-import win32com
+import win32com.client
 
 class SapKeys:
     ENTER = 0
@@ -619,7 +619,7 @@ class SapGuiComponent():
     def __init__(self, component: object):
         self.class_attrs = ['component']
         self.component = component
-
+    
     def __getattr__(self, attr):
         return getattr(self.component, attr)
 
@@ -628,7 +628,7 @@ class SapGuiComponent():
             super().__setattr__(attr, value)
         else:
             setattr(self.component, attr, value)
-
+    
     def IsContainerType(self) -> bool:
         ''' Retorna True se o objeto é um container
         '''
@@ -670,6 +670,12 @@ class SapGuiComponent():
     
     def CastTo(self) -> SapCastTo:
         return SapCastTo(self.component)
+    
+    def ConnectedSap(self):
+        try:
+            self.TypeAsNumber()
+            return True
+        except: return False
 
 class SapGuiScrollbar():
     ''' A classe GuiScrollbar é uma classe utilitária usada, por exemplo, em GuiScrollContainer ou GuiTableControl.
@@ -749,7 +755,7 @@ class SapGuiComponentCollection(SapGuiComponent):
         '''
         itens = []
         for index in range(0, self.Count()):
-            itens.append(SapTypeInstance.GetInstance(self.Item(index)))
+            itens.append(self.Item(index))
         return itens
     
     def LastItem(self) -> SapGuiComponent:
@@ -5237,6 +5243,9 @@ class SapGuiSession(SapGuiContainer):
     É, portanto, o ponto de acesso para aplicações, que gravam as ações de um usuário em relação a uma tarefa específica ou reproduzem essas ações.
     '''
     
+    def SendKey(self, v_key: int) -> None:
+        self.ActiveWindow().SendVKey(v_key=v_key)
+    
     def GetAlertStatusPane(self) -> SapGuiStatusPane:
         ''' Obtém a barra de alerta principal.
         '''
@@ -5245,7 +5254,7 @@ class SapGuiSession(SapGuiContainer):
     def Parent(self) -> SapGuiConnection:
         ''' Obtém a conexão da sessão
         '''
-        return SapGuiConnection(super().Parent)
+        return SapGuiConnection(self.component.Parent)
     
     def AsStdNumberFormat(self, number: str) -> str:
         ''' Dependendo do formato numérico do sistema, o sinal de menos dos números pode ser colocado à direita do número.
@@ -5327,10 +5336,20 @@ class SapGuiSession(SapGuiContainer):
         '''
         return self.component.SendCommand(command)
     
-    def StartTransaction(self, transaction: str) -> None:
+    def StartTransaction(self, transaction: str, new_session: bool = False) -> bool:
         ''' Chamar esta função com o parâmetro "xyz" tem o mesmo efeito que SendCommand("/nxyz").
         '''
-        return self.component.StartTransaction(transaction)
+        if transaction.startswith('/o/') or transaction.startswith('/o/'):
+            transaction = transaction[3:]
+        
+        t_transaction = ('/o/' + transaction) if new_session else ('/n/' + transaction)
+        if new_session:
+            ses_count = self.Parent().Sessions().Count()
+            self.component.StartTransaction(t_transaction)
+            return self.Parent().Sessions().Count() > ses_count
+        else:
+            self.component.StartTransaction(t_transaction)
+            return self.Info().Transaction == transaction
     
     def AccEnhancedTabChain(self, option: bool = None) -> bool:
         ''' Esta propriedade será True se a respectiva opção "Incluir elementos somente leitura e desabilitados na cadeia de guias"
@@ -5542,9 +5561,9 @@ class SapGuiConnection(SapGuiContainer):
     ''' Um GuiConnection representa a conexão entre o SAP GUI e um servidor de aplicativos.
     As conexões podem ser abertas a partir do SAP Logon ou dos métodos openConnection e openConnectionByConnectionString do GuiApplication.
     '''
-    
+
     def Parent(self) -> SapGuiApplication:
-        return SapGuiApplication(super().Parent)
+        return SapGuiApplication(self.component.Parent)
     
     def CloseConnection(self) -> None:
         ''' Este método fecha uma conexão junto com todas as suas sessões.
@@ -5604,6 +5623,7 @@ class SapGuiConnection(SapGuiContainer):
     def SessionsInTransaction(self, transaction: str) -> [SapGuiSession]:
         ''' Obtém todas sessões que está na transação.
         '''
+        sessions = self.SessionsList()
         return list(filter(lambda session: session.Info().Transaction() == transaction, self.SessionsList()))
 
 class SapGuiApplication(SapGuiContainer):
@@ -5640,13 +5660,17 @@ class SapGuiApplication(SapGuiContainer):
         
         Esta função irá gerar a exceção E_ACCESSDENIED se o suporte a scripts tiver sido desabilitado pelo administrador ou pelo usuário.
         '''
-        return SapGuiConnection(self.component.OpenConnection(description, sync, on_raise))
+        conn = self.component.OpenConnection(description, sync, on_raise)
+        if conn is not None: return SapGuiConnection(conn)
+        return None
     
     def OpenConnectionByConnectionString(self, connect_string: str, sync = False, on_raise: bool = True) -> SapGuiConnection:
         ''' O parâmetro ConnectString é a string de conexão do servidor SAP, por exemplo “/R/ALR/G/SPACE”.
         Consulte a descrição do método openConnection para uma discussão sobre os parâmetros de sincronização e aumento.
         '''
-        return SapGuiConnection(self.component.OpenConnection(connect_string, sync, on_raise))
+        conn = self.component.OpenConnection(connect_string, sync, on_raise)
+        if conn is not None: return SapGuiConnection(conn)
+        return None
     
     def GetActiveSession(self) -> SapGuiSession:
         ''' Retorna a Sessão com a qual o usuário está trabalhando atualmente, que será a janela superior.
@@ -5761,7 +5785,9 @@ class SapGuiAuto():
 class SapTypeInstance():
     @staticmethod
     def GetInstance(sap_object: object):
-        id = sap_object.TypeAsNumber
+        try:
+            id = sap_object.TypeAsNumber
+        except: return None
         if id == 0: return SapGuiComponent(sap_object)
         if id == 1: return SapGuiVComponent(sap_object)
         if id == 2: return SapGuiVContainer(sap_object)
