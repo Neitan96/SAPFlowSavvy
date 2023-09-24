@@ -504,7 +504,3 @@ class SapInit():
             if len(sessions) > 0: return self.LoginSignIn(sessions[0])
         
         return None
-
-sap_init = SapInit()
-session = sap_init.GetSessionLoged(SapConnNames.EWM)
-print('End')
