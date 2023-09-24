@@ -12,6 +12,7 @@ Funções Adicionais nos Wrapper:
   - ConnectionsList() -> [SapGuiConnection]: Retorna uma list com as conexões.
   - OpenNewSession() -> SapGuiSession: Abre uma nova sessão na conexão.
   - SessionsUser() -> [SapGuiSession]: Obtém todas sessões do usuário.
+  - SessionsInTransaction() -> [SapGuiSession]: Obtém todas sessões que está na transação.
   
 - SapGuiComponentCollection:
   - ToList() -> [object]: Retorna uma list com todos os itens da coleção.
@@ -5449,7 +5450,7 @@ class SapGuiConnection(SapGuiContainer):
         return list(filter(lambda session: session.Info().User() == user_name, self.SessionsList()))
     
     def SessionsInTransaction(self, transaction: str) -> [SapGuiSession]:
-        ''' Obtém todas sessões do usuário.
+        ''' Obtém todas sessões que está na transação.
         '''
         return list(filter(lambda session: session.Info().Transaction() == transaction, self.SessionsList()))
 
