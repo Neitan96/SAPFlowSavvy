@@ -5,6 +5,14 @@ Este arquivo contém enums e classes wrapper do SAP GUI Scripting API, com algum
 
 Funções Adicionais nos Wrapper:
 
+- SapGuiComponent:
+  - CastTo() -> SapCastTo: Retorna a uma classe para fazer o cast do componente atual.
+  - ParentCast() -> SapCastTo: Retorna o Parent pronto para fazer o Cast.
+  - ConnectedSap() -> bool: Verifica se o componente ainda está conectado ao SAP.
+
+- SapGuiContainer:
+  - FindByIdCast(id: str, on_raise: bool = True) -> SapCastTo: O Componente será retornado em uma classe de cast para fazer o hint no tipo desejado.
+
 - SapGuiConnection:
   - SessionsList() -> [SapGuiSession]: Retorna uma list com as sessões.
   
@@ -15,8 +23,9 @@ Funções Adicionais nos Wrapper:
   - SessionsInTransaction() -> [SapGuiSession]: Obtém todas sessões que está na transação.
   
 - SapGuiComponentCollection:
-  - ToList() -> [object]: Retorna uma list com todos os itens da coleção.
-  - LastItem() -> object: Retona o útimo item da coleção.
+  - ToList() -> [SapGuiComponent]: Retorna uma list com todos os itens da coleção.
+  - LastItem() -> SapGuiComponent: Retona o útimo item da coleção.
+  - ItemCast(index: int, on_raise: bool = True) -> SapCastTo: O item será retornado em uma classe pronto para fazer o cast para o tipo do item desejado.
 
 - SapGuiCollection:
   - ToList() -> [object]: Retorna uma list com todos os itens da coleção.
@@ -587,8 +596,8 @@ class SapGuiTableSelectionType:
     SINGLE_SELECTION = 1 # Uma coluna/linha pode ser selecionada. (1)
 
 class SapGuiEnum():
-    # TODO Fazer descrição
-    # TODO Verificar retorno e descrições das funções dessa classe
+    ''' GuiEnum é a classe base para alguns enumeradores usados em scripts SAP GUI.
+    '''
     
     def __init__(self, component: object):
         self.class_attrs = ['component']
@@ -653,7 +662,12 @@ class SapGuiComponent():
         ''' O objeto pai acima na hierarquia de tempo de execução.
         Um objeto está sempre na coleção filhos de seu pai.
         '''
-        return SapTypeInstance.GetInstance(self.component.Parent)
+        return SapGuiAuto.InstanceComp(self.component.Parent)
+    
+    def ParentCast(self, t: type) -> SapCastTo:
+        ''' Retorna o Parent pronto para fazer o Cast.
+        '''
+        return SapCastTo(self.component.Parent)
     
     def Type(self) -> str:
         ''' Nome do tipo do objeto.
@@ -669,9 +683,13 @@ class SapGuiComponent():
         return self.component.TypeAsNumber
     
     def CastTo(self) -> SapCastTo:
+        ''' Retorna a uma classe para fazer o cast do componente atual.
+        '''
         return SapCastTo(self.component)
     
-    def ConnectedSap(self):
+    def ConnectedSap(self) -> bool:
+        ''' Verifica se o componente ainda está conectado ao SAP.
+        '''
         try:
             self.TypeAsNumber()
             return True
@@ -726,18 +744,28 @@ class SapGuiComponentCollection(SapGuiComponent):
         ''' Esta função retorna o membro da coleção na posição index, onde o index pode variar de 0 a contagem-1.
         Se nenhum membro puder ser encontrado para o índice fornecido e on_raise for True, a exceção Gui_Err_Enumerator_Index (614) será gerada.
         '''
-        if on_raise: return SapTypeInstance().GetInstance(self.component.ElementAt(index))
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.ElementAt(index))
         else:
-            try: return SapTypeInstance().GetInstance(self.component.ElementAt(index))
+            try: return SapGuiAuto.InstanceComp(self.component.ElementAt(index))
             except: return None
     
     def Item(self, index: int, on_raise: bool = True) -> SapGuiComponent:
         ''' Esta função retorna o membro da coleção na posição index, onde o index pode variar de 0 a contagem-1.
         Se nenhum membro puder ser encontrado para o índice fornecido e on_raise for True, a exceção Gui_Err_Enumerator_Index (614) será gerada.
         '''
-        if on_raise: return SapTypeInstance().GetInstance(self.component.Item(index))
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.Item(index))
         else:
-            try: return SapTypeInstance().GetInstance(self.component.Item(index))
+            try: return SapGuiAuto.InstanceComp(self.component.Item(index))
+            except: return None
+    
+    def ItemCast(self, index: int, on_raise: bool = True) -> SapCastTo:
+        ''' Esta função retorna o membro da coleção na posição index, onde o index pode variar de 0 a contagem-1.
+        O item será retornado em uma classe pronto para fazer o cast para o tipo do item desejado.
+        Se nenhum membro puder ser encontrado para o índice fornecido e on_raise for True, a exceção Gui_Err_Enumerator_Index (614) será gerada.
+        '''
+        if on_raise: return SapCastTo(self.component.Item(index))
+        else:
+            try: return SapCastTo(self.component.Item(index))
             except: return None
     
     def Count(self) -> int:
@@ -764,7 +792,8 @@ class SapGuiComponentCollection(SapGuiComponent):
         return self.ElementAt(self.Count()-1)
 
 class SapGuiTableColumn(SapGuiComponentCollection):
-    # TODO Fazer uma descrição
+    ''' GuiTableColumn representa uma coluna em um controle de tabela.
+    '''
     
     def DefaultTooltip(self) -> str:
         ''' Texto de dica de ferramenta gerado a partir do texto curto definido no dicionário de dados para determinado tipo de elemento de tela.
@@ -798,7 +827,8 @@ class SapGuiTableColumn(SapGuiComponentCollection):
         return self.component.Tooltip
 
 class SapGuiTableRow(SapGuiComponentCollection):
-    # TODO colocar descrição
+    ''' GuiTableRow representa uma linha em um controle de tabela.
+    '''
     
     # TODO Funções de auxilio
     
@@ -824,7 +854,17 @@ class SapGuiContainer(SapGuiComponent):
         a menos que o parâmetro opcional on_raise seja definido como False.
         '''
         result = self.component.findById(id, on_raise)
-        if result is not None: return SapTypeInstance.GetInstance(result)
+        if result is not None: return SapGuiAuto.InstanceComp(result)
+        return None
+    
+    def FindByIdCast(self, id: str, on_raise: bool = True) -> SapCastTo:
+        ''' Pesquise nos descendentes do objeto um determinado objeto que corresponde ao ID.
+        Se nenhum descendente com o ID fornecido puder ser encontrado, a função gera uma exceção,
+        a menos que o parâmetro opcional on_raise seja definido como False.
+        O Componente será retornado em uma classe de cast para fazer o hint no tipo desejado.
+        '''
+        result = self.component.findById(id, on_raise)
+        if result is not None: return SapCastTo(result)
         return None
     
     def Children(self) -> SapGuiComponentCollection:
@@ -957,7 +997,7 @@ class SapGuiCollection():
 class SapGuiVComponent(SapGuiComponent):
     ''' A interface GuiVComponent é exposta por todos os objetos visuais, como janelas, botões ou campos de texto.
     Assim como o GuiComponent, é uma interface abstrata. Qualquer objeto que suporte a interface GuiVComponent também expõe
-    a interface GuiComponent. GuiVComponent estende o objeto GuiComponent.
+    a interface GuiComponent.
     '''
     
     def DumpState(self, inner_object: str) -> SapGuiCollection:
@@ -967,7 +1007,7 @@ class SapGuiVComponent(SapGuiComponent):
         comum o fato de retornarem informações gerais sobre o estado do controle se o parâmetro “innerObject” contiver uma string vazia.
         Os valores disponíveis para o parâmetro innerObject são especificados como parte da descrição da classe dos componentes que o suportam.
         '''
-        return SapGuiCollection(self.component.DumpState(inner_object))
+        return SapGuiAuto.InstanceComp(self.component.DumpState(inner_object))
     
     def SetFocus(self) -> None:
         ''' Esta função pode ser usada para definir o foco em um objeto. Se um usuário interagir com SAP GUI,
@@ -987,7 +1027,7 @@ class SapGuiVComponent(SapGuiComponent):
     def AccLabelCollection(self) -> SapGuiComponentCollection:
         ''' A coleção contém objetos do tipo GuiLabel que foram atribuídos a este controle no ABAP Screen Painter.
         '''
-        return SapGuiComponentCollection(self.component.AccLabelCollection)
+        return SapGuiAuto.InstanceComp(self.component.AccLabelCollection)
     
     def AccText(self) -> str:
         ''' Um texto adicional para suporte de acessibilidade.
@@ -1030,11 +1070,10 @@ class SapGuiVComponent(SapGuiComponent):
         '''
         return self.component.Modified
     
-    def ParentFrame(self) -> bool:
+    def ParentFrame(self) -> SapGuiComponent:
         ''' Se o controle estiver hospedado no objeto Frame, o valor da propriedade será esse quadro.
         '''
-        # TODO
-        return self.component.ParentFrame
+        return SapGuiAuto.InstanceComp(self.component.ParentFrame)
     
     def Text(self, text: str = None) -> str:
         ''' O valor desta propriedade depende muito do tipo de objeto no qual ela é chamada.
@@ -1113,7 +1152,8 @@ class SapGuiOkCodeField(SapGuiVComponent):
         return self.component.Opened
 
 class SapGuiMessageWindow(SapGuiVComponent):
-    # TODO Criar descrição
+    ''' GuiMessageWindow é uma caixa de mensagem exibida pela mensagem showMessageBox do GuiUtils.
+    '''
     
     def FocusedButton(self) -> int:
         ''' Índice baseado em zero do botão que atualmente tem foco (somente leitura).
@@ -1170,7 +1210,9 @@ class SapGuiMessageWindow(SapGuiVComponent):
         return self.component.Visible
 
 class SapGuiLabel(SapGuiVComponent):
-    # TODO criar descrição
+    ''' GuiLabel representa uma etiqueta de texto.
+    O prefixo do tipo é lbl, o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
 
     def GetListProperty(self, property: str) -> str:
         ''' Retorna propriedades de contêineres em geral.
@@ -1584,12 +1626,12 @@ class SapGuiComboBox(SapGuiVComponent):
     def CurListBoxEntry(self) -> SapGuiComboBoxEntry:
         ''' A entrada atualmente focada na lista suspensa.
         '''
-        return self.component.CurListBoxEntry
+        return SapGuiAuto.InstanceComp(self.component.CurListBoxEntry)
 
     def Entries(self) -> SapGuiCollection:
         ''' Todos os membros desta coleção são do tipo GuiComboBoxEntry e têm apenas duas propriedades, chave e valor, ambas do tipo String. O key data pode ser exibido no SAP GUI configurando as opções 'Show keys...' no diálogo de opções do SAP GUI.
         '''
-        return self.component.Entries
+        return SapGuiAuto.InstanceComp(self.component.Entries)
 
     def Flushing(self) -> bool:
         ''' Alguns componentes, como botões de rádio, caixas de seleção ou caixas de combinação, podem causar uma round trip quando seu valor é alterado. Se for o caso, a propriedade Flushing é Verdadeira.
@@ -1636,7 +1678,7 @@ class SapGuiComboBox(SapGuiVComponent):
     def RightLabel(self) -> SapGuiVComponent:
         ''' Este rótulo foi definido no ABAP Screen Painter para ser o rótulo direito da caixa de combinação.
         '''
-        return self.component.RightLabel
+        return SapGuiAuto.InstanceComp(self.component.RightLabel)
 
     def ShowKey(self) -> bool:
         ''' Esta propriedade é Verdadeira se a caixa de combinação mostrar tanto as chaves quanto os valores (isso pode ser configurado definindo as opções 'Show keys...' no diálogo de opções do SAP GUI).
@@ -1651,7 +1693,9 @@ class SapGuiComboBox(SapGuiVComponent):
         return self.component.Value
 
 class SapGuiCheckBox(SapGuiVComponent):
-    #TODO Fazer uma descrição
+    ''' GuiCheckBox representa uma CheckBox no SAP.
+    O prefixo do tipo é chk, o nome é o nome do campo retirado do dicionário de dados SAP.
+    '''
     
     def GetListProperty(self, property: str) -> str:
         ''' Para mais informações consulte a documentação sobre o método GetListProperty dentro do GuiLabel Object.
@@ -1747,12 +1791,12 @@ class SapGuiButton(SapGuiVComponent):
     def LeftLabel(self) -> SapGuiVComponent:
         ''' Rótulo esquerdo do GuiButton. O rótulo é atribuído no Screen Painter, usando o sinalizador 'assign left'.
         '''
-        return self.component.LeftLabel
+        return SapGuiAuto.InstanceComp(self.component.LeftLabel)
     
     def RightLabel(self) -> SapGuiVComponent:
         ''' Rótulo direito do GuiButton. Esta propriedade é definida no Screen Painter usando o sinalizador 'assign right'.
         '''
-        return self.component.RightLabel
+        return SapGuiAuto.InstanceComp(self.component.RightLabel)
 
 class SapGuiBox(SapGuiVComponent):
     ''' Uma GuiBox é um quadro simples com um nome (também chamado de "Group Box").
@@ -1808,26 +1852,22 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
         ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
         No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção quando FindAllByName ou FindAllByNameEx forem usados.
         '''
-        result = None
-        if on_raise: result = self.component.FindAllByName(name, type)
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.FindAllByName(name, type))
         else:
-            try: result = self.component.FindAllByName(name, type)
+            try: return SapGuiAuto.InstanceComp(self.component.FindAllByName(name, type))
             except: pass
         
-        if result is not None: return SapGuiComponentCollection(result)
         return None
     
     def FindAllByNameEx(self, name: str, type: int, on_raise: bool = True) -> SapGuiComponentCollection:
         ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
         No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção quando FindAllByName ou FindAllByNameEx forem usados.
         '''
-        result = None
-        if on_raise: result = self.component.FindAllByNameEx(name, type)
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.FindAllByNameEx(name, type))
         else:
-            try: result = self.component.FindAllByNameEx(name, type)
+            try: return SapGuiAuto.InstanceComp(self.component.FindAllByNameEx(name, type))
             except: pass
         
-        if result is not None: return SapGuiComponentCollection(result)
         return None
     
     def FindByName(self, name: str, type: str, on_raise: bool = True) -> SapGuiComponent:
@@ -1837,24 +1877,23 @@ class SapGuiVContainer(SapGuiVComponent, SapGuiContainer):
         pois a maioria dos outros objetos não tem um nome significativo. Se nenhum descendente com nome
         e tipo correspondentes for encontrado, a função gera uma exceção.
         '''
-        result = None
-        if on_raise: result = self.component.FindByName(name, type)
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.FindByName(name, type))
         else:
-            try: result = self.component.FindByName(name, type)
+            try: return SapGuiAuto.InstanceComp(self.component.FindByName(name, type))
             except: pass
         
-        if result is not None: return SapTypeInstance.GetInstance(result)
         return None
     
     def FindByNameEx(self, name: str, type: int, on_raise: bool = True) -> SapGuiComponentCollection:
-        # TODO Criar descrição
-        result = None
-        if on_raise: result = self.component.FindByNameEx(name, type)
+        ''' Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
+        No entanto, pode haver vários objetos correspondentes, que serão retornados como membros de uma coleção
+        quando FindAllByName ou FindAllByNameEx forem usados.
+        '''
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.FindByNameEx(name, type))
         else:
-            try: result = self.component.FindByNameEx(name, type)
+            try: return SapGuiAuto.InstanceComp(self.component.FindByNameEx(name, type))
             except: pass
         
-        if result is not None: return SapGuiComponentCollection(result)
         return None
 
 class SapGuiMenubar(SapGuiVContainer):
@@ -1996,24 +2035,22 @@ class SapGuiUserArea(SapGuiVContainer):
     def FindByLabel(self, text: str, type: str, on_raise: bool = True) -> SapGuiComponent:
         ''' Um método muito simples para encontrar um objeto é pesquisar especificando o texto do respectivo rótulo.
         '''
-        result = None
-        if on_raise: result = self.component.FindByLabel(text, type)
+        if on_raise: return SapGuiAuto.InstanceComp(self.component.FindByLabel(text, type))
         else:
-            try: result = self.component.FindByLabel(text, type)
+            try: return SapGuiAuto.InstanceComp(self.component.FindByLabel(text, type))
             except: pass
         
-        if result is not None: return SapTypeInstance.GetInstance(result)
         return None
     
     def CurrentContextMenu(self) -> SapGuiContextMenu:
         ''' Esta propriedade só é definida quando um menu de contexto está disponível no objeto shell.
         '''
-        return self.component.CurrentContextMenu
+        return SapGuiAuto.InstanceComp(self.component.CurrentContextMenu)
     
     def HorizontalScrollbar(self) -> SapGuiScrollbar:
         ''' A área do usuário é definida para ser rolável mesmo que as barras de rolagem nem sempre estejam visíveis.
         '''
-        return self.component.HorizontalScrollbar
+        return SapGuiAuto.InstanceComp(self.component.HorizontalScrollbar)
     
     def IsOTFPreview(self) -> bool:
         ''' Esta propriedade é TRUE, caso seja exibido um Controle de Preview SAPScript na área do usuário.
@@ -2023,7 +2060,7 @@ class SapGuiUserArea(SapGuiVContainer):
     def VerticalScrollbar(self) -> SapGuiScrollbar:
         ''' A área do usuário é definida para ser rolável mesmo que as barras de rolagem nem sempre estejam visíveis.
         '''
-        return self.component.VerticalScrollbar
+        return SapGuiAuto.InstanceComp(self.component.VerticalScrollbar)
 
 class SapGuiShell(SapGuiVContainer):
     ''' GuiShell é um objeto abstrato cuja interface é suportada por todos os controles.
@@ -2054,7 +2091,7 @@ class SapGuiShell(SapGuiVContainer):
     def CurrentContextMenu(self) -> SapGuiContextMenu:
         ''' Esta propriedade só é definida quando um menu de contexto está disponível no objeto shell.
         '''
-        return self.component.CurrentContextMenu
+        return SapGuiAuto.InstanceComp(self.component.CurrentContextMenu)
     
     def DragDropSupported(self) -> bool:
         ''' Esta propriedade é True se o shell permitir operações de arrastar e soltar.
@@ -2069,7 +2106,7 @@ class SapGuiShell(SapGuiVContainer):
     def OcxEvents(self) -> SapGuiCollection:
         ''' Retorna uma coleção contendo os IDs de eventos do controle ActiveX. Estes são os eventos que o controle pode enviar ao servidor.
         '''
-        return self.component.OcxEvents
+        return SapGuiAuto.InstanceComp(self.component.OcxEvents)
     
     def SubType(self) -> str:
         ''' Informações adicionais de tipo para identificar o controle representado pelo shell, por exemplo Picture, TextEdit, GridView…
@@ -2173,7 +2210,9 @@ class SapGuiPicture(SapGuiShell):
         return self.component.Url
 
 class SapGuiOfficeIntegration(SapGuiShell):
-    # TODO Criar descrição
+    ''' O objeto GuiOfficeIntegration (Desktop Office Integration) oferece um contêiner para hospedar
+    diversos tipos de aplicativos Office (Microsoft Word, Microsoft Excel, Microsoft Powerpoint).
+    '''
     
     def AppendRow(self, name: str, row: str) -> None:
         ''' Adiciona uma nova linha a uma tabela especificada pelo parâmetro "name" na coleção de tabelas.
@@ -3382,7 +3421,9 @@ class SapGuiSplit(SapGuiShell):
         return self.component.IsVertical
 
 class SapGuiInputFieldControl(SapGuiShell):
-    # TODO Criar descrição
+    ''' GuiInputFieldControl oferece um campo de entrada que pode ser usado dentro de
+    contêineres de controle (ao contrário do elemento Dynpro representado por GuiTextField)
+    '''
     
     def Submit(self):
         ''' Submete a entrada para a aplicação.
@@ -4126,7 +4167,7 @@ class SapGuiComboBoxControl(SapGuiShell):
     def Entries(self) -> SapGuiCollection:
         ''' As entradas são novamente uma GuiCollection com: key(index=0), text(index=1) o texto de cada entrada que você pode obter por meio desta coleção.
         '''
-        return self.component.Entries
+        return SapGuiAuto.InstanceComp(self.component.Entries)
     
     def LabelText(self) -> str:
         ''' Texto da etiqueta.
@@ -4199,36 +4240,36 @@ class SapGuiGridView(SapGuiShell):
     
     def GetCellChangeable(self, row: int, column: str) -> bool:
         ''' Esta função retorna True se a célula especificada puder ser alterada. '''
-        self.component.GetCellChangeable(row, column)
+        return self.component.GetCellChangeable(row, column)
     
     def GetCellCheckBoxChecked(self, row: int, column: str) -> bool:
         ''' Retorna True se a caixa de seleção na posição especificada estiver marcada.
         Lança uma exceção se não houver caixa de seleção na célula especificada. '''
-        self.component.GetCellCheckBoxChecked(row, column)
+        return self.component.GetCellCheckBoxChecked(row, column)
     
     def GetCellColor(self, row: int, column: str) -> int:
         ''' Retorna um identificador para a cor da célula.
         Isso pode ser usado para recuperar as informações de cores usando GetColorInfo.
         '''
-        self.component.GetCellColor(row, column)
+        return self.component.GetCellColor(row, column)
     
     def GetCellHeight(self, row: int, column: str) -> int:
         ''' Retorna a altura da célula em pixels. '''
-        self.component.GetCellHeight(row, column)
+        return self.component.GetCellHeight(row, column)
     
     def GetCellIcon(self, row: int, column: str) -> str:
         ''' Retorna a sequência de ícones da célula, se a célula contiver um ícone.
         A string tem o formato de ícone ABAP '@xy@', onde xy é um número ou caractere.
         '''
-        self.component.GetCellIcon(row, column)
+        return self.component.GetCellIcon(row, column)
     
     def GetCellLeft(self, row: int, column: str) -> int:
         ''' Retorna a posição esquerda da célula nas coordenadas do cliente. '''
-        self.component.GetCellLeft(row, column)
+        return self.component.GetCellLeft(row, column)
     
     def GetCellMaxLength(self, row: int, column: str) -> int:
         ''' Retorna o comprimento máximo da célula em número de bytes. '''
-        self.component.GetCellMaxLength(row, column)
+        return self.component.GetCellMaxLength(row, column)
     
     def GetCellState(self, row: int, column: str) -> str:
         ''' Retorna o estado da célula. Os valores possíveis são:
@@ -4237,16 +4278,16 @@ class SapGuiGridView(SapGuiShell):
         Warning
         Info
         '''
-        self.component.GetCellState(row, column)
+        return self.component.GetCellState(row, column)
     
     def GetCellTooltip(self, row: int, column: str) -> str:
         ''' Retorna a dica de ferramenta da célula.
         '''
-        self.component.GetCellTooltip(row, column)
+        return self.component.GetCellTooltip(row, column)
     
     def GetCellTop(self, row: int, column: str) -> int:
         ''' Retorna a posição superior da célula nas coordenadas do cliente. '''
-        self.component.GetCellTop(row, column)
+        return self.component.GetCellTop(row, column)
     
     def GetCellType(self, row: int, column: str) -> str:
         ''' Esta função retorna o tipo da célula especificada. Os valores possíveis são:
@@ -4256,31 +4297,31 @@ class SapGuiGridView(SapGuiShell):
         ValueList
         RadioButton
         '''
-        self.component.GetCellType(row, column)
+        return self.component.GetCellType(row, column)
     
     def GetCellValue(self, row: int, column: str) -> str:
         ''' Retorna o valor da célula como uma string.
         '''
-        self.component.GetCellValue(row, column)
+        return self.component.GetCellValue(row, column)
     
     def GetCellWidth(self, row: int, column: str) -> int:
         ''' Retorna a largura da célula em pixels. '''
-        self.component.GetCellWidth(row, column)
+        return self.component.GetCellWidth(row, column)
     
     def GetColorInfo(self, color: int) -> str:
         ''' Retorna a descrição da cor da célula.
         '''
-        self.component.GetColorInfo(color)
+        return self.component.GetColorInfo(color)
     
     def GetColumnDataType(self, column: str) -> str:
         ''' Retorna o tipo de dados da coluna de acordo com os 'tipos de dados integrados' do padrão de esquema XML.
         '''
-        self.component.GetColumnDataType(column)
+        return self.component.GetColumnDataType(column)
     
     def GetColumnPosition(self, column: str) -> int:
         ''' Retorna a posição da coluna conforme mostrado na tela, começando em 1.
         '''
-        self.component.GetColumnPosition(column)
+        return self.component.GetColumnPosition(column)
     
     def GetColumnSortType(self, column: str) -> str:
         ''' Retorna o tipo de classificação da coluna. Os valores possíveis são:
@@ -4288,19 +4329,19 @@ class SapGuiGridView(SapGuiShell):
         Ascending
         Descending
         '''
-        self.component.GetColumnSortType(column)
+        return self.component.GetColumnSortType(column)
     
     def GetColumnTitles(self, column: str) -> object:
         ''' Esta função retorna uma coleção de strings que são usadas para exibir o título de uma coluna.
         O controle escolhe o título apropriado de acordo com a largura da coluna.
         '''
         # TODO Verificar retorno
-        self.component.GetColumnTitles(column)
+        return self.component.GetColumnTitles(column)
     
     def GetColumnTooltip(self, column: str) -> str:
         ''' A dica de ferramenta de uma coluna contém um texto projetado para ajudar o usuário a compreender o significado da coluna.
         '''
-        self.component.GetColumnTooltip(column)
+        return self.component.GetColumnTooltip(column)
     
     def GetColumnTotalType(self, column: str) -> str:
         ''' Retorna o tipo total da coluna. Os valores possíveis são:
@@ -4308,53 +4349,53 @@ class SapGuiGridView(SapGuiShell):
         Total
         Subtotal
         '''
-        self.component.GetColumnTotalType(column)
+        return self.component.GetColumnTotalType(column)
     
     def GetDisplayedColumnTitle(self, column: str) -> str:
         ''' Esta função retorna o título da coluna exibida atualmente.
         Este texto é um dos valores da coleção retornada da função "getColumnTitles".
         '''
-        self.component.GetDisplayedColumnTitle(column)
+        return self.component.GetDisplayedColumnTitle(column)
     
     def GetRowTotalLevel(self, row: int) -> int:
         ''' Retorna o nível da linha.
         '''
-        self.component.GetRowTotalLevel(row)
+        return self.component.GetRowTotalLevel(row)
     
     def GetSymbolInfo(self, symbol: str) -> str:
         ''' Retorna a descrição do símbolo na célula.
         '''
-        self.component.GetSymbolInfo(symbol)
+        return self.component.GetSymbolInfo(symbol)
     
     def GetToolbarButtonChecked(self, button_pos: int) -> bool:
         ''' Retorna True se o botão estiver marcado (pressionado).
         '''
-        self.component.GetToolbarButtonChecked(button_pos)
+        return self.component.GetToolbarButtonChecked(button_pos)
     
     def GetToolbarButtonEnabled(self, button_pos: int) -> bool:
         ''' Indica se o botão pode ser pressionado.
         '''
-        self.component.GetToolbarButtonEnabled(button_pos)
+        return self.component.GetToolbarButtonEnabled(button_pos)
     
     def GetToolbarButtonIcon(self, button_pos: int) -> str:
         ''' Retorna o nome do ícone do botão da barra de ferramentas especificado.
         '''
-        self.component.GetToolbarButtonIcon(button_pos)
+        return self.component.GetToolbarButtonIcon(button_pos)
         
     def GetToolbarButtonId(self, button_pos: int) -> str:
         ''' Retorna o ID do botão da barra de ferramentas especificado, conforme definido no dicionário de dados ABAP.
         '''
-        self.component.GetToolbarButtonId(button_pos)
+        return self.component.GetToolbarButtonId(button_pos)
 
     def GetToolbarButtonText(self, button_pos: int) -> str:
         ''' Retorna o texto do botão da barra de ferramentas especificado.
         '''
-        self.component.GetToolbarButtonText(button_pos)
+        return self.component.GetToolbarButtonText(button_pos)
 
     def GetToolbarButtonTooltip(self, button_pos: int) -> str:
         ''' Retorna a dica de ferramentas do botão da barra de ferramentas especificado.
         '''
-        self.component.GetToolbarButtonTooltip(button_pos)
+        return self.component.GetToolbarButtonTooltip(button_pos)
 
     def GetToolbarButtonType(self, button_pos: int) -> str:
         ''' Retorna o tipo do botão da barra de ferramentas especificado. Os valores possíveis são:
@@ -4365,38 +4406,38 @@ class SapGuiGridView(SapGuiShell):
         Group
         CheckBox
         '''
-        self.component.GetToolbarButtonType(button_pos)
+        return self.component.GetToolbarButtonType(button_pos)
 
     def GetToolbarFocusButton(self) -> int:
         ''' Retorna a posição do botão da barra de ferramentas que tem o foco. Se nenhum botão na barra de ferramentas tiver o foco, o método retorna -1.
         '''
-        self.component.GetToolbarFocusButton()
+        return self.component.GetToolbarFocusButton()
 
     def HasCellF4Help(self, row: int, column: str) -> bool:
         ''' Retorna True se a célula tiver um valor de ajuda.
         '''
-        self.component.HasCellF4Help(row, column)
+        return self.component.HasCellF4Help(row, column)
 
     def HistoryCurEntry(self, row: int, column: str) -> str:
         ''' Retorna o texto da entrada selecionada atualmente da lista de histórico na célula especificada.
         '''
-        self.component.HistoryCurEntry(row, column)
+        return self.component.HistoryCurEntry(row, column)
 
     def HistoryCurIndex(self, row: int, column: str) -> int:
         ''' Retorna o índice (base zero) da entrada selecionada atualmente na lista de histórico da célula especificada.
         '''
-        self.component.HistoryCurIndex(row, column)
+        return self.component.HistoryCurIndex(row, column)
 
     def HistoryIsActive(self, row: int, column: str) -> bool:
         ''' Este método retorna True se a lista de histórico de entrada estiver aberta para a célula especificada.
         '''
-        self.component.HistoryIsActive(row, column)
+        return self.component.HistoryIsActive(row, column)
 
     def HistoryList(self, row: int, column: str) -> SapGuiCollection:
         ''' Este método recupera a lista de entradas de histórico de entrada da célula GuiGridView especificada como uma GuiCollection.
         Os valores da lista de histórico dependem do valor atual contido na célula.
         '''
-        self.component.HistoryList(row, column)
+        return SapGuiAuto.InstanceComp(self.component.HistoryList(row, column))
 
     def InsertRows(self, rows: str) -> None:
         ''' As linhas de parâmetro são uma sequência separada por vírgulas de índices ou intervalos de índices, por exemplo “3,5-8,14,15”.
@@ -4410,32 +4451,32 @@ class SapGuiGridView(SapGuiShell):
     def IsCellHotspot(self, row: int, column: str) -> bool:
         ''' Retorna True se a célula for um link.
         '''
-        self.component.IsCellHotspot(row, column)
+        return self.component.IsCellHotspot(row, column)
 
     def IsCellSymbol(self, row: int, column: str) -> bool:
         ''' Retorna True se o texto na célula for exibido na fonte de símbolo SAP.
         '''
-        self.component.IsCellSymbol(row, column)
+        return self.component.IsCellSymbol(row, column)
 
     def IsCellTotalExpander(self, row: int, column: str) -> bool:
         ''' Retorna True se a célula contiver um botão de expansão total.
         '''
-        self.component.IsCellTotalExpander(row, column)
+        return self.component.IsCellTotalExpander(row, column)
 
     def IsColumnFiltered(self, column: str) -> bool:
         ''' Retorna True se um filtro foi aplicado à coluna.
         '''
-        self.component.IsColumnFiltered(column)
+        return self.component.IsColumnFiltered(column)
 
     def IsColumnKey(self, column: str) -> bool:
         ''' Retorna True se a coluna estiver marcada como uma coluna de chave.
         '''
-        self.component.IsColumnKey(column)
+        return self.component.IsColumnKey(column)
 
     def IsTotalRowExpanded(self, row: int) -> bool:
         ''' Retorna True se a linha que contém um botão de expansão estiver atualmente expandida.
         '''
-        self.component.IsTotalRowExpanded(row)
+        return self.component.IsTotalRowExpanded(row)
 
     def ModifyCell(self, row: int, column: str, value: str) -> None:
         ''' Se a linha e a coluna identificarem uma célula editável válida e o valor tiver um tipo válido para essa célula,
@@ -4714,12 +4755,12 @@ class SapGuiScrollContainer(SapGuiVContainer):
     def HorizontalScrollbar(self) -> SapGuiScrollbar:
         ''' A barra de rolagem horizontal do contêiner de rolagem.
         '''
-        return SapGuiScrollbar(self.component.HorizontalScrollbar)
+        return SapGuiAuto.InstanceComp(self.component.HorizontalScrollbar)
     
     def VerticalScrollbar(self) -> SapGuiScrollbar:
         ''' A barra de rolagem vertical do contêiner de rolagem.
         '''
-        return SapGuiScrollbar(self.component.VerticalScrollbar)
+        return SapGuiAuto.InstanceComp(self.component.VerticalScrollbar)
 
 class SapGuiFrameWindow(SapGuiVContainer):
     ''' Um GuiFrameWindow é um objeto visual de alto nível na hierarquia de tempo de execução.
@@ -4855,7 +4896,7 @@ class SapGuiFrameWindow(SapGuiVContainer):
         ''' O SystemFocus suporta apenas elementos dynpro.
         Para receber informações sobre o controle ActiveX atualmente em foco você pode acessar a propriedade GuiFocus.
         '''
-        return SapTypeInstance.GetInstance(self.component.GuiFocus)
+        return SapGuiAuto.InstanceComp(self.component.GuiFocus)
     
     def Handle(self) -> int:
         ''' O identificador de janela do controle que está conectado ao GuiShell.
@@ -4875,7 +4916,7 @@ class SapGuiFrameWindow(SapGuiVContainer):
         ''' O SystemFocus especifica o componente que o sistema SAP está atualmente vendo como sendo focado.
         Este valor é válido apenas para elementos dynpro e pode, portanto, diferir do foco visto no frontend.
         '''
-        return SapTypeInstance.GetInstance(self.component.SystemFocus)
+        return SapGuiAuto.InstanceComp(self.component.SystemFocus)
     
     def WorkingPaneHeight(self) -> int:
         ''' Esta é a altura do painel de trabalho na métrica de caracteres.
@@ -4961,7 +5002,7 @@ class SapGuiTableControl(SapGuiVContainer):
     def ConfigureLayout(self) -> SapGuiModalWindow:
         ''' Na caixa de diálogo de configuração o layout da tabela pode ser alterado. Esta caixa de diálogo é uma GuiModalWindow.
         '''
-        return self.component.ConfigureLayout()
+        return SapGuiAuto.InstanceComp(self.component.ConfigureLayout())
     
     def DeselectAllColumns(self) -> None:
         ''' Esta função pode ser usada para controles de tabela com um botão que permite desmarcar todas as colunas em uma única etapa.
@@ -4973,25 +5014,25 @@ class SapGuiTableControl(SapGuiVContainer):
         mas conta as linhas começando pela primeira linha em relação à primeira posição de rolagem.
         Se a linha selecionada não estiver visível no momento, uma exceção será gerada.
         '''
-        return self.component.GetAbsoluteRow()
+        return SapGuiAuto.InstanceComp(self.component.GetAbsoluteRow())
     
     def GetCell(self, row: int, column: int) -> SapGuiVComponent:
         ''' Este método retorna uma determinada célula da tabela.
         É mais eficiente do que acessar uma única célula usando coleções de linhas ou colunas.
         '''
-        return self.component.GetCell(row, column)
+        return SapGuiAuto.InstanceComp(self.component.GetCell(row, column))
     
     def ReorderTable(self, permutation: str) -> None:
         ''' A permutação de parâmetros descreve uma nova ordem das colunas.
         Por exemplo "1 3 2" moverá a coluna 3 para a segunda posição.
         '''
         # TODO Melhorar a função usando o nome das colunas
-        return self.component.ReorderTable(permutation)
+        self.component.ReorderTable(permutation)
     
     def SelectAllColumns(self) -> None:
         ''' Esta função pode ser usada para controles de tabela com um botão que permite selecionar todas as colunas em uma única etapa.
         '''
-        return self.component.SelectAllColumns()
+        self.component.SelectAllColumns()
     
     def CharHeight(self) -> int:
         ''' Altura do GuiTableControl na métrica de caracteres.
@@ -5022,7 +5063,7 @@ class SapGuiTableControl(SapGuiVContainer):
         ''' Os membros desta coleção são do tipo GuiTableColumn.
         Portanto, eles não suportam propriedades como id ou nome.
         '''
-        return self.component.Columns
+        return SapGuiAuto.InstanceComp(self.component.Columns)
     
     def CurrentCol(self) -> int:
         ''' Índice baseado em zero da coluna atual.
@@ -5037,7 +5078,7 @@ class SapGuiTableControl(SapGuiVContainer):
     def HorizontalScrollbar(self) -> SapGuiScrollbar:
         ''' A barra de rolagem horizontal do controle de tabela.
         '''
-        return self.component.HorizontalScrollbar
+        return SapGuiAuto.InstanceComp(self.component.HorizontalScrollbar)
     
     def RowCount(self) -> int:
         ''' Número de linhas na tabela. Isso inclui linhas invisíveis. Para o número de linhas visíveis está disponível a propriedade VisibleRowCount.
@@ -5049,7 +5090,7 @@ class SapGuiTableControl(SapGuiVContainer):
         A indexação começa com 0 para a primeira linha visível, independente da posição atual da barra de rolagem horizontal.
         Após a rolagem, uma linha diferente terá o índice 0.
         '''
-        return self.component.Rows
+        return SapGuiAuto.InstanceComp(self.component.Rows)
     
     def RowSelectMode(self) -> int:
         ''' Existem três modos diferentes para selecionar colunas ou linhas,
@@ -5066,7 +5107,7 @@ class SapGuiTableControl(SapGuiVContainer):
     def VerticalScrollbar(self) -> SapGuiScrollbar:
         ''' A barra de rolagem vertical do controle de tabela.
         '''
-        return self.component.VerticalScrollbar
+        return SapGuiAuto.InstanceComp(self.component.VerticalScrollbar)
     
     def VisibleRowCount(self) -> int:
         ''' Número de linhas visíveis na tabela. Para o número de todas as linhas a propriedade RowCount está disponível.
@@ -5254,7 +5295,7 @@ class SapGuiSession(SapGuiContainer):
     def Parent(self) -> SapGuiConnection:
         ''' Obtém a conexão da sessão
         '''
-        return SapGuiConnection(self.component.Parent)
+        return SapGuiAuto.InstanceComp(self.component.Parent)
     
     def AsStdNumberFormat(self, number: str) -> str:
         ''' Dependendo do formato numérico do sistema, o sinal de menos dos números pode ser colocado à direita do número.
@@ -5304,9 +5345,7 @@ class SapGuiSession(SapGuiContainer):
         Se nenhum componente for encontrado, uma exceção será gerada, a menos que raise seja definido como False.
         Nesse caso, um objeto None é retornado.
         '''
-        result = self.component.FindByPosition(x, y, on_raise)
-        if result is not None: return SapGuiCollection(result)
-        return None
+        return SapGuiAuto.InstanceComp(self.component.FindByPosition(x, y, on_raise))
     
     def GetIconResourceName(self, text: str) -> str:
         ''' No SAP GUI, os ícones são frequentemente descritos como texto no formato @nn@, onde nn é um número.
@@ -5374,7 +5413,7 @@ class SapGuiSession(SapGuiContainer):
         No entanto, na maioria das vezes, um aplicativo acessará a janela da sessão atualmente ativada,
         pois essa é a janela com a qual o usuário provavelmente irá interagir. Esta propriedade pretende ser um atalho para esta janela.
         '''
-        return SapGuiFrameWindow(self.component.ActiveWindow)
+        return SapGuiAuto.InstanceComp(self.component.ActiveWindow)
     
     def Busy(self, option: bool = None) -> bool:
         ''' Enquanto o SAP GUI aguarda dados do servidor, nenhuma chamada de script será retornada,
@@ -5388,16 +5427,16 @@ class SapGuiSession(SapGuiContainer):
             return self.component.Busy
     
     def ErrorList(self, errors: SapGuiCollection = None) -> SapGuiCollection:
-        if errors is None: return self.component.ErrorList
+        if errors is None: return SapGuiAuto.InstanceComp(self.component.ErrorList)
         else:
-            self.component.ErrorList = errors
-            return SapGuiCollection(self.component.ErrorList)
+            self.component.ErrorList = errors.component
+            return SapGuiAuto.InstanceComp(self.component.ErrorList)
     
     def Info(self) -> SapGuiSessionInfo:
         ''' As informações são do tipo GuiSessionInfo.
         Ele contém informações técnicas sobre a conexão atual, os dados de login, o aplicativo SAP em execução e muito mais.
         '''
-        return SapGuiSessionInfo(self.component.Info)
+        return SapGuiAuto.InstanceComp(self.component.Info)
     
     def IsActive(self, option: bool = None) -> bool:
         ''' TRUE se a janela da sessão estiver ativa.
@@ -5563,7 +5602,7 @@ class SapGuiConnection(SapGuiContainer):
     '''
 
     def Parent(self) -> SapGuiApplication:
-        return SapGuiApplication(self.component.Parent)
+        return SapGuiAuto.InstanceComp(self.component.Parent)
     
     def CloseConnection(self) -> None:
         ''' Este método fecha uma conexão junto com todas as suas sessões.
@@ -5599,7 +5638,7 @@ class SapGuiConnection(SapGuiContainer):
         ''' Esta propriedade é outro nome para a propriedade Children.
         Foi adicionado para melhor legibilidade, pois todos os filhos do GuiConnection são sessões.
         '''
-        return SapGuiComponentCollection(self.component.Sessions)
+        return SapGuiAuto.InstanceComp(self.component.Sessions)
     
     def SessionsList(self) -> [SapGuiSession]:
         ''' Retorna uma list com as sessões
@@ -5614,6 +5653,7 @@ class SapGuiConnection(SapGuiContainer):
             session.CreateSession()
             if self.Sessions().Count() > session_count:
                 return self.Sessions().LastItem()
+        return None
     
     def SessionsUser(self, user_name: str) -> [SapGuiSession]:
         ''' Obtém todas sessões do usuário.
@@ -5623,7 +5663,6 @@ class SapGuiConnection(SapGuiContainer):
     def SessionsInTransaction(self, transaction: str) -> [SapGuiSession]:
         ''' Obtém todas sessões que está na transação.
         '''
-        sessions = self.SessionsList()
         return list(filter(lambda session: session.Info().Transaction() == transaction, self.SessionsList()))
 
 class SapGuiApplication(SapGuiContainer):
@@ -5661,21 +5700,19 @@ class SapGuiApplication(SapGuiContainer):
         Esta função irá gerar a exceção E_ACCESSDENIED se o suporte a scripts tiver sido desabilitado pelo administrador ou pelo usuário.
         '''
         conn = self.component.OpenConnection(description, sync, on_raise)
-        if conn is not None: return SapGuiConnection(conn)
-        return None
+        return SapGuiAuto.InstanceComp(conn)
     
     def OpenConnectionByConnectionString(self, connect_string: str, sync = False, on_raise: bool = True) -> SapGuiConnection:
         ''' O parâmetro ConnectString é a string de conexão do servidor SAP, por exemplo “/R/ALR/G/SPACE”.
         Consulte a descrição do método openConnection para uma discussão sobre os parâmetros de sincronização e aumento.
         '''
         conn = self.component.OpenConnection(connect_string, sync, on_raise)
-        if conn is not None: return SapGuiConnection(conn)
-        return None
+        return SapGuiAuto.InstanceComp(conn)
     
     def GetActiveSession(self) -> SapGuiSession:
         ''' Retorna a Sessão com a qual o usuário está trabalhando atualmente, que será a janela superior.
         '''
-        return SapGuiSession(self.component.ActiveSession)
+        return SapGuiAuto.InstanceComp(self.component.ActiveSession)
     
     def AllowSystemMessages(self, enable: bool = None) -> bool:
         ''' As mensagens do sistema são exibidas quando um administrador as invoca no servidor para enviar uma notificação aos usuários atualmente logados.
@@ -5705,7 +5742,7 @@ class SapGuiApplication(SapGuiContainer):
         ''' Esta propriedade é outro nome para a propriedade Children.
         Foi adicionado para melhor legibilidade, pois todos os filhos do GuiApplication são conexões.
         '''
-        return SapGuiComponentCollection(self.component.Connections)
+        return SapGuiAuto.InstanceComp(self.component.Connections)
     
     def ConnectionsList(self, description: str = None) -> [SapGuiConnection]:
         ''' Retorna uma list com as conexões
@@ -5771,7 +5808,7 @@ class SapGuiApplication(SapGuiContainer):
     def Utils(self) -> SapGuiUtils:
         ''' Esta propriedade retorna um objeto GuiUtils global.
         '''
-        return self.component.Utils
+        return SapGuiAuto.InstanceComp(self.component.Utils)
 
 class SapGuiAuto():
     @staticmethod
@@ -5780,11 +5817,11 @@ class SapGuiAuto():
     
     @staticmethod
     def GetSapApplication() -> SapGuiApplication:
-        return SapGuiApplication(SapGuiAuto.GetSapGuiObject().GetScriptingEngine)
+        return SapGuiAuto.InstanceComp(SapGuiAuto.GetSapGuiObject().GetScriptingEngine)
 
-class SapTypeInstance():
     @staticmethod
-    def GetInstance(sap_object: object):
+    def InstanceComp(sap_object: object):
+        if sap_object is None: return None
         try:
             id = sap_object.TypeAsNumber
         except: return None
