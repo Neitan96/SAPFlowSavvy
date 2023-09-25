@@ -9,7 +9,7 @@ setup(
     version = '0.3',
     author = 'Nathan Almeida',
     author_email = 'neitan96@outlook.com',
-    license='GPL-3',
+    license='GPLv3',
     packages = ['PySavvyApi'],
     description = 'Toolkit de automatização para SAP Gui',
     long_description = readme,
