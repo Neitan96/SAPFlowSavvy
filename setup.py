@@ -16,5 +16,5 @@ setup(
     long_description_content_type="text/markdown",
     keywords='sap sapgui sapscript',
     url = 'https://github.com/Neitan96/SAPFlowSavvy',
-    install_requires=['win32com', 'pywinauto', 'pymsgbox']
+    install_requires=['pywin32', 'pywinauto', 'pymsgbox']
 )
