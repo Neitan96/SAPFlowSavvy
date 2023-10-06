@@ -52,7 +52,7 @@ class GuiCollection:
         """
         return self.component.Length
 
-    def to_list(self) -> [object]:
+    def to_list(self) -> list[object]:
         """ Retorna uma list com todos os itens da coleção.
         """
         itens = []

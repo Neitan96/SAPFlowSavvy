@@ -11,6 +11,7 @@ class GuiConnection(GuiContainer):
     As conexões podem ser abertas a partir do SAP Logon ou dos métodos openConnection e openConnectionByConnectionString do GuiApplication.
     """
 
+    @property
     def parent(self) -> GuiApplication:
         return GuiApplication(self.component.Parent)
 
@@ -68,7 +69,7 @@ class GuiConnection(GuiContainer):
         sessions.reverse()
         session_count = len(sessions)
         for session in sessions:
-            session.CreateSession()
+            session.create_session()
             if self.sessions.count > session_count:
                 # noinspection PyTypeChecker
                 return self.sessions.last_item()
@@ -79,7 +80,7 @@ class GuiConnection(GuiContainer):
         """
         return list(filter(lambda session: session.info.user == user_name, self.sessions_list))
 
-    def sessions_in_transaction(self, transaction: str) -> [GuiSession]:
+    def sessions_in_transaction(self, transaction: str) -> list[GuiSession]:
         """ Obtém todas as sessões que está na transação.
         """
         return list(filter(lambda session: session.info.transaction == transaction, self.sessions_list))

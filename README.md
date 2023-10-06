@@ -28,9 +28,9 @@ Este repositório é uma coleção de APIs desenvolvidas em *Python* e *VBA* pro
 ## Exemplos
 
 #### **Python:**
+
 ```python
-sap_gui = SapGui()
-session = sap_gui.GetSessionLoged()
+# TODO
 ```
 
 #### **VBA:**
@@ -48,7 +48,7 @@ session = sap_gui.GetSessionLoged()
   * Varredura e busca de valores em GridView
   * Carregamento rápido da GridView completa
   * Funções de filtros
-  * Formulas para GridView, como soma, média e etc.
+  * Fórmulas para GridView, como soma, média e etc.
 * Funções para pop-ups comuns:
   * Seleção múltipla.
   * Botões comuns: limpar, executar, cancelar e etc.

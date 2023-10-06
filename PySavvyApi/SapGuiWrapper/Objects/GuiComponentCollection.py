@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from PySavvyApi.SapGuiWrapper.Objects.GuiComponent import GuiComponent
-from PySavvyApi.SapGuiWrapper.Helpers.ComponentCast import ComponentCast
+from .GuiComponent import GuiComponent
+from .ComponentCast import ComponentCast
 
 class GuiComponentCollection(GuiComponent):
     """ O GuiComponentCollection é usado para elementos de coleções, como a propriedade Children de contêineres.
@@ -63,7 +63,7 @@ class GuiComponentCollection(GuiComponent):
         return self.component.Length
 
     def to_list(self) -> list[GuiComponent]:
-        """ Retorna uma list com todos os itens da coleção.
+        """ Retorna uma lista com todos os itens da coleção.
         """
         itens = []
         for index in range(0, self.Count()):
@@ -74,3 +74,8 @@ class GuiComponentCollection(GuiComponent):
         """ Retona o útimo item da coleção.
         """
         return self.element_at(self.count - 1)
+
+    def last_item_cast(self) -> ComponentCast:
+        """ Retona o útimo item da coleção em uma classe pronta para fazer o cast para o tipo do item desejado.
+        """
+        return self.item_cast(self.count - 1)

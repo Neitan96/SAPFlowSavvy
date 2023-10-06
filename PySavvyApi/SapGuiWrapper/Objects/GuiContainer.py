@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from PySavvyApi.SapGuiWrapper.Helpers.ComponentCast import ComponentCast
-from PySavvyApi.SapGuiWrapper.Objects.GuiComponent import GuiComponent
-from PySavvyApi.SapGuiWrapper.Objects.GuiComponentCollection import GuiComponentCollection
+from typing import Optional
+
+from .ComponentCast import ComponentCast
+from .GuiComponent import GuiComponent
+from .GuiComponentCollection import GuiComponentCollection
 
 
 class GuiContainer(GuiComponent):
@@ -19,7 +21,7 @@ class GuiContainer(GuiComponent):
         if result is not None: return ComponentCast.get_instance(result)
         return None
 
-    def find_by_id_cast(self, id_element: str, on_raise: bool = True) -> None | ComponentCast:
+    def find_by_id_cast(self, id_element: str, on_raise: bool = True) -> Optional[ComponentCast]:
         """ Pesquise nos descendentes do objeto um determinado objeto que corresponde ao ID.
         Se nenhum descendente com o ID fornecido puder ser encontrado, a função gera uma exceção,
         a menos que o parâmetro opcional on_raise seja definido como False.

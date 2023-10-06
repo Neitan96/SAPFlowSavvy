@@ -1,7 +1,7 @@
 from __future__ import annotations
 import win32com.client
 
-from ..Helpers.ComponentCast import ComponentCast
+from .ComponentCast import ComponentCast
 
 
 class GuiComponent:

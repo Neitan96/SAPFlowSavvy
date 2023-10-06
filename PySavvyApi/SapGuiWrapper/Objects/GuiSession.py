@@ -17,7 +17,10 @@ class GuiSession(GuiContainer):
     """
 
     def send_key(self, v_key: int) -> None:
-        self.active_window.SendVKey(v_key=v_key)
+        """ A chave virtual v_key é executada na janela ativa da sessão.
+        As VKeys são definidas no pintor de menus.
+        """
+        self.active_window.send_v_key(v_key=v_key)
 
     def get_alert_status_pane(self) -> GuiStatusPane:
         """ Obtém a barra de alerta principal.
@@ -25,6 +28,7 @@ class GuiSession(GuiContainer):
         # noinspection PyTypeChecker
         return self.find_by_id(SapFields.ALERT_STATUS_PANE, False)
 
+    @property
     def parent(self) -> GuiConnection:
         """ Obtém a conexão da sessão
         """

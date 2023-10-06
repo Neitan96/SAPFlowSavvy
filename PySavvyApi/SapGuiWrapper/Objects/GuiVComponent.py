@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from PySavvyApi.SapGuiWrapper.Objects.GuiComponent import GuiComponent
-from PySavvyApi.SapGuiWrapper.Objects.GuiCollection import GuiCollection
-from PySavvyApi.SapGuiWrapper.Objects.GuiComponentCollection import GuiComponentCollection
-from PySavvyApi.SapGuiWrapper.Helpers.ComponentCast import ComponentCast
+from .GuiComponent import GuiComponent
+from .GuiCollection import GuiCollection
+from .GuiComponentCollection import GuiComponentCollection
+from .ComponentCast import ComponentCast
 
 
 class GuiVComponent(GuiComponent):

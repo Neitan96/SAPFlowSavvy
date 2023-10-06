@@ -1,5 +1,4 @@
 __all__ = [
-    'ComponentCast',
     'SapConnNames',
     'SapTransactions',
     'SapPrograms',
@@ -7,5 +6,4 @@ __all__ = [
     'SapFields'
 ]
 
-from .ComponentCast import ComponentCast
 from .StdTCodes import *

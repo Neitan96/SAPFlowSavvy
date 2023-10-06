@@ -1,10 +1,10 @@
 from typing import Optional
 
-from PySavvyApi.SapGuiWrapper.Objects.GuiVContainer import GuiVContainer
-from PySavvyApi.SapGuiWrapper.Objects.GuiComponent import GuiComponent
-from PySavvyApi.SapGuiWrapper.Objects.GuiContextMenu import GuiContextMenu
-from PySavvyApi.SapGuiWrapper.Objects.GuiScrollbar import GuiScrollbar
-from PySavvyApi.SapGuiWrapper.Helpers.ComponentCast import ComponentCast
+from .GuiVContainer import GuiVContainer
+from .GuiComponent import GuiComponent
+from .GuiContextMenu import GuiContextMenu
+from .GuiScrollbar import GuiScrollbar
+from .ComponentCast import ComponentCast
 
 
 # noinspection PyBroadException
