@@ -69,7 +69,7 @@ class GuiFrameWindow(GuiVContainer):
         """ Isso definirá uma janela para o estado iconificado.
         Não é possível iconificar uma janela específica de uma sessão, tanto a janela principal quanto todos os modais existentes serão iconificados.
         """
-        self.Iconify()
+        self.iconify()
 
     def maximize(self) -> None:
         """ Isso maximizará uma janela. Não é possível maximizar uma janela modal,
@@ -86,8 +86,8 @@ class GuiFrameWindow(GuiVContainer):
     def set_focus_windows(self) -> None:
         """ Isso faz o windows focar na janela indepedente do estado atual do mesmo.
         """
-        self.Minimize()
-        self.Maximize()
+        self.minimize()
+        self.maximize()
 
     def send_v_key(self, v_key: int) -> None:
         """ A chave virtual VKey é executada na janela. As VKeys são definidas no pintor de menus.

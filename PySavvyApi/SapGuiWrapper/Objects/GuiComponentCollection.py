@@ -66,7 +66,7 @@ class GuiComponentCollection(GuiComponent):
         """ Retorna uma lista com todos os itens da coleção.
         """
         itens = []
-        for index in range(0, self.Count()):
+        for index in range(0, self.count):
             itens.append(self.item(index))
         return itens
 

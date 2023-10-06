@@ -50,19 +50,20 @@ class GuiSession(GuiContainer):
         """ Esta função abre uma nova sessão, que é então visualizada por uma nova janela principal.
         Isso se assemelha ao comando "/o" que pode ser executado no campo de comando.
         """
-        conn = self.Parent()
-        ses_count = conn.Sessions().Count()
+        conn = self.parent
+        ses_count = conn.sessions.count
         self.component.CreateSession()
-        if ses_count < conn.Sessions().Count():
-            return conn.Sessions().LastItem()
+        if ses_count < conn.sessions.count:
+            # noinspection PyTypeChecker
+            return conn.sessions.last_item()
 
         return None
 
     def close_session(self, ignore_popup_logoff: bool = False) -> None:
-        if ignore_popup_logoff and self.Parent().Sessions().Count() <= 1:
-            self.SendCommand(SapCommands.CLOSE_ALL_SESSIONS)
+        if ignore_popup_logoff and self.parent.sessions.count <= 1:
+            self.send_command(SapCommands.CLOSE_ALL_SESSIONS)
         else:
-            self.SendCommand(SapCommands.CLOSE_SESSION)
+            self.send_command(SapCommands.CLOSE_SESSION)
 
     def enable_jaws_events(self) -> None:
         """ Habilite o envio de eventos para o leitor de tela Freedom Scientific JAWS,
@@ -121,12 +122,12 @@ class GuiSession(GuiContainer):
 
         t_transaction = ('/o/' + transaction) if new_session else ('/n/' + transaction)
         if new_session:
-            ses_count = self.Parent().Sessions().Count()
+            ses_count = self.parent.sessions.count
             self.component.StartTransaction(t_transaction)
-            return self.Parent().Sessions().Count() > ses_count
+            return self.parent.sessions.count > ses_count
         else:
             self.component.StartTransaction(t_transaction)
-            return self.Info().Transaction == transaction
+            return self.info.transaction == transaction
 
     @property
     def acc_enhanced_tab_chain(self) -> bool:

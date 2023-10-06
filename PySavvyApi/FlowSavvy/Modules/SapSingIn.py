@@ -46,14 +46,14 @@ class SavvySapSingIn:
     def _login_after_sign_in(session: GuiSession) -> GuiSession:
 
         field_count_fails = session.find_by_id(SapFields.POP_UP_COUNT_FAILS_LABEL_LINE_1, False)
-        if field_count_fails is not None: session.SendKey(SapKeys.ENTER)
+        if field_count_fails is not None: session.send_key(SapKeys.ENTER)
 
-        copy_r = session.FindById('wnd[1]', False)
-        if copy_r is not None and copy_r.Text == 'Copyright':
-            session.SendKey(SapKeys.ENTER)
+        copy_r = session.find_by_id_cast('wnd[1]', False).GuiFrameWindow()
+        if copy_r is not None and copy_r.text == 'Copyright':
+            session.send_key(SapKeys.ENTER)
 
-        if not session.Info().Transaction() == SapTransactions.LOGIN:
-            session.SendCommand(SapCommands.RETURN_MENU)
+        if not session.info.transaction == SapTransactions.LOGIN:
+            session.send_command(SapCommands.RETURN_MENU)
 
         return session
 
@@ -76,7 +76,7 @@ class SavvySapSingIn:
 
         session = SavvySapSingIn._login_after_sign_in(session)
 
-        if not session.Info().Transaction() == SapTransactions.LOGIN:
+        if not session.info.transaction == SapTransactions.LOGIN:
             return session
 
         conn_name = session.parent.description

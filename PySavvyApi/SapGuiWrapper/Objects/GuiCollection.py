@@ -10,17 +10,8 @@ class GuiCollection:
     component: win32com.client.CDispatch
 
     def __init__(self, component: win32com.client.CDispatch):
-        self.class_attrs = ['component']
+        # self.class_attrs = ['component']
         self.component = component
-
-    def __getattr__(self, attr):
-        return getattr(self.component, attr)
-
-    def __setattr__(self, attr, value):
-        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
-            super().__setattr__(attr, value)
-        else:
-            setattr(self.component, attr, value)
 
     def add(self, item):
         """ Após a criação de uma GuiCollection, os itens podem ser adicionados chamando a função add.
@@ -56,14 +47,14 @@ class GuiCollection:
         """ Retorna uma list com todos os itens da coleção.
         """
         itens = []
-        for index in range(0, self.Count()):
-            itens.append(self.Item(index))
+        for index in range(0, self.count):
+            itens.append(self.item(index))
         return itens
 
     def last_item(self) -> object:
         """ Retona o útimo item da coleção.
         """
-        return self.ElementAt(self.Count() - 1)
+        return self.element_at(self.count - 1)
 
     @property
     def type(self) -> str:

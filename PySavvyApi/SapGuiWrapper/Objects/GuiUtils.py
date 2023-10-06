@@ -6,17 +6,8 @@ class GuiUtils:
     component: win32com.client.CDispatch
 
     def __init__(self, component: win32com.client.CDispatch):
-        self.class_attrs = ['component']
+        # self.class_attrs = ['component']
         self.component = component
-
-    def __getattr__(self, attr):
-        return getattr(self.component, attr)
-
-    def __setattr__(self, attr, value):
-        if attr in self.__dict__ or attr == 'class_attrs' or attr in self.class_attrs:
-            super().__setattr__(attr, value)
-        else:
-            setattr(self.component, attr, value)
 
     def close_file(self, file: int) -> None:
         """ Esta função fecha um arquivo que foi aberto usando OpenFile.
