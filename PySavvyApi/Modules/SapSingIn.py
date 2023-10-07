@@ -9,10 +9,10 @@ import os
 from ..SavvyLogger import SavvyLogger
 from ..SavvyHelper import inputbox_text, inputbox_password, inputbox_yes_no, check_strings
 
-from ...SapGuiWrapper.Objects.GuiSession import GuiSession
-from ...SapGuiWrapper.SapGui import SapGui
-from ...SapGuiWrapper.Enums.SapKeys import SapKeys
-from ...SapGuiWrapper.Helpers.StdTCodes import *
+from ..StdTCodes import SapFields, SapCommands, SapTransactions
+from ..Enums.SapKeys import SapKeys
+from .SapGui import SapGui
+from ..SapGuiWrapper import GuiSession
 
 
 class SingInType:
@@ -79,7 +79,7 @@ class SavvySapSingIn:
         if not session.info.transaction == SapTransactions.LOGIN:
             return session
 
-        conn_name = session.parent.description
+        conn_name = session.parent_cast.GuiConnection().description
 
         if login_type == SingInType.WAIT:
             session.active_window.set_focus_windows()
@@ -133,7 +133,7 @@ class SavvySapSingIn:
                 session.send_key(SapKeys.ENTER)
 
             if force_type == SingInForceType.WAIT:
-                sap_app = session.parent.parent
+                sap_app = session.parent.parent_cast.GuiApplication()
                 session.send_key(SapKeys.F12)
                 time.sleep(10)
 

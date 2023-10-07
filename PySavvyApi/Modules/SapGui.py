@@ -4,7 +4,7 @@ import pywinauto
 import win32com.client
 import os
 
-from .Objects.GuiApplication import GuiApplication
+from ..SapGuiWrapper import GuiApplication
 
 class SapGui:
 
