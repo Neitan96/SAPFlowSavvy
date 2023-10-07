@@ -28,7 +28,6 @@
 
 - GuiCollection:
   - **to_list()** → *list[object]*: Retorna uma list com todos os itens da coleção.
-  - **last_item()** → *object*: Retona o útimo item da coleção.
 
 
 - GuiFrameWindow:

@@ -50,6 +50,8 @@ class SapGui:
                 elements = list(filter(SapGui.__filter_buttons_no, popup_window.children()))
                 for element in elements:
                     element.click()
+                if len(elements) > 0:
+                    time.sleep(2)
         except:
             pass
 

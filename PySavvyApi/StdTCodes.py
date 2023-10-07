@@ -7,6 +7,7 @@ class SapConnNames:
 class SapTransactions:
     LOGIN = 'S000'  # Tela de login
     MAIN_MENU = 'SESSION_MANAGER'  # Menu principal
+    MAIN_MENU_RETURN = 'SMEN'  # Menu principal - Essa transação é quando o comando /n é executado na tela do menu.
     TRANS_EWM_MONITOR = '/SCWM/MON'  # Monitor de WM
 
 
@@ -32,6 +33,7 @@ class SapFields:
     LOGIN_PASSWORD = 'wnd[0]/usr/pwdRSYST-BCODE'
     LOGIN_MANDT = 'wnd[0]/usr/txtRSYST-MANDT'
     LOGIN_LANGUAGE = 'wnd[0]/usr/txtRSYST-LANGU'
+    LOGIN_TO_MENU = 'wnd[0]/usr/btnSTARTBUTTON'
 
     # Pop-up número de tentativas falhadas
     POP_UP_COUNT_FAILS_ICON = 'wnd[1]/usr/txtIK1'
