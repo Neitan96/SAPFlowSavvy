@@ -5,6 +5,7 @@ from typing import Optional
 import win32com.client
 
 from .StdTCodes import SapFields, SapCommands
+from .SavvyHelper import check_strings
 
 
 class GuiComponentType:
@@ -1986,9 +1987,11 @@ class GuiSession(GuiContainer):
     É, portanto, o ponto de acesso para aplicações, que gravam as ações de um usuário em relação a uma tarefa específica ou reproduzem essas ações.
     """
 
-    @property
-    def user_area(self) -> GuiUserArea:
-        return self.find_by_id_cast('wnd[0]/usr').GuiUserArea()
+    def is_loged(self) -> bool:
+        return check_strings(self.info.user)
+
+    def user_area(self, window: int = 0) -> GuiUserArea:
+        return self.find_by_id_cast('wnd[' + str(window) + ']/usr').GuiUserArea()
 
     def send_v_key(self, v_key: int) -> None:
         """ A chave virtual v_key é executada na janela ativa da sessão.
@@ -2462,9 +2465,14 @@ class GuiConnection(GuiContainer):
         return list(filter(lambda session: session.info.user == user_name, self.sessions_list))
 
     def sessions_in_transaction(self, *transactions: str) -> list[GuiSession]:
-        """ Obtém todas as sessões que está na transação.
+        """ Obtém todas as sessões que estão na transação.
         """
-        return list(filter(lambda session: session.info.transaction in transactions, self.sessions_list))
+        return list(filter(lambda session: session.info.in_transaction in transactions, self.sessions_list))
+
+    def sessions_not_in_transaction(self, *transactions: str) -> list[GuiSession]:
+        """ Obtém todas as sessões que não estão na transação.
+        """
+        return list(filter(lambda session: session.info.in_transaction not in transactions, self.sessions_list))
 
 
 class GuiUtils:
@@ -2514,6 +2522,14 @@ class GuiApplication(GuiContainer):
     GuiApplication é uma classe criável. Contudo, deve haver apenas um componente deste tipo em qualquer processo.
     GuiApplication estende o objeto GuiContainer.
     """
+
+    def sessions_list(self, conn_name: str = None) -> list[GuiSession]:
+        sessions = []
+        for conn in self.connections_list():
+            if conn_name is None or conn.description == conn_name:
+                sessions.extend(conn.sessions_list)
+
+        return sessions
 
     def add_history_entry(self, field_name: str, value: str) -> bool:
         """ SAP GUI para Windows possui uma funcionalidade de histórico de entrada,
