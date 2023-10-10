@@ -8,7 +8,7 @@ class SapTransactions:
     LOGIN = 'S000'  # Tela de login
     MAIN_MENU = 'SESSION_MANAGER'  # Menu principal
     MAIN_MENU_RETURN = 'SMEN'  # Menu principal - Essa transação é quando o comando /n é executado na tela do menu.
-    TRANS_EWM_MONITOR = '/SCWM/MON'  # Monitor de WM
+    EWM_MONITOR = '/SCWM/MON'  # Monitor de WM
 
 
 class SapPrograms:

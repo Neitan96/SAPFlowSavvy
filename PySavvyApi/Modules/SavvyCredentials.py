@@ -29,7 +29,7 @@ class SavvyCredentials:
         self.credentials = {}
         self.read_all_in_file()
 
-    def get_credentials(self, conn_name: str = 'Default', force_read: bool = False) -> (str, str):
+    def get_credentials(self, conn_name: str = 'Default', force_read: bool = False, save_in_file: bool = True) -> (str, str):
         """ Obtém a crendencial SAP do usuário
 
         Faz a leitura das credenciais e faz o tratamento caso não tenha credenciais armazenadas,
@@ -37,6 +37,7 @@ class SavvyCredentials:
         armazena as credenciais tanto no cache quanto no arquivo.
 
         Args:
+            save_in_file: Se deseja salvar as credenciais no arquivo na pasta pessoal do usuário
             conn_name (str): nome da conexão das credenciais.
             force_read (bool): força a leitura das credenciais mesmo que ela já esteja em cache.
         """
@@ -46,7 +47,7 @@ class SavvyCredentials:
 
         if self.file_path is not None:
             if self.read_in_file(conn_name) or \
-                    (self.read_input_box(conn_name) and self.write_in_file(conn_name)):
+                    (self.read_input_box(conn_name) and (not save_in_file or self.write_in_file(conn_name))):
                 return self.credentials[conn_name][0], self.credentials[conn_name][1]
 
         else:

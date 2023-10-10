@@ -2099,8 +2099,6 @@ class GuiSession(GuiContainer):
         """
         if transaction.startswith('/o') or transaction.startswith('/o'):
             transaction = transaction[2:]
-        if transaction.startswith('/'):
-            transaction = transaction[1:]
         self.component.StartTransaction(transaction)
         return self.info.transaction == transaction
 
@@ -2467,12 +2465,12 @@ class GuiConnection(GuiContainer):
     def sessions_in_transaction(self, *transactions: str) -> list[GuiSession]:
         """ Obtém todas as sessões que estão na transação.
         """
-        return list(filter(lambda session: session.info.in_transaction in transactions, self.sessions_list))
+        return list(filter(lambda session: session.info.transaction in transactions, self.sessions_list))
 
     def sessions_not_in_transaction(self, *transactions: str) -> list[GuiSession]:
         """ Obtém todas as sessões que não estão na transação.
         """
-        return list(filter(lambda session: session.info.in_transaction not in transactions, self.sessions_list))
+        return list(filter(lambda session: session.info.transaction not in transactions, self.sessions_list))
 
 
 class GuiUtils:

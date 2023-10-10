@@ -1,7 +1,9 @@
-
+from PySavvyApi.Modules.SapGui import SapGui
 from PySavvyApi.SapGuiWrapper import *
 
 class SavvySessionsFilter:
+    """ Classe feita para facilitar a obtenção de sessões a partir de filtros.
+    """
 
     _sap_app: GuiApplication
     _conn_names: list[str]
@@ -13,7 +15,7 @@ class SavvySessionsFilter:
     _sessions_app_count_min: int
     _sessions_app_count_max: int
 
-    def __init__(self, sap_app: GuiApplication):
+    def __init__(self, sap_app: GuiApplication = None):
         self._sap_app = sap_app
 
         self._conn_names = []
@@ -25,36 +27,44 @@ class SavvySessionsFilter:
         self._sessions_app_count_min = -1
         self._sessions_app_count_max = -1
 
-    def conn_name(self, *conn_name: str):
+    def conn_name(self, *conn_name: str) -> None:
         self._conn_names.extend(conn_name)
 
-    def user(self, *user: str):
+    def user(self, *user: str) -> None:
         self._users.extend(user)
 
-    def in_transaction(self, *transaction: str):
+    def in_transaction(self, *transaction: str) -> None:
         self._in_transactions.extend(transaction)
 
-    def not_is_transaction(self, *transaction: str):
+    def not_is_transaction(self, *transaction: str) -> None:
         self._not_in_transactions.extend(transaction)
 
-    def only_loged(self):
+    def only_loged(self) -> None:
         self._p_only_loged = True
 
-    def only_not_loged(self):
+    def only_not_loged(self) -> None:
         self._p_only_not_loged = True
 
-    def conn_sessions_count_min(self, min_sessions: int):
+    def conn_sessions_count_min(self, min_sessions: int) -> None:
         self._sessions_app_count_min = min_sessions
 
-    def conn_sessions_count_max(self, max_sessions: int):
+    def conn_sessions_count_max(self, max_sessions: int) -> None:
         self._sessions_app_count_max = max_sessions
 
     def get_sessions(self) -> Optional[list[GuiSession]]:
-        if not self._sap_app.connected_sap():
+        """ Faz a busca das sessões conforme os filtros definidos.
+        Returns:
+            list[GuiSession]: Sessões filtradas
+        """
+        sap_app = self._sap_app
+        if sap_app is None or not sap_app.connected_sap():
+            sap_app = SapGui.get_sap_application()
+
+        if sap_app is None or not sap_app.connected_sap():
             return None
 
         sessions: list[GuiSession]
-        sessions = self._sap_app.sessions_list()
+        sessions = sap_app.sessions_list()
 
         if len(self._conn_names) > 0:
             sessions = list(filter(lambda session: session.parent_cast.GuiConnection().description in self._conn_names, sessions))

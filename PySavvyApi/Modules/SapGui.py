@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 import pywinauto
 import win32com.client
@@ -7,14 +8,34 @@ import os
 from ..SapGuiWrapper import GuiApplication
 
 class SapGui:
+    """ Classe feita para fazer manipulação na aplicação do Sap Gui.
+    """
 
     @staticmethod
-    def get_sap_gui_object():
-        return win32com.client.GetObject("SAPGUI")
+    def get_sap_gui_object(on_raise: bool = False) -> Optional[win32com.client.CDispatch]:
+        """ Obtém o objeto CDispatch do Sap Gui
+        Args:
+            on_raise: quando verdadeiro e o SAP Gui não está disponivel ocasiona um erro
+        Returns:
+            GuiApplication: Objeto CDispatch do Sap Gui
+        """
+        if on_raise:
+            return win32com.client.GetObject("SAPGUI")
+        else:
+            # noinspection PyBroadException
+            try:
+                return win32com.client.GetObject("SAPGUI")
+            except: return None
 
     @staticmethod
-    def get_sap_application() -> GuiApplication:
-        return GuiApplication(SapGui.get_sap_gui_object().GetScriptingEngine)
+    def get_sap_application() -> Optional[GuiApplication]:
+        """ Obtém a aplicação do Sap Gui
+        Returns:
+            GuiApplication: Aplicação do Sap Gui
+        """
+        obj = SapGui.get_sap_gui_object()
+        if obj is None: return None
+        return GuiApplication(obj.GetScriptingEngine)
 
     @staticmethod
     def sap_running() -> bool:
@@ -40,7 +61,9 @@ class SapGui:
         return 'SAP GUI for Windows' in window.element_info.rich_text
 
     @staticmethod
-    def close_all_time_out_popups():
+    def close_all_popups():
+        """ Fecha popups de timeout e erros de conexão
+        """
         # noinspection PyBroadException
         try:
             popup_app = pywinauto.Application(backend='uia').connect(title_re='SAP GUI for Windows .*', found_index=0)
