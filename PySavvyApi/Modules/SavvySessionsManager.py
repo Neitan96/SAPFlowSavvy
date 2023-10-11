@@ -1,145 +1,219 @@
 from PySavvyApi.SapGuiWrapper import *
 from PySavvyApi.StdTCodes import SapTransactions
 from PySavvyApi.Modules.SapGui import SapGui
-from PySavvyApi.Modules.SavvySessionsFilter import SavvySessionsFilter
 from PySavvyApi.Modules.SavvyCredentials import SavvyCredentials
 from PySavvyApi.Modules.SavvySingIn import SavvySingIn, SingInResult, MultiLoginOption
 
+class ErrCredentiailsInvalid(Exception):
+    def __init__(self):
+        super().__init__('Credenciais do usuário inválidos')
+
+class ErrStartSAPLogon(Exception):
+    def __init__(self):
+        super().__init__('Não foi possível iniciar o SAP Logon')
+
+class ErrFillCredentials(Exception):
+    def __init__(self):
+        super().__init__('Erro ao preencher as credenciais na tela de login')
+
 class SavvySessionsManager:
+    """ Essa classe permiter o gerenciamento de sessões do SAP.
+    O objetivo dessa classe é servir como suporte para a distribuição
+    de sessões para diferentes scripts, ela vai permitir saber quantas sessões
+    tem disponíveis para uso de scripts, obter essas sessões disponíveis.
 
-    filter: SavvySessionsFilter
-    credentials: SavvyCredentials
+    Os cálculos de sessões disponíveis considera o limite de sessões por
+    conexão do SAP, mesmo que não tenha sessões abertas ou não esteja usando
+    o limite de sessões do SAP ele irá somar essas sessões que podem ser abertas.
 
-    main_menu_available: bool
-    max_sessions: int
-    save_creds: bool
-    conn_names: list[str]
+    Ao obter uma sessão disponível para uso a classe irá fazer o preparo para
+    obter a sessão, isso inclui abrir o SAP Logon, abrir conexões, abrir sessões
+    em conexões já abertas.
+    """
+
+    _credentials: SavvyCredentials
     _sap_app: GuiApplication
 
-    def __init__(self, *conn_names: str, main_menu_available: bool = True, max_sessions_per_conn: int = 6, save_creds: bool = True):
+    _transactions_is_available: list[str]
+    _max_sessions_per_conn: int
+    _save_crededentials: bool
+    _conn_descriptions: list[str]
+
+    def __init__(self, *conn_descriptions: str):
         """
         Args:
-            main_menu_available: se deseja considerar as sessões no menu principal como sessões disponiveis
-            max_sessions_per_conn: número de sessões máximas por conexão
-            save_creds: se deseja salvar as credenciais obtidas em um arquivo na pasta pessoal do usuário
-            *conn_names: nome das conexões para fazer o gerenciamento das conexões
+            *conn_descriptions: nome das conexões para fazer o gerenciamento
         """
-        self.filter = SavvySessionsFilter()
-        self.credentials = SavvyCredentials()
-        self.credentials.read_all_in_file()
+        self._credentials = SavvyCredentials()
+        self._credentials.read_all_in_file()
 
-        self.main_menu_available = main_menu_available
-        self.max_sessions = max_sessions_per_conn
-        self.save_creds = save_creds
-        self.conn_names = list(conn_names)
+        self._conn_descriptions = list(conn_descriptions)
+        self._transactions_is_available = [SapTransactions.MAIN_MENU, SapTransactions.MAIN_MENU_RETURN]
+        self._max_sessions_per_conn = 6
+        self._save_crededentials = True
         # noinspection PyTypeChecker
         self._sap_app = None
 
     @property
     def sap_app(self) -> GuiApplication:
+        """ Obtém o objeto da plaicação do SAP Gui
+        """
         if self._sap_app is None or not self._sap_app.connected_sap():
             self._sap_app = SapGui.get_sap_application()
         return self._sap_app
 
+    @property
+    def list_transactions_is_available(self) -> list[str]:
+        """ Uma lista de transações, quando uma sessão está em uma dessas
+        transações será considerada uma sessão disponivel.
+        """
+        return self._transactions_is_available
 
-    def connections(self) -> list[GuiConnection]:
-        return self._sap_app.connections_list()
+    @list_transactions_is_available.setter
+    def list_transactions_is_available(self, list_transactions_is_available: list[str]) -> None:
+        self._transactions_is_available = list_transactions_is_available
 
-    def sessions(self) -> list[GuiSession]:
-        return self._sap_app.sessions_list()
+    @property
+    def max_sessions_per_conn(self) -> int:
+        """ O limite de sessões abertas por conexão do SAP.
+        O limite padrão do SAP é 6 sessões por conexão, mas isso pode ser alterado
+        pelo adiministrador do SAP.
+        """
+        return self._max_sessions_per_conn
+
+    @max_sessions_per_conn.setter
+    def max_sessions_per_conn(self, max_sessions_per_conn: int) -> None:
+        self._max_sessions_per_conn = max_sessions_per_conn
+
+    @property
+    def save_crededentials(self) -> bool:
+        """ Se as credenciais lidas do usuário serão salvas em um arquivo na
+        pasta pessoal do usuário.
+        """
+        return self._save_crededentials
+
+    @save_crededentials.setter
+    def save_crededentials(self, save_crededentials: bool) -> None:
+        self._save_crededentials = save_crededentials
 
     def sessions_available(self) -> dict[str, int]:
+        """ Cálcula a quantidade de sessões disponiveis para uso.
+        Returns:
+            dict[str, int]: Um dicionário sendo a chave o nome da conexão e o valor a qauntidade de conexões disponiveis.
+        """
         quantity_available = {}
-        for conn in self.conn_names:
-            quantity_available[conn] = self.max_sessions
 
         connections = self.sap_app.connections_list()
         for connection in connections:
-            if connection.description in quantity_available.keys():
-                if connection.sessions_list[0].is_loged():
-                    if self.main_menu_available:
-                        quantity_available[connection.description] -= len(connection.sessions_not_in_transaction(SapTransactions.MAIN_MENU, SapTransactions.MAIN_MENU_RETURN))
-                    else:
-                        quantity_available[connection.description] -= connection.sessions.count
+            conn_description = connection.description
+            if conn_description in self._conn_descriptions and connection.sessions_list[0].is_loged():
+                if conn_description in quantity_available:
+                    quantity_available[conn_description] += self._max_sessions_per_conn
+                else:
+                    quantity_available[conn_description] = self._max_sessions_per_conn
+                quantity_available[conn_description] -= len(connection.sessions_not_in_transaction(*self._transactions_is_available))
 
+        for conn_description in self._conn_descriptions:
+            if conn_description not in quantity_available:
+                quantity_available[conn_description] = self._max_sessions_per_conn
 
         return quantity_available
 
-    def sessions_available_conn(self, conn_name: str) -> int:
-
-        connections = self.sap_app.connections_list(conn_name)
+    def sessions_available_conn(self, conn_description: str) -> int:
+        """ Cálcula a quantidade de sessões disponiveis para uso para uma conexão.
+        """
+        connections = self.sap_app.connections_list(conn_description)
         if not len(connections) > 0:
-            return self.max_sessions
+            return self._max_sessions_per_conn
 
-        quantity_available = 0
+        quantity_available = -1
         for connection in connections:
-            if connection.description == conn_name:
-                if connection.sessions_list[0].is_loged():
-                    if self.main_menu_available:
-                        quantity_available += self.max_sessions - len(connection.sessions_not_in_transaction(SapTransactions.MAIN_MENU, SapTransactions.MAIN_MENU_RETURN))
-                    else:
-                        quantity_available += self.max_sessions - connection.sessions.count
+            if connection.sessions_list[0].is_loged():
+                quantity_available += self._max_sessions_per_conn - len(connection.sessions_not_in_transaction(*self._transactions_is_available))
 
-        return quantity_available
+        return quantity_available if quantity_available >= 0 else self._max_sessions_per_conn
 
-    def singin_session(self, session: GuiSession, new_try_on_fail: bool = True) -> Optional[GuiSession]:
+    def singin_session(self, session: GuiSession) -> SingInResult:
+        """ Realiza o login de uma sessão que está na tela de login.
+        Para fazer login a função usa o gerenciador de credenciais SavvyCredentials, que
+        faz a leitura das credenciais do usuário e armazena em arquivo na pasta pessoal
+        do usuário.
+        Args:
+            session: sessão na tela de login
+        """
         conn_name = session.parent_cast.GuiConnection().description
-        username, password = self.credentials.get_credentials(conn_name=conn_name, save_in_file=self.save_creds)
-        result_login = SavvySingIn.send_credentials(session, username,password)
+        username, password = self._credentials.get_credentials(conn_name=conn_name, save_in_file=self._save_crededentials)
+        return  SavvySingIn.send_credentials(session, username,password)
 
-        if result_login == SingInResult.Sucess:
-            return session
+    def sessions_in_transactions_available(self, conn_description: str) -> list[GuiSession]:
+        """ Busca todas as sessões que estão na lista de transações disponíveis.
+        Args:
+            conn_description: descrição da conexão no SAP para fazer a busca
+        """
+        sessions = []
+        if self.sap_app is not None and len(self._transactions_is_available) > 0:
+            connections = self.sap_app.connections_list(conn_description)
+            for connection in connections:
+                sessions.extend(connection.sessions_in_transaction(*self._transactions_is_available))
+        return sessions
 
-        if result_login == SingInResult.WrongCredentials:
-            self.credentials.clear_credentials(conn_name)
-            if new_try_on_fail:
-                if not session.connected_sap():
-                    session = self.sap_app.open_connection(conn_name, True).sessions_list[0]
-                return self.singin_session(session, False)
+    def get_available_session(self, conn_description: str) -> Optional[GuiSession]:
+        """ Busca e obtém uma sessão disponível para uso.
+        Essa função prepara uma sessão para uso, isso inclui abrir o SAP Logon, abrir uma conexão e
+        abrir uma nova sessão, caso necessário, ele somente não irá retornar uma sessão caso o limite
+        de sessões abertas silmutanamentes foi atingindo.
+        Args:
+            conn_description: descrição da conexão no SAP
+        Returns:
 
-            return None
-
-        if result_login == SingInResult.PopupMultiLogin:
-            SavvySingIn.multi_login_select(session, MultiLoginOption.Exit)
-            return None
-
-        if result_login == SingInResult.ErrorFill:
-            return None
-
-    def get_available_session(self, conn_name: str) -> Optional[GuiSession]:
-        if conn_name not in self.credentials.credentials.keys():
-            self.credentials.get_credentials(conn_name=conn_name, save_in_file=self.save_creds)
-
-        if conn_name not in self.credentials.credentials.keys():
-            return None
+        """
+        if conn_description not in self._credentials.credentiails.keys():
+            self._credentials.get_credentials(conn_name=conn_description, save_in_file=self._save_crededentials)
 
         if not SapGui.sap_running():
-            SapGui.start_sap_logon()
-
-        usernames = [self.credentials.credentials[conn_name][0]]
-        connections = self.sap_app.connections_list(conn_name)
-
-        for connection in connections:
-            sessions = connection.sessions_in_transaction(SapTransactions.MAIN_MENU, SapTransactions.MAIN_MENU_RETURN)
+            if not SapGui.start_sap_logon():
+                raise ErrStartSAPLogon()
+        else:
+            sessions = self.sessions_in_transactions_available(conn_description)
             if len(sessions) > 0:
                 return sessions[0]
 
+        usernames = [self._credentials.credentiails[conn_description][0]]
+        connections = self.sap_app.connections_list(conn_description)
+
         for connection in connections:
-            sessions = connection.sessions_list
-            if not sessions[0].is_loged():
-                connection.close_connection()
+            if not connection.is_loged():
                 continue
 
-            if len(sessions) < self.max_sessions:
-                return connection.create_session()
+            if connection.sessions.count < self._max_sessions_per_conn:
+                session = connection.create_session()
+                if session is not None:
+                    return session
 
-            username = sessions[0].info.user
+            username = connection.user_loged()
             if username in usernames:
                 usernames.remove(username)
 
-        if len(usernames) > 0:
-            session_to_login = self.sap_app.open_connection(conn_name, True).sessions_list[0]
-            session_to_login = self.singin_session(session_to_login)
-            return session_to_login
+        has_wrong_pass: bool = False
+        while len(usernames) > 0:
+            session = self.sap_app.open_connection(conn_description, True).sessions.item_cast(0).GuiSession()
+            result = self.singin_session(session)
+
+            if result == SingInResult.Sucess:
+                return session
+
+            elif result == SingInResult.PopupMultiLogin:
+                SavvySingIn.multi_login_select(session, MultiLoginOption.Exit)
+
+            elif result == SingInResult.WrongCredentials:
+                self._credentials.clear_credentials(conn_description)
+                has_wrong_pass = True
+
+            elif result == SingInResult.ErrorFill:
+                session.parent_cast.GuiConnection().close_connection()
+                raise ErrFillCredentials()
+
+        if has_wrong_pass:
+            raise ErrCredentiailsInvalid()
 
         return None

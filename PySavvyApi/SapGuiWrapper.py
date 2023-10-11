@@ -4,8 +4,8 @@ import time
 from typing import Optional
 import win32com.client
 
-from .StdTCodes import SapFields, SapCommands
-from .SavvyHelper import check_strings
+from PySavvyApi.StdTCodes import SapFields, SapCommands
+from PySavvyApi.SavvyHelper import check_strings
 
 
 class GuiComponentType:
@@ -2405,6 +2405,16 @@ class GuiConnection(GuiContainer):
     As conexões podem ser abertas a partir do SAP Logon ou dos métodos openConnection e openConnectionByConnectionString do GuiApplication.
     """
 
+    def is_loged(self) -> bool:
+        """ Verifica se a conexão foi feito o login de usuário.
+        """
+        return self.sessions.item_cast(0).GuiSession().is_loged()
+
+    def user_loged(self) -> str:
+        """ Retonar o nome do usuário logado na conexão.
+        """
+        return self.sessions.item_cast(0).GuiSession().info.user
+
     def close_connection(self) -> None:
         """ Este método fecha uma conexão com todas as suas sessões.
         """
@@ -2552,7 +2562,7 @@ class GuiApplication(GuiContainer):
         """
         return self.component.DropHistory()
 
-    def open_connection(self, description: str, sync=False, on_raise: bool = True) -> GuiConnection:
+    def open_connection(self, description: str, sync=True, on_raise: bool = True) -> GuiConnection:
         """ O parâmetro Descrição deverá conter uma das descrições exibidas no SAP Logon, por exemplo, "XYZ [PÚBLICO]".
         Se você deseja criar uma nova instância SAP GUI e colocá-la em sua aplicação, você pode adicionar o sufixo "/INPLACE".
 

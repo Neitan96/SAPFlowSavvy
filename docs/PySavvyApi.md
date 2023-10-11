@@ -1,6 +1,20 @@
 # SAPFlowSavvy - Toolkit para Python
 
-### Funções adicionais implementadas
+### Funções adicionais implementadas no Wrapper
+
+- SapGuiConnection:
+  - **is_loged()** → *bool*: Verifica se a conexão foi feito o login de usuário.
+  - **user_loged()** → *str*: Retonar o nome do usuário logado na conexão.
+  - **create_session()** → *GuiSession*: Abre uma nova sessão na conexão.
+  - **sessions_list** → *list[GuiSession]*: Retorna uma lista com as sessões.
+  - **sessions_user(user_name: str)** → *list[GuiSession]*: Obtém todas as sessões do usuário.
+  - **sessions_in_transaction(transaction: str)** → *list[GuiSession]*: Obtém todas as sessões do usuário.
+
+
+- GuiSession:
+  - **get_alert_status_pane()** → *GuiStatusPane*: Obtém a barra de alerta principal.
+  - **send_key(v_key: int)** → *None*: A chave virtual v_key é executada na janela ativa da sessão.
+
 
 - GuiComponent:
   - **parent_cast** → *ComponentCast*:  Retorna o Parent pronto para fazer o Cast.
@@ -10,13 +24,6 @@
 
 - GuiContainer:
   - **find_by_id_cast(id: str, on_raise: bool = True)** → *ComponentCast*:  O Componente será retornado em uma classe de cast para fazer o hint no tipo desejado.
-
-
-- SapGuiConnection:
-  - **create_session()** → *GuiSession*: Abre uma nova sessão na conexão.
-  - **sessions_list** → *list[GuiSession]*: Retorna uma lista com as sessões.
-  - **sessions_user(user_name: str)** → *list[GuiSession]*: Obtém todas as sessões do usuário.
-  - **sessions_in_transaction(transaction: str)** → *list[GuiSession]*: Obtém todas as sessões do usuário.
 
 
 - GuiComponentCollection:
@@ -32,11 +39,6 @@
 
 - GuiFrameWindow:
   - **set_focus_windows()** → *None*: Isso faz o windows focar na janela indepedente do estado atual do mesmo.
-
-
-- GuiSession:
-  - **get_alert_status_pane()** → *GuiStatusPane*: Obtém a barra de alerta principal.
-  - **send_key(v_key: int)** → *None*: A chave virtual v_key é executada na janela ativa da sessão.
 
 
 - GuiStatusPane:

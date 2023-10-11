@@ -1,4 +1,4 @@
-from .SavvyHelper import check_strings
+from PySavvyApi.SavvyHelper import check_strings
 
 
 class SavvyLogger:

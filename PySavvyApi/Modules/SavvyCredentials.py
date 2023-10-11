@@ -1,10 +1,9 @@
-from typing import Optional
 import configparser
 import re
 import os
 
-from ..SavvyLogger import SavvyLogger
-from ..SavvyHelper import inputbox_text, inputbox_password, inputbox_yes_no, check_strings
+from PySavvyApi.SavvyLogger import SavvyLogger
+from PySavvyApi.SavvyHelper import inputbox_text, inputbox_password, inputbox_yes_no, check_strings
 
 
 class SavvyCredentials:
@@ -15,19 +14,27 @@ class SavvyCredentials:
     uma nova conexão.
     """
 
-    file_path: str
-    credentials: dict[str, list[str]]
+    _file_path: str
+    _credentials: dict[str, list[str]]
 
-    def __init__(self, file_path: Optional[str] = os.path.expanduser('~\\sapusercredentials.creds')):
-        """
-        Args:
-            file_path (str): caminho do arquivo para armazenar credenciais,
-                para desabilitar o armazenamento em arquivo passa esse parâmetro como None
-        """
-
-        self.file_path = file_path
-        self.credentials = {}
+    def __init__(self):
+        self._file_path = os.path.expanduser('~\\sapusercredentials.creds')
+        self._credentials = {}
         self.read_all_in_file()
+
+    @property
+    def file_path_credentials(self) -> str:
+        """ Caminho do arquivo para salvar as credenciais do usuário
+        """
+        return self._file_path
+
+    @file_path_credentials.setter
+    def file_path_credentials(self, file_path: str):
+        self._file_path = file_path
+
+    @property
+    def credentiails(self):
+        return self._credentials
 
     def get_credentials(self, conn_name: str = 'Default', force_read: bool = False, save_in_file: bool = True) -> (str, str):
         """ Obtém a crendencial SAP do usuário
@@ -42,17 +49,17 @@ class SavvyCredentials:
             force_read (bool): força a leitura das credenciais mesmo que ela já esteja em cache.
         """
 
-        if not force_read and conn_name in self.credentials:
-            return self.credentials[conn_name][0], self.credentials[conn_name][1]
+        if not force_read and conn_name in self._credentials:
+            return self._credentials[conn_name][0], self._credentials[conn_name][1]
 
-        if self.file_path is not None:
+        if self._file_path is not None:
             if self.read_in_file(conn_name) or \
                     (self.read_input_box(conn_name) and (not save_in_file or self.write_in_file(conn_name))):
-                return self.credentials[conn_name][0], self.credentials[conn_name][1]
+                return self._credentials[conn_name][0], self._credentials[conn_name][1]
 
         else:
             if self.read_input_box(conn_name):
-                return self.credentials[conn_name][0], self.credentials[conn_name][1]
+                return self._credentials[conn_name][0], self._credentials[conn_name][1]
 
         return None, None
 
@@ -62,8 +69,8 @@ class SavvyCredentials:
         """
         # noinspection PyBroadException
         try:
-            self.credentials = {}
-            os.remove(self.file_path)
+            self._credentials = {}
+            os.remove(self._file_path)
             return True
         except:
             SavvyLogger.error('Savvy Creds', 'Erro ao limpar todas as credenciais.')
@@ -77,15 +84,15 @@ class SavvyCredentials:
         """
         # noinspection PyBroadException
         try:
-            if conn_name in self.credentials: self.credentials.pop(conn_name)
+            if conn_name in self._credentials: self._credentials.pop(conn_name)
 
             parse = configparser.ConfigParser()
-            parse.read(self.file_path)
+            parse.read(self._file_path)
             conn_session = SavvyCredentials.__conn_name_to_session(conn_name)
 
             if parse.has_section(conn_session):
                 parse.remove_section(conn_session)
-                with open(self.file_path, 'w') as configfile:
+                with open(self._file_path, 'w') as configfile:
                     parse.write(configfile)
                 return True
 
@@ -114,7 +121,7 @@ class SavvyCredentials:
             password = inputbox_password('Login SAP', desc_conn_pass)
 
             if check_strings(user_name, password):
-                self.credentials[conn_name] = [user_name, password]
+                self._credentials[conn_name] = [user_name, password]
                 return True
             else:
                 if inputbox_yes_no('Credenciais inválidas',
@@ -140,21 +147,21 @@ class SavvyCredentials:
         Args:
             conn_name (str): Nome da conexão das credenciais.
         """
-        if self.file_path is None: return False
+        if self._file_path is None: return False
 
         parse: configparser.ConfigParser
         # noinspection PyBroadException
         try:
             parse = configparser.ConfigParser()
-            parse.read(self.file_path)
+            parse.read(self._file_path)
         except:
             SavvyLogger.error('Savvy Creds', 'Não foi possivel fazer a leitura do arquivo de credenciais')
             return False
 
         conn_session = SavvyCredentials.__conn_name_to_session(conn_name)
 
-        user_name = self.credentials[conn_name][0]
-        password = self.credentials[conn_name][1]
+        user_name = self._credentials[conn_name][0]
+        password = self._credentials[conn_name][1]
 
         if check_strings(user_name, password):
             # noinspection PyBroadException
@@ -163,7 +170,7 @@ class SavvyCredentials:
                 parse.set(conn_session, 'username', user_name)
                 parse.set(conn_session, 'password', password)
                 parse.set(conn_session, 'connection', conn_name)
-                with open(self.file_path, 'w') as configfile:
+                with open(self._file_path, 'w') as configfile:
                     parse.write(configfile)
                 return True
             except:
@@ -174,9 +181,9 @@ class SavvyCredentials:
     def write_all_in_file(self) -> bool:
         """ Armazena todas as credenciais do cache no arquivo de credenciais
         """
-        if self.file_path is None: return False
+        if self._file_path is None: return False
         result = True
-        for conn_name in self.credentials.keys():
+        for conn_name in self._credentials.keys():
             result = self.write_in_file(conn_name) and result
         return result
 
@@ -186,13 +193,13 @@ class SavvyCredentials:
         Args:
             conn_name (str): Nome da conexão das credenciais.
         """
-        if self.file_path is None: return False
+        if self._file_path is None: return False
 
         parse: configparser.ConfigParser
         # noinspection PyBroadException
         try:
             parse = configparser.ConfigParser()
-            parse.read(self.file_path)
+            parse.read(self._file_path)
         except:
             SavvyLogger.error('Savvy Creds', 'Não foi possivel fazer a leitura do arquivo de credenciais')
             return False
@@ -205,7 +212,7 @@ class SavvyCredentials:
         password = parse[conn_session]['password']
 
         if check_strings(user_name, password):
-            self.credentials[conn_name] = [user_name, password]
+            self._credentials[conn_name] = [user_name, password]
             return True
 
     def read_all_in_file(self) -> bool:
@@ -216,7 +223,7 @@ class SavvyCredentials:
         # noinspection PyBroadException
         try:
             parse = configparser.ConfigParser()
-            parse.read(self.file_path)
+            parse.read(self._file_path)
         except:
             SavvyLogger.error('Savvy Creds', 'Não foi possivel fazer a leitura do arquivo de credenciais')
             return False
@@ -227,6 +234,6 @@ class SavvyCredentials:
             conn_name = parse[conn_session]['connection']
 
             if check_strings(user_name, password, conn_name):
-                self.credentials[conn_name] = [user_name, password]
+                self._credentials[conn_name] = [user_name, password]
 
         return True

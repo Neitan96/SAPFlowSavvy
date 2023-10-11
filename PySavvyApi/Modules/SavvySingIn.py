@@ -18,6 +18,11 @@ class MultiLoginOption(Enum):
     Force = 1
 
 class SavvySingIn:
+    """ Essa classe permite realizar ações de login no SAP.
+    ALgumas das possibilidades é o preenchimento das credenciais,
+    tratamentos pós-login, como o fechamento de pop-ups ao fazer login
+    e ações ao abrir o pop-up de multi login do SAP.
+    """
 
     @staticmethod
     def close_popups_after_singin(session: GuiSession) -> None:

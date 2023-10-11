@@ -6,12 +6,11 @@ from PySavvyApi.StdTCodes import *
 # isso inclui abrir o sap quando não estiver aberto, abrir sessão quando não tiver sessão
 # aberta disponível para uso, se deseja considerar sessões no menu principal como sessões
 # disponíveis para uso defina o parâmetro main_menu_available como verdadeiro.
-sessions_manager = SavvySessionsManager(SapConnNames.ECC, SapConnNames.EWM, main_menu_available=True)
+sessions_manager = SavvySessionsManager(SapConnNames.ECC, SapConnNames.EWM)
 
 # Aqui obtemos uma sessão disponível para uso com o gerenciador.
 session = sessions_manager.get_available_session(SapConnNames.EWM)
 
-# A parti daqui começamos a automatização do SAP.
 if not session.start_transaction('VA03'):
     print('Erro: Não foi possivel iniciar a transação VA03 pelo usuário ' + session.info.user)
     exit(0)

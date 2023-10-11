@@ -5,7 +5,7 @@ import pywinauto
 import win32com.client
 import os
 
-from ..SapGuiWrapper import GuiApplication
+from PySavvyApi.SapGuiWrapper import GuiApplication
 
 class SapGui:
     """ Classe feita para fazer manipulação na aplicação do Sap Gui.
