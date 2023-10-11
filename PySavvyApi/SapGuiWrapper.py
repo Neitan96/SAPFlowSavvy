@@ -4,7 +4,7 @@ import time
 from typing import Optional
 import win32com.client
 
-from PySavvyApi.StdTCodes import SapFields, SapCommands
+from PySavvyApi.StdTCodes import SapFields, SapCommands, SapTransactions
 from PySavvyApi.SavvyHelper import check_strings
 
 
@@ -1987,10 +1987,22 @@ class GuiSession(GuiContainer):
     É, portanto, o ponto de acesso para aplicações, que gravam as ações de um usuário em relação a uma tarefa específica ou reproduzem essas ações.
     """
 
+    def return_to_menu(self) -> None:
+        """ Retorna ao menu principal.
+        """
+        if self.info.transaction not in (SapTransactions.MAIN_MENU, SapTransactions.MAIN_MENU_RETURN):
+            self.send_command(SapCommands.RETURN_MENU)
+
     def is_loged(self) -> bool:
+        """ Verifica se essa sessão está logada.
+        """
         return check_strings(self.info.user)
 
     def user_area(self, window: int = 0) -> GuiUserArea:
+        """ Obtém GuiUserArea de uma janela da sessão.
+        Args:
+            window: número da janela
+        """
         return self.find_by_id_cast('wnd[' + str(window) + ']/usr').GuiUserArea()
 
     def send_v_key(self, v_key: int) -> None:
@@ -2042,6 +2054,15 @@ class GuiSession(GuiContainer):
     def close_session(self, ignore_popup_logoff: bool = False) -> None:
         if ignore_popup_logoff and self.parent_cast.GuiConnection().sessions.count <= 1:
             self.send_command(SapCommands.CLOSE_ALL_SESSIONS)
+        else:
+            self.send_command(SapCommands.CLOSE_SESSION)
+
+    def close_session_or_menu(self) -> None:
+        """ Essa função fecha a sessão caso tiver mais sessões abertas na mesma conexão
+        caso essa for a única sessão aberta na conexão ele irá retornar para o menu principal.
+        """
+        if self.parent_cast.GuiConnection().sessions.count <= 1:
+            self.send_command(SapCommands.RETURN_MENU)
         else:
             self.send_command(SapCommands.CLOSE_SESSION)
 

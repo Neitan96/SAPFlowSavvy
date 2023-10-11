@@ -157,13 +157,14 @@ class SavvySessionsManager:
                 sessions.extend(connection.sessions_in_transaction(*self._transactions_is_available))
         return sessions
 
-    def get_available_session(self, conn_description: str) -> Optional[GuiSession]:
+    def get_available_session(self, conn_description: str, transaction_start: str) -> Optional[GuiSession]:
         """ Busca e obtém uma sessão disponível para uso.
         Essa função prepara uma sessão para uso, isso inclui abrir o SAP Logon, abrir uma conexão e
         abrir uma nova sessão, caso necessário, ele somente não irá retornar uma sessão caso o limite
         de sessões abertas silmutanamentes foi atingindo.
         Args:
             conn_description: descrição da conexão no SAP
+            transaction_start: transação para iniciar a sessão
         Returns:
 
         """
@@ -176,7 +177,9 @@ class SavvySessionsManager:
         else:
             sessions = self.sessions_in_transactions_available(conn_description)
             if len(sessions) > 0:
-                return sessions[0]
+                session = sessions[0]
+                session.start_transaction(transaction_start)
+                return session
 
         usernames = [self._credentials.credentiails[conn_description][0]]
         connections = self.sap_app.connections_list(conn_description)
@@ -188,6 +191,7 @@ class SavvySessionsManager:
             if connection.sessions.count < self._max_sessions_per_conn:
                 session = connection.create_session()
                 if session is not None:
+                    session.start_transaction(transaction_start)
                     return session
 
             username = connection.user_loged()
@@ -200,6 +204,7 @@ class SavvySessionsManager:
             result = self.singin_session(session)
 
             if result == SingInResult.Sucess:
+                session.start_transaction(transaction_start)
                 return session
 
             elif result == SingInResult.PopupMultiLogin:

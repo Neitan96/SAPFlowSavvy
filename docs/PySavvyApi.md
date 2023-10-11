@@ -14,6 +14,9 @@
 - GuiSession:
   - **get_alert_status_pane()** → *GuiStatusPane*: Obtém a barra de alerta principal.
   - **send_key(v_key: int)** → *None*: A chave virtual v_key é executada na janela ativa da sessão.
+  - **return_to_menu()** → *None*: Retorna ao menu principal.
+  - **is_loged()** → *None*: Verifica se essa sessão está logada.
+  - **user_area(window: int = 0)** → *None*: Obtém GuiUserArea de uma janela da sessão.
 
 
 - GuiComponent:

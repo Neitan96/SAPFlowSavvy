@@ -9,7 +9,7 @@ from PySavvyApi.StdTCodes import *
 sessions_manager = SavvySessionsManager(SapConnNames.ECC, SapConnNames.EWM)
 
 # Aqui obtemos uma sessão disponível para uso com o gerenciador.
-session = sessions_manager.get_available_session(SapConnNames.EWM)
+session = sessions_manager.get_available_session(SapConnNames.EWM, 'VA03')
 
 if not session.start_transaction('VA03'):
     print('Erro: Não foi possivel iniciar a transação VA03 pelo usuário ' + session.info.user)
