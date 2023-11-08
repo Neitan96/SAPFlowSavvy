@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from typing import Optional
 import win32com.client
@@ -1196,11 +1197,62 @@ class GuiComponent:
     """ GuiComponent é a classe base para a maioria das classes na API de script do SAP.
     """
 
-    component: win32com.client.CDispatch
+    _component: win32com.client.CDispatch
+    _session_cache: Optional[GuiSession]
+    _id_cache: Optional[str]
 
     def __init__(self, component: win32com.client.CDispatch):
         # self.class_attrs = ['component']
-        self.component = component
+        self._component = component
+
+        # noinspection PyBroadException
+        try:
+            self._id_cache = self.id
+        except: pass
+
+        self._session_cache = None
+
+    @property
+    def component(self):
+        if hasattr(self, '_session_cache') and hasattr(self, '_id_cache'):
+            if self._session_cache is not None and self._id_cache is not None:
+                if not self.connected_sap():
+                    # noinspection PyBroadException
+                    try:
+                        self._component = self._session_cache.find_by_id(self._id_cache).component
+                    except: pass
+        return self._component
+
+    @component.setter
+    def component(self, component: win32com.client.CDispatch):
+        self._component = component
+        self._id_cache = self.id
+
+    def get_session(self) -> Optional[GuiSession]:
+
+        if self.type_as_number == GuiSession:
+            # noinspection PyTypeChecker
+            return self
+
+        # noinspection PyBroadException
+        try:
+            comp_now = self.component.Parent
+            while comp_now is not None:
+                if comp_now.TypeAsNumber == GuiComponentType.GuiSession:
+                    return GuiSession(comp_now)
+                comp_now = comp_now.Parent
+        except: pass
+
+        return None
+
+    def get_indexes(self) -> (int | None, int | None):
+        # TODO Adicionar na lista de funções criadas
+        # TODO Criar a documentação
+        pattern = r'\[([0-9]+),([0-9]+)\]'
+        result = re.findall(pattern, self.id)
+        if len(result) > 0:
+            return int(result[0][0]), int(result[0][1])
+        return None, None
 
     @property
     def is_container_type(self) -> bool:
@@ -1264,10 +1316,10 @@ class GuiComponent:
         # noinspection PyBroadException
         try:
             # noinspection PyStatementEffect
-            self.type_as_number
+            self._component.TypeAsNumber
             return True
-        except:
-            return False
+        except: pass
+        return False
 
 
 class GuiVComponent(GuiComponent):
@@ -1520,6 +1572,20 @@ class GuiContainer(GuiComponent):
         """
         result = self.component.findById(id_element, on_raise)
         return ComponentCast(result)
+
+    def find_children_by_text(self, value: str, ignore_case: bool = False) -> Optional[GuiComponent]:
+        # TODO Colocar na lista de funções criadas
+        # TODO Criar documentação
+        all_comps = self.children
+        for item_index in range(all_comps.length):
+            comp = all_comps.item(item_index)
+            # noinspection PyBroadException
+            try:
+                text = comp.component.Text
+                if text is not None and (ignore_case and text.lower() == value.lower()) or (text == value):
+                    return comp
+            except: pass
+        return None
 
     @property
     def children(self) -> GuiComponentCollection:
@@ -2747,6 +2813,25 @@ class GuiScrollbar:
     def __init__(self, component: win32com.client.CDispatch):
         # self.class_attrs = ['component']
         self.component = component
+
+    def next_page(self):
+        # TODO Colocar na lista de funções criadas
+        # TODO Criar a documentação
+        page_size = self.page_size
+        position_now = self.position
+        position_next = position_now + page_size
+        maximum = self.maximum
+
+        if position_next > maximum:
+            if maximum == position_now: return
+            else: self.position = maximum
+        else:
+            self.position = position_next
+
+    def in_last_page(self) -> bool:
+        # TODO Colocar na lista de funções criadas
+        # TODO Criar a documentação
+        return self.position + self.page_size >= self.maximum
 
     @property
     def maximum(self) -> int:
@@ -5156,6 +5241,21 @@ class GuiTableRow(GuiComponentCollection):
 
     # TODO Funções de auxilio
 
+    def find_column_index(self, item_name: str) -> int:
+        item_name = item_name.lower()
+        for column_index in range(self.count):
+            if self.item(column_index).name.lower() == item_name:
+                return column_index
+        return -1
+
+    def find_column_text(self, item_name: str) -> Optional[str]:
+        item_name = item_name.lower()
+        for column_index in range(self.count):
+            item = self.item(column_index)
+            if item.name.lower() == item_name:
+                return item.component.Text
+        return None
+
     @property
     def selectable(self) -> bool:
         """ Esta propriedade será True se a linha puder ser selecionada.
@@ -5180,6 +5280,48 @@ class GuiTableControl(GuiVContainer):
     O prefixo do tipo é tbl, o nome é o nome do campo retirado do dicionário de dados SAP.
     """
     # TODO Funções adicionais
+
+    def __init__(self, component: win32com.client.CDispatch):
+        super().__init__(component)
+        self._session_cache = self.get_session()
+
+    def find_column_index(self, column_name: str):
+        # TODO Colocar na lista de funções criadas
+        # TODO Criar a documentação
+        columns = self.columns
+        for column_index in range(0, columns.count):
+            # noinspection PyTypeChecker
+            column = GuiTableColumn(columns.item(column_index))
+            if column.name == column_name:
+                return column_index
+        return -1
+
+    def find_values_text(self, column_name: str, column_type: int, values_search: list[str]):
+        # TODO Colocar na lista de funções criadas
+        # TODO Criar a documentação
+
+        self.vertical_scrollbar.position = 0
+        page_size = self.vertical_scrollbar.page_size
+        maximum_itens = self.vertical_scrollbar.maximum
+        column_index = self.find_column_index(column_name)
+        rows_find = {}
+
+        while True:
+
+            for v_index in range(page_size):
+                # noinspection PyBroadException
+                try:
+                    comp = self.get_cell(v_index, column_index).component
+                    text = comp.text
+                    if text in values_search:
+                        rows_find[text] = self.vertical_scrollbar.position + v_index
+                except: continue
+
+            if len(values_search) <= len(rows_find): break
+            if self.vertical_scrollbar.in_last_page(): break
+            else: self.vertical_scrollbar.next_page()
+
+        return rows_find
 
     def configure_layout(self) -> GuiModalWindow:
         """ Na caixa de diálogo de configuração o layout da tabela pode ser alterado. Esta caixa de diálogo é uma GuiModalWindow.
