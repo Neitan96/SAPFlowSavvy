@@ -2831,7 +2831,7 @@ class GuiScrollbar:
     def in_last_page(self) -> bool:
         # TODO Colocar na lista de funções criadas
         # TODO Criar a documentação
-        return self.position + self.page_size >= self.maximum
+        return self.position + self.page_size > self.maximum
 
     @property
     def maximum(self) -> int:
@@ -5296,19 +5296,19 @@ class GuiTableControl(GuiVContainer):
                 return column_index
         return -1
 
-    def find_values_text(self, column_name: str, column_type: int, values_search: list[str]):
+    def find_values_text(self, column_name: str, values_search: list[str]):
         # TODO Colocar na lista de funções criadas
         # TODO Criar a documentação
 
         self.vertical_scrollbar.position = 0
         page_size = self.vertical_scrollbar.page_size
-        maximum_itens = self.vertical_scrollbar.maximum
+        maximum = self.vertical_scrollbar.maximum
         column_index = self.find_column_index(column_name)
         rows_find = {}
 
         while True:
 
-            for v_index in range(page_size):
+            for v_index in range(min(page_size, maximum-self.vertical_scrollbar.position+1)):
                 # noinspection PyBroadException
                 try:
                     comp = self.get_cell(v_index, column_index).component

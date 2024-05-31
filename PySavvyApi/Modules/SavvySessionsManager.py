@@ -1,3 +1,5 @@
+import time
+
 from PySavvyApi.SapGuiWrapper import *
 from PySavvyApi.StdTCodes import SapTransactions
 from PySavvyApi.Modules.SapGui import SapGui
@@ -119,6 +121,38 @@ class SavvySessionsManager:
 
         return quantity_available
 
+    def sessions_not_available(self) -> list[(GuiConnection, int)]:
+        """ Cálcula a quantidade de sessões sendo usadas
+        Returns:
+            dict[GuiConnection, int]: Um dicionário sendo a chave o nome da conexão e o valor a qauntidade de conexões em uso.
+        """
+        quantity_available = []
+
+        sap = self.sap_app
+        if sap is None:
+            return quantity_available
+
+        connections = sap.connections_list()
+
+        if connections is None or len(connections) == 0:
+            return quantity_available
+
+        for connection in connections:
+            conn_description = connection.description
+            if conn_description in self._conn_descriptions and connection.sessions_list[0].is_loged():
+                quantity_available.append((connection, len(connection.sessions_not_in_transaction(*self._transactions_is_available))))
+
+        return quantity_available
+
+    def close_connections_not_used(self) -> None:
+        """ Fecha todas as conexões que não estão sendo usadas.
+        """
+        connections = self.sessions_not_available()
+        for (connection, sessions_used) in connections:
+            connection: GuiConnection
+            if sessions_used == 0:
+                connection.close_connection()
+
     def sessions_available_conn(self, conn_description: str) -> int:
         """ Cálcula a quantidade de sessões disponiveis para uso para uma conexão.
         """
@@ -171,6 +205,8 @@ class SavvySessionsManager:
         if conn_description not in self._credentials.credentiails.keys():
             self._credentials.get_credentials(conn_name=conn_description, save_in_file=self._save_crededentials)
 
+        SapGui.close_all_popups()
+
         if not SapGui.sap_running():
             if not SapGui.start_sap_logon():
                 raise ErrStartSAPLogon()
@@ -209,6 +245,7 @@ class SavvySessionsManager:
 
             elif result == SingInResult.PopupMultiLogin:
                 SavvySingIn.multi_login_select(session, MultiLoginOption.Exit)
+                time.sleep(60)
 
             elif result == SingInResult.WrongCredentials:
                 self._credentials.clear_credentials(conn_description)

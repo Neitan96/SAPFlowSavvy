@@ -66,7 +66,7 @@ class SapGui:
         """
         # noinspection PyBroadException
         try:
-            popup_app = pywinauto.Application(backend='uia').connect(title_re='SAP GUI for Windows .*', found_index=0)
+            popup_app = pywinauto.Application(backend='uia').connect(title_re='SAP GUI for Windows .*', found_index=0, timeout=15)
             windows_search = list(filter(SapGui.__filter_windows_titles, popup_app.windows()))
 
             for popup_window in windows_search:
