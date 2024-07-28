@@ -1255,6 +1255,18 @@ class GuiComponent:
         return None, None
 
     @property
+    def component_cache(self) -> bool:
+        return self._session_cache is not None
+
+    @component_cache.setter
+    def component_cache(self, value: bool):
+        if value:
+            if self._session_cache is None:
+                self._session_cache = self.get_session()
+        else:
+            self._session_cache = None
+
+    @property
     def is_container_type(self) -> bool:
         """ Retorna True se o objeto é um container
         """
@@ -1564,6 +1576,16 @@ class GuiContainer(GuiComponent):
         if result is not None: return ComponentCast.get_instance(result)
         return None
 
+    def press_by_id(self, id_element: str, on_raise: bool = True):
+        """ Pressione o botão ou controle com o ID fornecido."""
+        result = self.component.findById(id_element, on_raise)
+        if result is not None: result.Press()
+
+    def set_text_by_id(self, id_element: str, text: str, on_raise: bool = True):
+        """ Defina o texto do campo de texto com o ID fornecido."""
+        result = self.component.findById(id_element, on_raise)
+        if result is not None: result.Text = text
+
     def find_by_id_cast(self, id_element: str, on_raise: bool = False) -> Optional[ComponentCast]:
         """ Pesquise nos descendentes do objeto um determinado objeto que corresponde ao ID.
         Se nenhum descendente com o ID fornecido puder ser encontrado, a função gera uma exceção,
@@ -1649,6 +1671,20 @@ class GuiVContainer(GuiVComponent, GuiContainer):
                 pass
 
         return None
+
+    def press_by_name(self, name: str, type_component: str, on_raise: bool = True):
+        """ Pressione o botão ou controle com o nome fornecido."""
+        result = self.component.FindByName(name, type_component)
+        if on_raise and result is None:
+            raise Exception(f"Component not found with name: {name} and type: {type_component}")
+        if result is not None: result.Press()
+
+    def set_text_by_name(self, name: str, type_component: str, text: str, on_raise: bool = True):
+        """ Defina o texto do campo de texto com o nome fornecido."""
+        result = self.component.FindByName(name, type_component)
+        if on_raise and result is None:
+            raise Exception(f"Component not found with name: {name} and type: {type_component}")
+        if result is not None: result.Text = text
 
     def find_by_name_ex(self, name: str, type_component: int, on_raise: bool = True) -> Optional[GuiComponentCollection]:
         """ Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
@@ -2634,12 +2670,12 @@ class GuiApplication(GuiContainer):
         """
         return self.component.AddHistoryEntry(field_name, value)
 
-    def create_gui_collection(self) -> object:
+    def create_gui_collection(self) -> GuiCollection:
         """ Algumas funções aceitam coleções como parâmetros.
         Esta função cria um objeto de coleção independente da linguagem de script usada.
         """
         # TODO
-        return self.component.CreateGuiCollection()
+        return GuiCollection(self.component.CreateGuiCollection())
 
     def drop_history(self) -> bool:
         """ Chamar esta função excluirá todas as entradas do histórico de entrada.
@@ -2814,7 +2850,7 @@ class GuiScrollbar:
         # self.class_attrs = ['component']
         self.component = component
 
-    def next_page(self):
+    def next_page(self, ignore_maximum: bool = False):
         # TODO Colocar na lista de funções criadas
         # TODO Criar a documentação
         page_size = self.page_size
@@ -2822,7 +2858,7 @@ class GuiScrollbar:
         position_next = position_now + page_size
         maximum = self.maximum
 
-        if position_next > maximum:
+        if not ignore_maximum and position_next > maximum:
             if maximum == position_now: return
             else: self.position = maximum
         else:
@@ -3136,6 +3172,46 @@ class GuiShell(GuiVContainer):
 class GuiGridView(GuiShell):
     """ A visualização em grade é semelhante ao controle de tabela dynpro, mas significativamente mais poderosa.
     """
+
+    def extract_data(self, columns: Optional[list[str]] = None) -> list[list[str]]:
+        if columns is None:
+            columns = self.column_order.to_list()
+            columns = [str(column) for column in columns]
+
+        self.component_cache = True
+        row_count = self.row_count
+        page_size = self.visible_row_count
+        position_now = 0
+        data_table = []
+
+        self.set_current_cell(position_now, columns[0])
+        for row in range(row_count):
+            if row > position_now + page_size:
+                position_now = row + page_size - 1
+                position_now = min(row_count-1, position_now)
+                self.set_current_cell(position_now, columns[0])
+
+            data_row = [self.get_cell_value(row, column) for column in columns]
+            data_table.append(data_row)
+
+        return data_table
+
+    def double_click_proc_cell(self, column: str, value_search: str):
+
+        self.component_cache = True
+        row_count = self.row_count
+        page_size = self.visible_row_count
+        position_now = 0
+
+        self.set_current_cell(position_now, column)
+        for row in range(row_count):
+            if row > position_now + page_size:
+                position_now = row + page_size - 1
+                position_now = min(row_count-1, position_now)
+                self.set_current_cell(position_now, column)
+
+            if str(self.get_cell_value(row, column)) == value_search:
+                self.double_click(row, column)
 
     def clear_selection(self) -> None:
         """ Chamar ClearSelection remove todas as seleções de linhas, colunas e células.
@@ -3554,11 +3630,10 @@ class GuiGridView(GuiShell):
         return self.component.ColumnCount
 
     @property
-    def column_order(self) -> object:
+    def column_order(self) -> GuiCollection:
         """ Esta coleção contém todos os identificadores de coluna na ordem em que estão atualmente exibidos.
         """
-        # TODO Verificar retorno
-        return self.component.ColumnOrder
+        return GuiCollection(self.component.ColumnOrder)
 
     @column_order.setter
     def column_order(self, order: object = None) -> None:
@@ -5295,6 +5370,22 @@ class GuiTableControl(GuiVContainer):
             if column.name == column_name:
                 return column_index
         return -1
+
+    def fill_column(self, column_name: str, column_type_base: str, values: list[str]):
+        column_index = self.find_column_index(column_name)
+
+        position = -1
+        for value_str in values:
+            position += 1
+            scrollbar = self.vertical_scrollbar
+
+            if position >= scrollbar.page_size:
+                scrollbar.position = scrollbar.position + scrollbar.page_size - 1
+                position = 1
+
+            field_id = column_type_base + column_name + ('[{},{}]'.format(column_index, position))
+
+            self.set_text_by_id(field_id, value_str)
 
     def find_values_text(self, column_name: str, values_search: list[str]):
         # TODO Colocar na lista de funções criadas
