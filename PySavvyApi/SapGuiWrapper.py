@@ -3173,7 +3173,7 @@ class GuiGridView(GuiShell):
     """ A visualização em grade é semelhante ao controle de tabela dynpro, mas significativamente mais poderosa.
     """
 
-    def extract_data(self, columns: Optional[list[str]] = None) -> list[list[str]]:
+    def extract_data(self, columns: Optional[list[str]] = None, delay_page: float = 0) -> list[list[str]]:
         if columns is None:
             columns = self.column_order.to_list()
             columns = [str(column) for column in columns]
@@ -3190,6 +3190,8 @@ class GuiGridView(GuiShell):
                 position_now = row + page_size - 1
                 position_now = min(row_count-1, position_now)
                 self.set_current_cell(position_now, columns[0])
+                if delay_page > 0:
+                    time.sleep(delay_page)
 
             data_row = [self.get_cell_value(row, column) for column in columns]
             data_table.append(data_row)
@@ -3212,6 +3214,7 @@ class GuiGridView(GuiShell):
 
             if str(self.get_cell_value(row, column)) == value_search:
                 self.double_click(row, column)
+                return
 
     def clear_selection(self) -> None:
         """ Chamar ClearSelection remove todas as seleções de linhas, colunas e células.

@@ -53,7 +53,8 @@ class SapGui:
     def __filter_buttons_no(element):
         return (element.element_info.class_name == 'Button'
                 and element.element_info.control_type == 'Button'
-                and (element.element_info.rich_text == 'Não' or element.element_info.rich_text == 'No')
+                and (element.element_info.rich_text == 'Não' or element.element_info.rich_text == 'No'
+                     or element.element_info.rich_text == 'OK')
                 )
 
     @staticmethod
