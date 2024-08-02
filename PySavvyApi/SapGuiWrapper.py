@@ -1104,6 +1104,306 @@ class ComponentCast:
         return GuiComponent(sap_component)
 
 
+class FindNameCast:
+
+        _component: win32com.client.CDispatch
+        _name: str
+        _find_all: bool
+
+        def __init__(self, component: win32com.client.CDispatch, name: str, find_all: bool) -> None:
+            self._component = component
+            self._name = name
+            self._find_all = find_all
+
+        def _find_by_name(self, type: int) -> Optional[win32com.client.CDispatch]:
+            if self._component is None: return None
+            if self._find_all:
+                return self._component.FindAllByNameEx(self._name, type)
+            return self._component.FindByNameEx(self._name, type)
+
+        def GuiComponent(self) -> Optional[GuiComponent]:
+            if self._component is None: return None
+            return GuiComponent(self._find_by_name(GuiComponentType.GuiComponent))
+
+        def GuiScrollbar(self) -> Optional[GuiScrollbar]:
+            if self._component is None: return None
+            return GuiScrollbar(self._find_by_name(GuiComponentType.GuiScrollbar))
+
+        def GuiComponentCollection(self) -> Optional[GuiComponentCollection]:
+            if self._component is None: return None
+            return GuiComponentCollection(self._find_by_name(GuiComponentType.GuiComponentCollection))
+
+        def GuiTableColumn(self) -> Optional[GuiTableColumn]:
+            if self._component is None: return None
+            return GuiTableColumn(self._find_by_name(GuiComponentType.GuiTableColumn))
+
+        def GuiTableRow(self) -> Optional[GuiTableRow]:
+            if self._component is None: return None
+            return GuiTableRow(self._find_by_name(GuiComponentType.GuiTableRow))
+
+        def GuiContainer(self) -> Optional[GuiContainer]:
+            if self._component is None: return None
+            return GuiContainer(self._find_by_name(GuiComponentType.GuiContainer))
+
+        def GuiCollection(self) -> Optional[GuiCollection]:
+            if self._component is None: return None
+            return GuiCollection(self._find_by_name(GuiComponentType.GuiCollection))
+
+        def GuiVComponent(self) -> Optional[GuiVComponent]:
+            if self._component is None: return None
+            return GuiVComponent(self._find_by_name(GuiComponentType.GuiVComponent))
+
+        def GuiVHViewSwitch(self) -> Optional[GuiVHViewSwitch]:
+            if self._component is None: return None
+            return GuiVHViewSwitch(self._find_by_name(GuiComponentType.GuiVHViewSwitch))
+
+        def GuiOkCodeField(self) -> Optional[GuiOkCodeField]:
+            if self._component is None: return None
+            return GuiOkCodeField(self._find_by_name(GuiComponentType.GuiOkCodeField))
+
+        def GuiMessageWindow(self) -> Optional[GuiMessageWindow]:
+            if self._component is None: return None
+            return GuiMessageWindow(self._find_by_name(GuiComponentType.GuiMessageWindow))
+
+        def GuiLabel(self) -> Optional[GuiLabel]:
+            if self._component is None: return None
+            return GuiLabel(self._find_by_name(GuiComponentType.GuiLabel))
+
+        def GuiRadioButton(self) -> Optional[GuiRadioButton]:
+            if self._component is None: return None
+            return GuiRadioButton(self._find_by_name(GuiComponentType.GuiRadioButton))
+
+        def GuiTextField(self) -> Optional[GuiTextField]:
+            if self._component is None: return None
+            return GuiTextField(self._find_by_name(GuiComponentType.GuiTextField))
+
+        def GuiCTextField(self) -> Optional[GuiCTextField]:
+            if self._component is None: return None
+            return GuiCTextField(self._find_by_name(GuiComponentType.GuiCTextField))
+
+        def GuiPasswordField(self) -> Optional[GuiPasswordField]:
+            if self._component is None: return None
+            return GuiPasswordField(self._find_by_name(GuiComponentType.GuiPasswordField))
+
+        def GuiStatusbar(self) -> Optional[GuiStatusbar]:
+            if self._component is None: return None
+            return GuiStatusbar(self._find_by_name(GuiComponentType.GuiStatusbar))
+
+        def GuiStatusPane(self) -> Optional[GuiStatusPane]:
+            if self._component is None: return None
+            return GuiStatusPane(self._find_by_name(GuiComponentType.GuiStatusPane))
+
+        # TODO def GuiComboBoxEntry(self) -> Optional[GuiComboBoxEntry]
+
+        def GuiComboBox(self) -> Optional[GuiComboBox]:
+            if self._component is None: return None
+            return GuiComboBox(self._find_by_name(GuiComponentType.GuiComboBox))
+
+        def GuiCheckBox(self) -> Optional[GuiCheckBox]:
+            if self._component is None: return None
+            return GuiCheckBox(self._find_by_name(GuiComponentType.GuiCheckBox))
+
+        def GuiButton(self) -> Optional[GuiButton]:
+            if self._component is None: return None
+            return GuiButton(self._find_by_name(GuiComponentType.GuiButton))
+
+        def GuiBox(self) -> Optional[GuiBox]:
+            if self._component is None: return None
+            return GuiBox(self._find_by_name(GuiComponentType.GuiBox))
+
+        def GuiMenu(self) -> Optional[GuiMenu]:
+            if self._component is None: return None
+            return GuiMenu(self._find_by_name(GuiComponentType.GuiMenu))
+
+        def GuiContextMenu(self) -> Optional[GuiContextMenu]:
+            if self._component is None: return None
+            return GuiContextMenu(self._find_by_name(GuiComponentType.GuiContextMenu))
+
+        def GuiVContainer(self) -> Optional[GuiVContainer]:
+            if self._component is None: return None
+            return GuiVContainer(self._find_by_name(GuiComponentType.GuiVContainer))
+
+        def GuiMenubar(self) -> Optional[GuiMenubar]:
+            if self._component is None: return None
+            return GuiMenubar(self._find_by_name(GuiComponentType.GuiMenubar))
+
+        def GuiGOSShell(self) -> Optional[GuiGOSShell]:
+            if self._component is None: return None
+            return GuiGOSShell(self._find_by_name(GuiComponentType.GuiGOSShell))
+
+        def GuiDialogShell(self) -> Optional[GuiDialogShell]:
+            if self._component is None: return None
+            return GuiDialogShell(self._find_by_name(GuiComponentType.GuiDialogShell))
+
+        def GuiSimpleContainer(self) -> Optional[GuiSimpleContainer]:
+            if self._component is None: return None
+            return GuiSimpleContainer(self._find_by_name(GuiComponentType.GuiSimpleContainer))
+
+        def GuiCustomControl(self) -> Optional[GuiCustomControl]:
+            if self._component is None: return None
+            return GuiCustomControl(self._find_by_name(GuiComponentType.GuiCustomControl))
+
+        def GuiToolbar(self) -> Optional[GuiToolbar]:
+            if self._component is None: return None
+            return GuiToolbar(self._find_by_name(GuiComponentType.GuiToolbar))
+
+        def GuiTitlebar(self) -> Optional[GuiTitlebar]:
+            if self._component is None: return None
+            return GuiTitlebar(self._find_by_name(GuiComponentType.GuiTitlebar))
+
+        def GuiUserArea(self) -> Optional[GuiUserArea]:
+            if self._component is None: return None
+            return GuiUserArea(self._find_by_name(GuiComponentType.GuiUserArea))
+
+        def GuiShell(self) -> Optional[GuiShell]:
+            if self._component is None: return None
+            return GuiShell(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiStage(self) -> Optional[GuiStage]:
+            if self._component is None: return None
+            return GuiStage(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiPicture(self) -> Optional[GuiPicture]:
+            if self._component is None: return None
+            return GuiPicture(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiOfficeIntegration(self) -> Optional[GuiOfficeIntegration]:
+            if self._component is None: return None
+            return GuiOfficeIntegration(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiNetChart(self) -> Optional[GuiNetChart]:
+            if self._component is None: return None
+            return GuiNetChart(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiMap(self) -> Optional[GuiMap]:
+            if self._component is None: return None
+            return GuiMap(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiHTMLViewer(self) -> Optional[GuiHTMLViewer]:
+            if self._component is None: return None
+            return GuiHTMLViewer(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiGraphAdapt(self) -> Optional[GuiGraphAdapt]:
+            if self._component is None: return None
+            return GuiGraphAdapt(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiEAIViewer3D(self) -> Optional[GuiEAIViewer3D]:
+            if self._component is None: return None
+            return GuiEAIViewer3D(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiEAIViewer2D(self) -> Optional[GuiEAIViewer2D]:
+            if self._component is None: return None
+            return GuiEAIViewer2D(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiColorSelector(self) -> Optional[GuiColorSelector]:
+            if self._component is None: return None
+            return GuiColorSelector(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiCalendar(self) -> Optional[GuiCalendar]:
+            if self._component is None: return None
+            return GuiCalendar(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiBarChart(self) -> Optional[GuiBarChart]:
+            if self._component is None: return None
+            return GuiBarChart(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiApoGrid(self) -> Optional[GuiApoGrid]:
+            if self._component is None: return None
+            return GuiApoGrid(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiAbapEditor(self) -> Optional[GuiAbapEditor]:
+            if self._component is None: return None
+            return GuiAbapEditor(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiSplitterContainer(self) -> Optional[GuiSplitterContainer]:
+            if self._component is None: return None
+            return GuiSplitterContainer(self._find_by_name(GuiComponentType.GuiSplitterContainer))
+
+        def GuiSplit(self) -> Optional[GuiSplit]:
+            if self._component is None: return None
+            return GuiSplit(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiInputFieldControl(self) -> Optional[GuiInputFieldControl]:
+            if self._component is None: return None
+            return GuiInputFieldControl(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiTextedit(self) -> Optional[GuiTextedit]:
+            if self._component is None: return None
+            return GuiTextedit(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiToolbarControl(self) -> Optional[GuiToolbarControl]:
+            if self._component is None: return None
+            return GuiToolbarControl(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiTree(self) -> Optional[GuiTree]:
+            if self._component is None: return None
+            return GuiTree(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiChart(self) -> Optional[GuiChart]:
+            if self._component is None: return None
+            return GuiChart(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiSapChart(self) -> Optional[GuiSapChart]:
+            if self._component is None: return None
+            return GuiSapChart(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiComboBoxControl(self) -> Optional[GuiComboBoxControl]:
+            if self._component is None: return None
+            return GuiComboBoxControl(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiGridView(self) -> Optional[GuiGridView]:
+            if self._component is None: return None
+            return GuiGridView(self._find_by_name(GuiComponentType.GuiShell))
+
+        def GuiContainerShell(self) -> Optional[GuiContainerShell]:
+            if self._component is None: return None
+            return GuiContainerShell(self._find_by_name(GuiComponentType.GuiContainerShell))
+
+        def GuiTab(self) -> Optional[GuiTab]:
+            if self._component is None: return None
+            return GuiTab(self._find_by_name(GuiComponentType.GuiTab))
+
+        def GuiTabStrip(self) -> Optional[GuiTabStrip]:
+            if self._component is None: return None
+            return GuiTabStrip(self._find_by_name(GuiComponentType.GuiTabStrip))
+
+        def GuiScrollContainer(self) -> Optional[GuiScrollContainer]:
+            if self._component is None: return None
+            return GuiScrollContainer(self._find_by_name(GuiComponentType.GuiScrollContainer))
+
+        def GuiFrameWindow(self) -> Optional[GuiFrameWindow]:
+            if self._component is None: return None
+            return GuiFrameWindow(self._find_by_name(GuiComponentType.GuiFrameWindow))
+
+        def GuiMainWindow(self) -> Optional[GuiMainWindow]:
+            if self._component is None: return None
+            return GuiMainWindow(self._find_by_name(GuiComponentType.GuiMainWindow))
+
+        def GuiModalWindow(self) -> Optional[GuiModalWindow]:
+            if self._component is None: return None
+            return GuiModalWindow(self._find_by_name(GuiComponentType.GuiModalWindow))
+
+        def GuiTableControl(self) -> Optional[GuiTableControl]:
+            if self._component is None: return None
+            return GuiTableControl(self._find_by_name(GuiComponentType.GuiTableControl))
+
+        def GuiSessionInfo(self) -> Optional[GuiSessionInfo]:
+            if self._component is None: return None
+            return GuiSessionInfo(self._find_by_name(GuiComponentType.GuiSessionInfo))
+
+        def GuiSession(self) -> Optional[GuiSession]:
+            if self._component is None: return None
+            return GuiSession(self._find_by_name(GuiComponentType.GuiSession))
+
+        def GuiConnection(self) -> Optional[GuiConnection]:
+            if self._component is None: return None
+            return GuiConnection(self._find_by_name(GuiComponentType.GuiConnection))
+
+        def GuiApplication(self) -> Optional[GuiApplication]:
+            if self._component is None: return None
+            return GuiApplication(self._find_by_name(GuiComponentType.GuiApplication))
+
+
 class GuiCollection:
     """ GuiCollection é semelhante à coleção GuiComponentCollection, mas seus membros não são necessariamente extensões do objeto GuiComponent.
     Pode ser usado para passar uma coleção como parâmetro para funções de objetos programáveis.
@@ -1622,7 +1922,27 @@ class GuiVContainer(GuiVComponent, GuiContainer):
     GuiVContainer estende o objeto GuiContainer e o objeto GuiVComponent.
     """
 
-    # Criar mais funções de localização de componentes
+    def find_by_name_cast(self, name: str, on_raise: bool = False) -> Optional[FindNameCast]:
+        if on_raise:
+            return FindNameCast(self.component, name, False)
+        else:
+            # noinspection PyBroadException
+            try:
+                return FindNameCast(self.component, name, False)
+            except:
+                pass
+        return None
+
+    def find_all_by_name_cast(self, name: str, on_raise: bool = False) -> Optional[FindNameCast]:
+        if on_raise:
+            return FindNameCast(self.component, name, True)
+        else:
+            # noinspection PyBroadException
+            try:
+                return FindNameCast(self.component, name, True)
+            except:
+                pass
+        return None
 
     def find_all_by_name(self, name: str, type_component: str, on_raise: bool = True) -> Optional[GuiComponentCollection]:
         """ Os métodos FindByName e FindByNameEx retornam apenas o primeiro objeto com nome e tipo correspondentes.
