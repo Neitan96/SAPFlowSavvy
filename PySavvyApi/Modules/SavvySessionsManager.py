@@ -191,7 +191,7 @@ class SavvySessionsManager:
                 sessions.extend(connection.sessions_in_transaction(*self._transactions_is_available))
         return sessions
 
-    def get_available_session(self, conn_description: str, transaction_start: str) -> Optional[GuiSession]:
+    def get_available_session(self, conn_description: str, transaction_start: str, force_singin: bool = True) -> Optional[GuiSession]:
         """ Busca e obtém uma sessão disponível para uso.
         Essa função prepara uma sessão para uso, isso inclui abrir o SAP Logon, abrir uma conexão e
         abrir uma nova sessão, caso necessário, ele somente não irá retornar uma sessão caso o limite
@@ -199,6 +199,7 @@ class SavvySessionsManager:
         Args:
             conn_description: descrição da conexão no SAP
             transaction_start: transação para iniciar a sessão
+            force_singin: Força o login caso já esteja logado em outra máquina
         Returns:
 
         """
@@ -206,6 +207,7 @@ class SavvySessionsManager:
             self._credentials.get_credentials(conn_name=conn_description, save_in_file=self._save_crededentials)
 
         SapGui.close_all_popups()
+        time.sleep(0.5)
 
         if not SapGui.sap_running():
             if not SapGui.start_sap_logon():
@@ -244,8 +246,12 @@ class SavvySessionsManager:
                 return session
 
             elif result == SingInResult.PopupMultiLogin:
-                SavvySingIn.multi_login_select(session, MultiLoginOption.Exit)
-                time.sleep(60)
+                if force_singin:
+                    SavvySingIn.multi_login_select(session, MultiLoginOption.Force)
+                    return session
+                else:
+                    SavvySingIn.multi_login_select(session, MultiLoginOption.Exit)
+                    time.sleep(60)
 
             elif result == SingInResult.WrongCredentials:
                 self._credentials.clear_credentials(conn_description)

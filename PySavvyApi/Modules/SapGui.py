@@ -59,7 +59,8 @@ class SapGui:
 
     @staticmethod
     def __filter_windows_titles(window):
-        return 'SAP GUI for Windows' in window.element_info.rich_text
+        return ('SAP GUI for Windows' in window.element_info.rich_text
+                or 'Version Error' in window.element_info.rich_text)
 
     @staticmethod
     def close_all_popups():

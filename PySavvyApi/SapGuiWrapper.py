@@ -5375,8 +5375,10 @@ class GuiTableControl(GuiVContainer):
         return -1
 
     def fill_column(self, column_name: str, column_type_base: str, values: list[str]):
-        column_index = self.find_column_index(column_name)
 
+        values_sucess = []
+
+        column_index = self.find_column_index(column_name)
         position = -1
         for value_str in values:
             position += 1
@@ -5387,8 +5389,14 @@ class GuiTableControl(GuiVContainer):
                 position = 1
 
             field_id = column_type_base + column_name + ('[{},{}]'.format(column_index, position))
+            try:
+                self.set_text_by_id(field_id, value_str)
+                values_sucess.append(value_str)
+            except Exception as e:
+                position -= 1
+                continue
 
-            self.set_text_by_id(field_id, value_str)
+        return values_sucess
 
     def find_values_text(self, column_name: str, values_search: list[str]):
         # TODO Colocar na lista de funções criadas
