@@ -1,21 +1,28 @@
-import time
-from typing import Optional
-
-import pywinauto
 import win32com.client
+import pywinauto
+import time
 import os
 
 from PySavvyApi.SapGuiWrapper import GuiApplication
 
 class SapGui:
-    """ Classe feita para fazer manipulação na aplicação do Sap Gui.
+    """ Classe feita para fazer manipulação no windows do programa do Sap Gui.
+
+    Responsável por abrir, fechar e verificar, programa está aberto e manipular
+    ambientes fora do SAP que está fora do controle no SAP Gui Scripting, como
+    popups de erro e timeout.
     """
 
+    WINDOW_TITLE_RE = 'SAP GUI for Windows .*'
+    WINDOWS_TITLES = ['SAP GUI for Windows .*', 'Version Error']
+    WINDOWS_BUTTONS = ['Não', 'No', 'OK']
+    SAP_LOGON_PATH = r'C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe'
+
     @staticmethod
-    def get_sap_gui_object(on_raise: bool = False) -> Optional[win32com.client.CDispatch]:
+    def get_sap_gui_object(on_raise: bool = False) -> win32com.client.CDispatch | None:
         """ Obtém o objeto CDispatch do Sap Gui
         Args:
-            on_raise: quando verdadeiro e o SAP Gui não está disponivel ocasiona um erro
+            on_raise: quando verdadeiro e o SAP Gui não está disponível ocasiona um erro
         Returns:
             GuiApplication: Objeto CDispatch do Sap Gui
         """
@@ -28,7 +35,7 @@ class SapGui:
             except: return None
 
     @staticmethod
-    def get_sap_application() -> Optional[GuiApplication]:
+    def get_sap_application() -> GuiApplication | None:
         """ Obtém a aplicação do Sap Gui
         Returns:
             GuiApplication: Aplicação do Sap Gui
@@ -51,24 +58,23 @@ class SapGui:
 
     @staticmethod
     def __filter_buttons_no(element):
-        return (element.element_info.class_name == 'Button'
-                and element.element_info.control_type == 'Button'
-                and (element.element_info.rich_text == 'Não' or element.element_info.rich_text == 'No'
-                     or element.element_info.rich_text == 'OK')
-                )
+        return (element.element_info.class_name == 'Button' and element.element_info.control_type == 'Button'
+                and any(element.element_info.rich_text == button_title for button_title in SapGui.WINDOWS_BUTTONS))
 
     @staticmethod
     def __filter_windows_titles(window):
-        return ('SAP GUI for Windows' in window.element_info.rich_text
-                or 'Version Error' in window.element_info.rich_text)
+        return any(title in window.element_info.rich_text for title in SapGui.WINDOWS_TITLES)
 
     @staticmethod
-    def close_all_popups():
+    def close_all_popups(timeout: int = 3):
         """ Fecha popups de timeout e erros de conexão
+        Args:
+            timeout: Tempo máximo em segundos para procurar popups
         """
         # noinspection PyBroadException
         try:
-            popup_app = pywinauto.Application(backend='uia').connect(title_re='SAP GUI for Windows .*', found_index=0, timeout=15)
+            popup_app = (pywinauto.Application(backend='uia')
+                         .connect(title_re=SapGui.WINDOW_TITLE_RE, found_index=0, timeout=timeout))
             windows_search = list(filter(SapGui.__filter_windows_titles, popup_app.windows()))
 
             for popup_window in windows_search:
@@ -81,15 +87,14 @@ class SapGui:
             pass
 
     @staticmethod
-    def start_sap_logon(sap_logon_path: str = r'C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe',
-                        wait_secs_timeout: int = 30) -> bool:
+    def start_sap_logon(sap_logon_path: str | None = None, wait_secs_timeout: int = 30) -> bool:
         """ Inicia o SAP Logon
 
         Abre o executável do SAP Logon conforme o parâmetro sap_logon_path,
         caso já esteja aberto a função não é executada.
 
         Args:
-            sap_logon_path (str): Caminho do executavel do SAP Logon.
+            sap_logon_path (str): Caminho do executável do SAP Logon.
             wait_secs_timeout (int): Tempo máximo de espera para o SAP Logon abrir.
         """
 
