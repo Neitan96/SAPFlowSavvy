@@ -101,7 +101,7 @@ class SapGui:
         if SapGui.sap_running(): return True
 
         # noinspection PyBroadException
-        try: os.startfile(sap_logon_path)
+        try: os.startfile(sap_logon_path or SapGui.SAP_LOGON_PATH)
         except: return False
 
         while wait_secs_timeout > 0:
