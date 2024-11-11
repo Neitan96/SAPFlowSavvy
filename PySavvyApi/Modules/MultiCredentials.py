@@ -1,7 +1,7 @@
 import os
 import json
-import random
 import datetime
+from random import randint
 from typing import Callable, Literal
 
 
@@ -20,10 +20,10 @@ class MultiCredentials:
     multi_cred = MultiCredentials()
 
     # Registra uma conexão
-    multi_cred.register_conn('ECC', '1. ECC - Produção (DFP)', 'SAP - 100 - 00 - 00 - 00')
+    multi_cred.conn_register('ECC', '1. ECC - Produção (DFP)', 'SAP - 100 - 00 - 00 - 00')
 
     # Registra uma credencial
-    multi_cred.register_cred(conn_name='ECC',
+    multi_cred.creds_register(conn_name='ECC',
                                 username='user1',
                                 password='password1',
                                 cred_id='user1',
@@ -31,7 +31,7 @@ class MultiCredentials:
                                 order=0)
 
     # Registra outra credencial
-    multi_cred.register_cred(conn_name='ECC',
+    multi_cred.creds_register(conn_name='ECC',
                                 username='user2',
                                 password='password2',
                                 cred_id='user2',
@@ -39,22 +39,22 @@ class MultiCredentials:
                                 order=1)
 
     # Lista as credenciais registradas
-    print(multi_cred.list_cred())
+    print(multi_cred.creds_list())
 
     # Habilita o gerador de senha padrão
-    multi_cred.set_default_password_gen()
+    multi_cred.pass_gen_set_default_gen()
 
     # Gera uma nova senha para a credencial
-    multi_cred.gen_new_password('user1')
+    multi_cred.creds_gen_new_pass('user1')
 
     # Busca as credenciais registradas
-    print(multi_cred.find_creds(conn_name='ECC', transactions=['S000']))
+    print(multi_cred.creds_find(conn_name='ECC', transactions=['S000']))
 
     # Deleta uma credencial registrada
-    multi_cred.delete_cred('user1')
+    multi_cred.creds_delete('user1')
 
     # Deleta todas as credenciais registradas
-    multi_cred.delete_all_creds()
+    multi_cred.creds_delete_all()
     ```
 
     Arquivo de exemplo: PySavvyApi/Modules/MultiCredentialsExample.json
@@ -62,7 +62,7 @@ class MultiCredentials:
 
     _file_path: str  # Caminho do arquivo para salvar as credenciais do usuário
     _credentials: dict  # Cache de credenciais do usuário
-    _password_gen: Callable[[str, str], str] | None  # Gerador de senhas caso o sap requisitar a troca de senha
+    _password_gen: Callable[[str, str, str], str] | None  # Gerador de senhas caso o sap requisitar a troca de senha
     _credentials_user_input: Callable[[str, str], str] | None  # Função para obter as credenciais do usuário
 
     def __init__(self, file_path: str = None):
@@ -70,26 +70,28 @@ class MultiCredentials:
         self._file_path = file_path
         self._credentials = {}
         self._password_gen = None
-        self.load_file()
+        self.load_creds_file()
 
     # noinspection PyUnusedLocal
     @staticmethod
-    def default_password_gen(username: str, conn_name: str) -> str:
+    def default_password_gen(username: str, conn_name: str, password_now: str) -> str:
         """ Gerador de senha padrão
         Gera uma senha padrão baseada no nome do usuário data e número aleatório.
 
         Args:
             username (str): Nome do usuário
             conn_name (str): Nome da conexão
+            password_now (str): Senha de atual
 
         Returns:
             str: Senha gerada
         """
-        return (f'{username[:5]}'
-                f'@{random.randint(1000,9999)}'
-                f'@{datetime.datetime.now().strftime("%Y%m")}')
+        new_password = f'{username[:5]}@{datetime.datetime.now().strftime("%Y%m")}'
+        if new_password == password_now:
+            new_password += str(randint(1000,9999))
+        return new_password
 
-    def set_default_password_gen(self):
+    def pass_gen_set_default_gen(self):
         """ Define o gerador de senha padrão
 
         Define o gerador de senha padrão, caso o sap requisitar a troca de senha,
@@ -98,7 +100,7 @@ class MultiCredentials:
         self._password_gen = self.default_password_gen
 
     @property
-    def password_generator(self) -> Callable[[str, str], str] | None:
+    def pass_gen(self) -> Callable[[str, str], str] | None:
         """ Gerador de senha
 
         Returns:
@@ -106,8 +108,8 @@ class MultiCredentials:
         """
         return self._password_gen
 
-    @password_generator.setter
-    def password_generator(self, generator: Callable[[str, str], str]):
+    @pass_gen.setter
+    def pass_gen(self, generator: Callable[[str, str, str], str]):
         """ Define o gerador de senha
         Define o gerador de senha, caso o sap requisitar a troca de senha,
 
@@ -125,23 +127,23 @@ class MultiCredentials:
     @file_path_credentials.setter
     def file_path_credentials(self, file_path: str):
         self._file_path = file_path
-        self.load_file()
+        self.load_creds_file()
 
-    def load_file(self):
+    def load_creds_file(self):
         """ Carrega as credenciais do arquivo
         """
         if os.path.exists(self._file_path):
             with open(self._file_path, 'r') as file:
                 self._credentials = json.load(file)
 
-    def save_file(self):
+    def save_creds_file(self):
         """ Salva as credenciais no arquivo
         """
         with open(self._file_path, 'w', encoding ='utf8') as file:
             # noinspection PyTypeChecker
             json.dump(self._credentials, file, indent=4)
 
-    def register_conn(self, conn_id: str, conn_description: str | None, conn_string: str | None, replace: bool = False):
+    def conn_register(self, conn_id: str, conn_description: str | None, conn_string: str | None, replace: bool = False):
         """ Registra uma conexão nomeada
         Registra uma conexão serve para garantir que a conexão exista no arquivo de credenciais,
         não irá substituir a conexão caso ela já exista, apenas se o parâmetro replace for True.
@@ -160,12 +162,12 @@ class MultiCredentials:
             return
         if conn_description is None and conn_description != '':
             self._credentials['Connections'][conn_id] = {'Description': conn_description}
-            self.save_file()
+            self.save_creds_file()
         elif conn_string is None and conn_string != '':
             self._credentials['Connections'][conn_id] = {'ConnectionString': conn_string}
-            self.save_file()
+            self.save_creds_file()
 
-    def list_conn(self) -> list:
+    def conn_list_ids(self) -> list:
         """ Lista as conexões registradas
         Retorna uma lista com os identificadores das conexões registradas.
 
@@ -194,7 +196,7 @@ class MultiCredentials:
         type_conn = next(iter(creds.keys()))
         return type_conn, creds[type_conn]
 
-    def find_conn_desc(self, conn_description: str) -> str | None:
+    def conn_find_desc(self, conn_description: str) -> str | None:
         """ Retorna o identificador da conexão
         Retorna o identificador da conexão baseado na descrição da conexão.
 
@@ -212,7 +214,7 @@ class MultiCredentials:
                 return conn_id
         return None
 
-    def find_conn_string(self, conn_string: str) -> str | None:
+    def conn_find_conn_string(self, conn_string: str) -> str | None:
         """ Retorna o identificador da conexão
         Retorna o identificador da conexão baseado na string de conexão.
 
@@ -230,7 +232,7 @@ class MultiCredentials:
                 return conn_id
         return None
 
-    def delete_conn(self, conn_id: str):
+    def conn_delete(self, conn_id: str):
         """ Deleta uma conexão registrada
         Deleta uma conexão registrada, caso a conexão não exista, não faz nada.
 
@@ -240,17 +242,17 @@ class MultiCredentials:
         conn_id = conn_id.lower()
         if conn_id in self._credentials['Connections']:
             del self._credentials['Connections'][conn_id]
-            self.save_file()
+            self.save_creds_file()
 
-    def delete_all_conns(self):
+    def conn_delete_all(self):
         """ Deleta todas as conexões registradas
         """
         self._credentials['Connections'] = {}
-        self.save_file()
+        self.save_creds_file()
 
-    def register_cred(self, conn_name: str, username: str | None = None, password: str | None = None,
-                      cred_id: str | None = None, transactions: list[str] = None, order: int | None = None,
-                      replace_pass: bool = False) -> str:
+    def creds_register(self, conn_name: str, username: str | None = None, password: str | None = None,
+                       cred_id: str | None = None, transactions: list[str] = None, order: int | None = None,
+                       replace_pass: bool = False) -> str:
         """ Faz o registro de uma credencial.
         Somente é necessário fazer o registro de uma credencial caso deseje fazer a busca por credenciais
         específicas durante a execução do programa ou queria registrar multiplas credenciais para a mesma conexão,
@@ -293,9 +295,9 @@ class MultiCredentials:
             'Transactions': transactions or []
         }
 
-        self.save_file()
+        self.save_creds_file()
 
-    def list_cred(self) -> list:
+    def creds_list(self) -> list:
         """ Lista as credenciais registradas
         Retorna uma lista com os identificadores das credenciais registradas.
 
@@ -306,7 +308,7 @@ class MultiCredentials:
             return []
         return list(self._credentials['Credentials'].keys())
 
-    def find_creds(self, conn_name: str = None, transactions: list[str] = None, username: str = None,
+    def creds_find(self, conn_name: str = None, transactions: list[str] = None, username: str = None,
                    order_min: int | None = 0, order_max: int | None = None) -> dict[str, dict]:
         """ Busca as credenciais registradas pelos parâmetros fornecidos.
         Ao passar algum parâmetro None, ele não será considerado na busca.
@@ -340,7 +342,7 @@ class MultiCredentials:
             creds[cred_id] = cred
         return creds
 
-    def cred(self, cred_id: str) -> dict | None:
+    def creds(self, cred_id: str) -> dict | None:
         """ Retorna as informações da credencial
         Retorna as informações da credencial registrada.
 
@@ -354,7 +356,7 @@ class MultiCredentials:
             return None
         return self._credentials['Credentials'][cred_id]
 
-    def set_password(self, cred_id: str, password: str):
+    def creds_set_password(self, cred_id: str, password: str | None):
         """ Define a senha da credencial
         Define a senha da credencial registrada.
 
@@ -370,9 +372,18 @@ class MultiCredentials:
             self._credentials['Credentials'][cred_id]['Password'] = password
         else:
             del self._credentials['Credentials'][cred_id]['Password']
-        self.save_file()
+        self.save_creds_file()
 
-    def gen_new_password(self, cred_id: str) -> str | None:
+    def creds_invalidate_pass(self, cred_id: str):
+        """ Invalida a senha da credencial
+        Invalida a senha da credencial registrada, removendo a senha da credencial.
+
+        Args:
+            cred_id (str): Identificador da credencial
+        """
+        self.creds_set_password(cred_id, None)
+
+    def creds_gen_new_pass(self, cred_id: str) -> str | None:
         """ Gera uma nova senha para a credencial
         Gera uma nova senha para a credencial, caso o gerador de senha não esteja definido,
         não será gerada uma nova senha.
@@ -391,15 +402,18 @@ class MultiCredentials:
             return None
 
         cred_infos = self._credentials['Credentials'][cred_id]
-        new_password = self._password_gen(cred_infos['Username'], cred_infos['ConnectionName'])
+        password_now = None
+        if 'Password' in cred_infos:
+            password_now = cred_infos['Password']
+        new_password = self._password_gen(cred_infos['Username'], cred_infos['ConnectionName'], password_now)
         if new_password is None:
             return None
 
         self._credentials['Credentials'][cred_id]['Password'] = new_password
-        self.save_file()
+        self.save_creds_file()
 
 
-    def delete_cred(self, cred_id: str):
+    def creds_delete(self, cred_id: str):
         """ Deleta uma credencial registrada
         Deleta uma credencial registrada, caso a credencial não exista, não faz nada.
 
@@ -409,10 +423,10 @@ class MultiCredentials:
         if 'Credentials' not in self._credentials or cred_id not in self._credentials['Credentials']:
             return
         del self._credentials['Credentials'][cred_id]
-        self.save_file()
+        self.save_creds_file()
 
-    def delete_all_creds(self):
+    def creds_delete_all(self):
         """ Deleta todas as credenciais registradas
         """
         self._credentials['Credentials'] = {}
-        self.save_file()
+        self.save_creds_file()

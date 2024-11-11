@@ -1,5 +1,3 @@
-import time
-
 from PySavvyApi.SapGuiWrapper import *
 from PySavvyApi.StdTCodes import SapTransactions
 from PySavvyApi.Modules.SapGui import SapGui

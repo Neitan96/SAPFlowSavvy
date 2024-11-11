@@ -1,5 +1,5 @@
 from PySavvyApi.Modules.SapGui import SapGui
-from PySavvyApi.SapGuiWrapper import *
+from PySavvyApi.SapGuiWrapper import GuiApplication, GuiSession
 
 class SavvySessionsFilter:
     """ Classe feita para facilitar a obtenção de sessões a partir de filtros.
@@ -51,7 +51,7 @@ class SavvySessionsFilter:
     def conn_sessions_count_max(self, max_sessions: int) -> None:
         self._sessions_app_count_max = max_sessions
 
-    def get_sessions(self) -> Optional[list[GuiSession]]:
+    def get_sessions(self) -> list[GuiSession] | None:
         """ Faz a busca das sessões conforme os filtros definidos.
         Returns:
             list[GuiSession]: Sessões filtradas
