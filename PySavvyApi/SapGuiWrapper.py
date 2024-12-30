@@ -3493,46 +3493,51 @@ class GuiGridView(GuiShell):
     """ A visualização em grade é semelhante ao controle de tabela dynpro, mas significativamente mais poderosa.
     """
 
-    def extract_data(self, columns: Optional[list[str]] = None, delay_page: float = 0) -> list[list[str]]:
-        if columns is None:
-            columns = self.column_order.to_list()
-            columns = [str(column) for column in columns]
-
+    def iter_grid(self, column: str | None = None, pre_load: bool = False, delay_on_next_page: float = 0):
         self.component_cache = True
         row_count = self.row_count
         page_size = self.visible_row_count
+
+        if column is None:
+            column = str(self.column_order.item(0))
+
+        if pre_load:
+            list(self.iter_grid(column, False))
+
         position_now = 0
-        data_table = []
-
-        self.set_current_cell(position_now, columns[0])
-        for row in range(row_count):
-            if row > position_now + page_size:
-                position_now = row + page_size - 1
-                position_now = min(row_count-1, position_now)
-                self.set_current_cell(position_now, columns[0])
-                if delay_page > 0:
-                    time.sleep(delay_page)
-
-            data_row = [self.get_cell_value(row, column) for column in columns]
-            data_table.append(data_row)
-
-        return data_table
-
-    def double_click_proc_cell(self, column: str, value_search: str):
-
-        self.component_cache = True
-        row_count = self.row_count
-        page_size = self.visible_row_count
-        position_now = 0
-
         self.set_current_cell(position_now, column)
         for row in range(row_count):
             if row > position_now + page_size:
                 position_now = row + page_size - 1
                 position_now = min(row_count-1, position_now)
                 self.set_current_cell(position_now, column)
+                if delay_on_next_page > 0:
+                    time.sleep(delay_on_next_page)
+            yield row
 
-            if str(self.get_cell_value(row, column)) == value_search:
+    def __iter__(self):
+        return self.iter_grid()
+
+    def extract_data(self, columns: Optional[list[str]] = None, pre_load: bool = True, delay_on_next_page: float = 0) -> list[list[str]]:
+        if columns is None:
+            columns = self.column_order.to_list()
+            columns = [str(column) for column in columns]
+
+        data_table = []
+        for row in self.iter_grid(columns[0], pre_load=pre_load, delay_on_next_page=delay_on_next_page):
+            data_row = [self.get_cell_value(row, column) for column in columns]
+            data_table.append(data_row)
+
+        return data_table
+
+    def double_click_proc_cell(self, column: str, value_search: str, ignore_case: bool = False, pre_load: bool = True, delay_on_next_page: float = 0):
+        if ignore_case:
+            value_search = value_search.lower()
+        for row in self.iter_grid(column, pre_load=pre_load, delay_on_next_page=delay_on_next_page):
+            if ignore_case and str(self.get_cell_value(row, column)).lower() == value_search:
+                self.double_click(row, column)
+                return
+            if (not ignore_case) and str(self.get_cell_value(row, column)) == value_search:
                 self.double_click(row, column)
                 return
 
