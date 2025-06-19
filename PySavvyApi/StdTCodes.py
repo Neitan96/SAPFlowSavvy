@@ -1,4 +1,9 @@
 
+class SapConnNames:
+    ECC = '1. ECC - Produção (DFP)'
+    EWM = '2. EWM - Produção (EWP)'
+
+
 class SapTransactions:
     LOGIN = 'S000'  # Tela de login
     MAIN_MENU = 'SESSION_MANAGER'  # Menu principal
